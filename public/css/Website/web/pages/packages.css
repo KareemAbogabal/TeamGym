@@ -1,0 +1,114 @@
+﻿@import url("../public.css");
+
+header nav main {
+  width: 56%;
+}
+
+.section-1 {
+  position: relative;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: end;
+}
+
+.section-1 > h1 {
+  position: absolute;
+  top: clamp(23%, calc(23% + ((2020px - 100vw) / 30) ), 83%);
+  font-family: "Oswald", sans-serif;
+  width: 100%;
+  white-space: nowrap;
+  line-height: 1;
+  font-size: clamp(180px, 26vw, 357px);
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke-width: 2px;
+  -webkit-text-stroke-color: rgba(255,255,255,0.41);
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+}
+
+.section-1 main {
+  width: 100%;
+}
+
+.section-1 .content {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: end;
+}
+
+.section-1 .content h1 {
+  position: absolute;
+  top: clamp(-10px, calc((100vw - 1200px) * -0.15), 0px);
+  width: clamp(700px, 80vw, 900px);
+  text-align: center;
+  font-size: clamp(48px, 12vw, 160px);
+  text-transform: capitalize;
+  color: rgb(245, 239, 184);
+  user-select: none;
+  z-index: 1;
+}
+
+.section-1 .content::after {
+  content: "";
+  position: absolute;
+  bottom: -27px;
+  width: 288px;
+  height: 58px;
+  background-color: rgb(45, 45, 45);
+  filter: blur(20px);
+  -webkit-filter: blur(13px);
+  z-index: 3;
+}
+
+.section-1 .content img {
+  position: relative;
+  width: clamp(220px, 36vw, 640px);
+  height: auto;
+  filter: drop-shadow(0px 0px 280px rgb(255, 255, 255));
+  -webkit-filter: drop-shadow(0px 0px 280px rgb(255, 255, 255));
+  pointer-events: none;
+  z-index: 2;
+}
+
+.section-2 {
+  padding: 10px 0px;
+  width: 100%;
+  height: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: column;
+  background-color: #0a0a0a;
+}
+
+.section-2 .systems .card,
+.section-2 .systems .pro {
+  overflow: visible;
+}
+
+.header {
+  margin: 50px 20px;
+}
+
+.header h1 {
+  margin: 10px;
+  color: white;
+  text-align: center;
+  text-transform: capitalize;
+  font-size: var(--fontSizeHeaderSection);
+}
+
+.header p {
+  color: var(--colorParagraph);
+  text-align: center;
+  font-size: 13px;
+}
+
+mark {
+  background-color: transparent;
+  color: var(--colorMark);
+}

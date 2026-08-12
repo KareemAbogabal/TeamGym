@@ -1,0 +1,194 @@
+@import url("../public.css");
+
+:root {
+  --colorSVG1: #b3b3b3ce;
+  --colorSVG2: #474747a6;
+  --bg: #f7f8fb;
+  --colorTitle: #535353;
+  --accent-1: #fce296;
+  --accent-2: #5cff9d;
+  --accent-3: #4a90ff;
+  --accent-4: #e98b51;
+  --accent-5: #9653fc;
+  --accent-6: #5fffda;
+  --shadow: 0 8px 24px rgba(12, 14, 20, 0.897);
+  --radius: 12px;
+  --max-width: 1100px;
+  --gap: 22px;
+  --page-padding: 36px;
+  --btn-bg: var(--colorPearnt);
+  --btn-color: #fff;
+}
+
+header nav main {
+  width: 60%;
+}
+
+.privacy-page {
+  padding: 100px 0px 0px 0px;
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.privacy-page .group {
+  margin-bottom: 70px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.privacy-page .group  .section-title {
+  margin: 35px 0px;
+  font-size: clamp(20px, 3vw, var(--fontSizeHeaderSection));
+  font-weight: 800;
+  color: rgb(233, 233, 233);
+  text-align: center;
+}
+
+.privacy-page .group .cards-grid {
+  width: 80%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(100px, 1fr));
+  gap: var(--gap);
+}
+
+.privacy-page .group .card {
+  width: 100%;
+  padding: 16px;
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  border: 1px solid rgba(15, 15, 15, 0.04);
+  background-color: transparent;
+  border-radius: 12px;
+  -webkit-border-radius: 12px;
+  -moz-border-radius: 12px;
+  -ms-border-radius: 12px;
+  -o-border-radius: 12px;
+  transition: transform 0.16s ease;
+  -webkit-transition: transform 0.16s ease;
+  -moz-transition: transform 0.16s ease;
+  -ms-transition: transform 0.16s ease;
+  -o-transition: transform 0.16s ease;
+}
+
+.privacy-page .group .card:hover {
+  transform: translateY(-6px);
+  -webkit-transform: translateY(-6px);
+  -moz-transform: translateY(-6px);
+  -ms-transform: translateY(-6px);
+  -o-transform: translateY(-6px);
+}
+
+.privacy-page .group .card .card-icon {
+  width: 64px;
+  min-width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  -webkit-border-radius: 12px;
+  -moz-border-radius: 12px;
+  -ms-border-radius: 12px;
+  -o-border-radius: 12px;
+}
+
+.privacy-page .group .card .card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.privacy-page .group .card .card-content .card-title {
+  color: #dbdbdb;
+  font-weight: 700;
+}
+
+.privacy-page .group .card .card-content .card-text {
+  color: var(--colorParagraph);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.privacy-page .group .card .accent--gold {
+  background: linear-gradient(180deg, var(--colorGold), var(--accent-1));
+  color: var(--colorPearnt);
+}
+
+.privacy-page .group .card .accent--green {
+  background: linear-gradient(180deg, var(--accent-2), #b2ffbb);
+  color: var(--colorPearnt);
+}
+
+.privacy-page .group .card .accent--blue {
+  background: linear-gradient(180deg, var(--accent-3), #7c9dd8);
+  color: var(--colorPearnt);
+}
+
+.privacy-page .group .card .accent--orange {
+  background: linear-gradient(180deg, var(--accent-4), #ffc095);
+  color: var(--colorPearnt);
+}
+
+.privacy-page .group .card .accent--purple {
+  background: linear-gradient(180deg, var(--accent-5), #bba4ff);
+  color: var(--colorPearnt);
+}
+
+.privacy-page .group .card .accent--teal {
+  background: linear-gradient(180deg, var(--accent-6), #a2ffeb);
+  color: var(--colorPearnt);
+}
+
+.privacy-page .cta {
+  margin: 20px;
+  padding: 22px;
+  background: linear-gradient(90deg, #e0ec38, #d3a304);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: column;
+  border-radius: 14px;
+  -webkit-border-radius: 14px;
+  -moz-border-radius: 14px;
+  -ms-border-radius: 14px;
+  -o-border-radius: 14px;
+}
+
+.privacy-page .cta .content {
+  margin: 0px 0px 20px 0px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: column;
+}
+
+.privacy-page .cta-title {
+  font-weight: 800;
+  font-size: 22px;
+}
+
+.privacy-page .cta-desc {
+  color: var(--colorTitle);
+  margin: 10px 0px;
+  font-size: 12px;
+}
+
+.privacy-page .cta-btn {
+  background: var(--btn-bg);
+  color: var(--btn-color);
+  text-decoration: none;
+  font-size: 15px;
+  padding: 10px 16px;
+  border: none;
+  font-weight: 700;
+  border-radius: 10px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
+  cursor: pointer;
+}

@@ -1,0 +1,73 @@
+@import url("https://fonts.googleapis.com/css2?family=Varela+Round&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap");
+@import url("../../variables.css");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Varela Round", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+*::selection {
+  background-color: rgb(253, 217, 55);
+  color: white;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+html[lang="ar"] * {
+  font-family: "Cairo", sans-serif;
+  line-height: 1.2 !important;
+}
+
+html::-webkit-scrollbar {
+  background-color: var(--colorPearnt);
+  width: 5px;
+}
+
+html::-webkit-scrollbar-thumb {
+  background-color: var(--colorAverage);
+  border-radius: 20px;
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  -ms-border-radius: 20px;
+  -o-border-radius: 20px;
+}
+
+body {
+  background-color: var(--colorPearnt);
+  padding: 4px;
+}
+
+html[lang="ar"] i[class^="fa-solid"],
+html[lang="ar"] i[class*=" fa-solid"] {
+  font-family: "Font Awesome 6 Free" !important;
+  font-weight: 900;
+}
+
+html[lang="ar"] i[class^="fa-brands"],
+html[lang="ar"] i[class*="fa-brands"] {
+  font-family: "Font Awesome 6 Brands" !important;
+  font-weight: 400;
+}
+
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined" !important;
+}
+
+.fa-regular {
+  font-family: "Font Awesome 6 Free" !important;
+  font-weight: 400;
+}
+
+img {
+  -webkit-user-drag: none;
+  user-select: none;
+  object-fit: cover;
+}

@@ -1,0 +1,28 @@
+:root {
+  --colorGold: rgb(255, 230, 91);
+  --colorAverage: rgb(236, 234, 74);
+  --colorSVG1: rgb(255, 240, 150);
+  --colorSVG2: rgb(255, 230, 91);
+  --colorPearnt: rgb(15, 15, 15);
+  --colorPearntSection: rgb(22, 22, 22);
+  --colorOfOpacityLight: rgba(165, 164, 164, 0.295);
+  --colorParagraph: rgb(126, 126, 126);
+  --colorReverse: rgb(224, 224, 224);
+  --colorReverseBg: rgb(46, 46, 46);
+  --colorSVGAnalytcis: #82eb58;
+  --colorCheck: #82eb58;
+  --colorError: #ff4a4a;
+  --glass-bg: rgba(18, 18, 18, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+.light {
+  --colorPearnt: rgb(238, 238, 238);
+  --colorPearntSection: rgb(233, 233, 233);
+  --colorReverse: rgb(31, 31, 31);
+  --colorReverseBg: rgb(230, 230, 230);
+  --glass-bg: rgba(255, 255, 255, 0.55);
+  --glass-border: rgba(0, 0, 0, 0.12);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}

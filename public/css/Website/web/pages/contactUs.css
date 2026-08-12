@@ -1,0 +1,94 @@
+@import url("../public.css");
+
+.section-1 {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 140px 20px 60px;
+}
+
+.section-1 .content {
+  width: 100%;
+  max-width: 540px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.section-1 .content h1 {
+  color: white;
+  font-size: clamp(30px, 5vw, 46px);
+  text-transform: capitalize;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.section-1 .content > p {
+  color: var(--colorParagraph);
+  text-align: center;
+  font-size: 14px;
+  margin-bottom: 32px;
+}
+
+.contact-form {
+  width: 100%;
+  padding: 30px;
+  background: linear-gradient(160deg, rgba(32, 32, 32, 0.7), rgba(12, 12, 12, 0.9));
+  border: 1px solid rgba(255, 230, 91, 0.14);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+}
+
+.contact-form .main-input {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.contact-form label {
+  color: var(--colorGold);
+  font-size: 14px;
+  text-transform: capitalize;
+}
+
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  padding: 12px 14px;
+  background-color: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  color: white;
+  outline: none;
+  font-family: inherit;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.contact-form textarea {
+  resize: vertical;
+  min-height: 130px;
+}
+
+.contact-form input::placeholder,
+.contact-form textarea::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  border-color: var(--colorGold);
+}
+
+.contact-form .card-btn {
+  width: 100%;
+  padding: 13px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 15px;
+}

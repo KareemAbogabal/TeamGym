@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="csrf-token" content="harness-test">
+<title>InBody OCR harness</title>
+<style>
+  body { font-family: monospace; margin: 8px; background:#111; color:#eee; }
+  pre { white-space: pre-wrap; font-size: 12px; max-height: 90vh; overflow: auto; border: 1px solid #444; padding: 8px; }
+  .img-up { display: none; }
+</style>
+</head>
+<body>
+  <div id="dom">
+    <input type="file" id="body" class="inbodyUpload" name="img">
+    <span id="status"></span>
+    <button type="button" class="show-img-inBody">show</button>
+    <button type="button" class="remove-img-inBody">x</button>
+    <span class="weight"></span>
+    <span class="BMI"></span>
+    <span class="PBF"></span>
+    <span class="SMM"></span>
+    <span class="KCAL"></span>
+    <span class="water"></span>
+    <span class="fat_mass"></span>
+    <span class="protein"></span>
+    <span class="right-arm-lean-kg"></span>
+    <span class="left-arm-lean-kg"></span>
+    <span class="right-leg-lean-kg"></span>
+    <span class="left-leg-lean-kg"></span>
+    <span class="right-arm-fat-kg"></span>
+    <span class="left-arm-fat-kg"></span>
+    <span class="right-leg-fat-kg"></span>
+    <span class="left-leg-fat-kg"></span>
+    <div class="img-up"><div class="content"><div class="img"></div></div></div>
+  </div>
+  <pre id="out">waiting...</pre>
+
+  <script src="js/Website/Dashboard/pages/Inbody-coordinates.js?v=harness"></script>
+
+  <script>
+    // Intercept the network calls the original page makes so the harness runs offline.
+    const realFetch = window.fetch.bind(window);
+    window.fetch = (url, opts) => {
+      const u = String(url);
+      if (u === "/lineage" || u === "/save-img") {
+        console.log("[harness] blocked fetch:", u);
+        return Promise.resolve(new Response("{}", { status: 200, headers: { "Content-Type": "application/json" } }));
+      }
+      return realFetch(url, opts);
+    };
+
+    const q = new URLSearchParams(location.search);
+    const imgName = q.get("img") || "IMG20250908193729.jpg";
+    const out = document.getElementById("out");
+    const log = (msg) => { out.textContent = msg; };
+
+    function compact() {
+      const f = window.__finalDebug;
+      const g = {
+        weight: document.querySelector(".weight").textContent,
+        bmi: document.querySelector(".BMI").textContent,
+        pbf: document.querySelector(".PBF").textContent,
+        smm: document.querySelector(".SMM").textContent,
+        kcal: document.querySelector(".KCAL").textContent,
+        water: document.querySelector(".water").textContent,
+        fat_mass: document.querySelector(".fat_mass").textContent,
+        protein: document.querySelector(".protein").textContent,
+        right_arm_lean: document.querySelector(".right-arm-lean-kg").textContent,
+        left_arm_lean: document.querySelector(".left-arm-lean-kg").textContent,
+        right_leg_lean: document.querySelector(".right-leg-lean-kg").textContent,
+        left_leg_lean: document.querySelector(".left-leg-lean-kg").textContent,
+        right_arm_fat: document.querySelector(".right-arm-fat-kg").textContent,
+        left_arm_fat: document.querySelector(".left-arm-fat-kg").textContent,
+        right_leg_fat: document.querySelector(".right-leg-fat-kg").textContent,
+        left_leg_fat: document.querySelector(".left-leg-fat-kg").textContent,
+      };
+      const rows = {};
+      if (f) {
+        for (const k of ["weight","tbw","protein","fat","smm","kcal","bmi","pbf"]) {
+          const l = f.located && f.located[k];
+          rows[k] = l ? { value: l.value, kind: l.kind } : null;
+        }
+      }
+      return { image: imgName, sheet: window.__sheet_bounds && {
+        x: Math.round(window.__sheet_bounds.x), y: Math.round(window.__sheet_bounds.y),
+        w: Math.round(window.__sheet_bounds.w), h: Math.round(window.__sheet_bounds.h),
+        angle: window.__sheet_bounds.angle, fullFrame: !!window.__sheet_bounds.fullFrame
+      }, spans: g, located: rows };
+    }
+
+    async function runImage() {
+      try {
+        const r = await fetch("images/" + imgName);
+        if (!r.ok) throw new Error("fetch " + imgName + " -> " + r.status);
+        const blob = await r.blob();
+        const file = new File([blob], imgName, { type: "image/jpeg" });
+        const input = document.querySelector(".inbodyUpload");
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        input.files = dt.files;
+        window.__currentFile = file;
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+        const start = Date.now();
+        const poll = setInterval(() => {
+          const st = document.getElementById("status").textContent || "";
+          if (window.__finalDebug || /خطأ/.test(st)) {
+            clearInterval(poll);
+            const c = compact();
+            c.elapsedSec = Math.round((Date.now() - start) / 1000);
+            c.status = st;
+            c.done = true;
+            log(JSON.stringify(c, null, 2));
+            window.__harnessDone = true;
+          }
+        }, 800);
+        setTimeout(() => { clearInterval(poll); if (!window.__harnessDone) { log("TIMEOUT. status=" + document.getElementById("status").textContent); window.__harnessDone = true; } }, 20 * 60 * 1000);
+      } catch (err) {
+        log("ERROR: " + err.message);
+        window.__harnessDone = true;
+      }
+    }
+
+    const loadTesseract = () => new Promise((resolve, reject) => {
+      if (typeof Tesseract !== "undefined") return resolve();
+      const s = document.createElement("script");
+      s.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error("failed to load tesseract.js"));
+      document.head.appendChild(s);
+    });
+
+    loadTesseract().then(runImage).catch((e) => log("ERROR: " + e.message));
+  </script>
+</body>
+</html>
