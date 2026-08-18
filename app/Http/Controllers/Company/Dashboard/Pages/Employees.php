@@ -48,6 +48,7 @@ class Employees extends Controller {
       $settingCompany->subscription_application_form = true;
       $settingCompany->save();
     };
+    notifySuccess(__('messages.saved-successfully'));
     return back();
   }
 }

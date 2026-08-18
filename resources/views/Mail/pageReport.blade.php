@@ -3,203 +3,128 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Login Notification Card</title>
-  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <title>Team Gym Report</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --yellow: #FFEE53;
-      --purple: #f8bf43;
-      --muted: #4b4b4b;
-      --card-width: 600px;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family:  "Lato", Arial, sans-serif;
-      background: linear-gradient(180deg, #fff 0%, #f7f7f8 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      background: #0a0a0a;
       min-height: 100vh;
-      padding: 20px;
-      color: var(--muted);
+      padding: 40px 20px;
+      color: #e0e0e0;
+      -webkit-font-smoothing: antialiased;
     }
-
-    .wrapper {
-      width: 100%;
-      max-width: var(--card-width);
-    }
-
+    .wrapper { width: 100%; max-width: 520px; margin: 0 auto; }
     .card {
-      background:  var(--yellow);
-      border-radius: 14px;
+      background: linear-gradient(145deg, #141414 0%, #0d0d0d 100%);
+      border: 1px solid rgba(255, 230, 91, 0.08);
+      border-radius: 20px;
       overflow: hidden;
-      box-shadow: 0 12px 30px rgba(50,8,165,0.12);
-      border: 1px solid rgba(0,0,0,0.04);
+      box-shadow: 0 25px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03);
     }
-
     .card-header {
       display: flex;
       align-items: center;
-      gap: 16px;
-      padding: 22px;
-      background: linear-gradient(90deg, rgba(255,238,83,0.95) 0%, rgba(255,243,180,0.95) 100%);
+      gap: 14px;
+      padding: 24px 28px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
     }
-
-    .card-header img {
-      margin: 10px;
-      width: 70px;
-      height: 70px;
-      display: block;
+    .logo-mark {
+      width: 44px; height: 44px;
+      border-radius: 12px;
       object-fit: cover;
     }
-
-    .title  {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
+    .brand { flex: 1; }
+    .brand h1 {
+      font-size: 15px; font-weight: 600;
+      color: #ffe65b;
+      letter-spacing: 0.3px;
     }
-
-    .title h1 {
-      font-size: 16px;
-      color: var(--muted);
-      margin-bottom: 6px;
-      letter-spacing: 0.2px;
+    .brand p {
+      font-size: 11px; font-weight: 400;
+      color: rgba(255,255,255,0.3);
+      margin-top: 1px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
-
-    .title p {
-      font-size: 13px;
-      color: rgba(0,0,0,0.6);
-    }
-
-    .card-body {
-      padding: 20px 22px;
-      background: linear-gradient(90deg, rgba(255,243,180,0.95) 0%, rgba(255,238,83,0.95) 100%);
-    }
-
+    .card-body { padding: 28px; }
     .greeting {
-      font-size: 16px;
-      margin-bottom: 14px;
-      color: #222;
+      font-size: 15px; font-weight: 400;
+      color: rgba(255,255,255,0.65);
+      margin-bottom: 24px;
+      line-height: 1.5;
     }
-
-    .details {
-      background: rgba(255,255,255,0.35);
-      border-radius: 10px;
-      padding: 12px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
+    .greeting strong { color: #fff; font-weight: 600; }
+    .message-block {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 20px;
     }
-
-    .detail-item {
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
+    .message-block .detail-label {
+      font-size: 10px; font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: rgba(255,255,255,0.25);
+      margin-bottom: 10px;
     }
-
-    .icon-wrap {
-      width: 36px;
-      height: 36px;
-      min-width: 36px;
-      border-radius: 8px;
-      background: rgba(50,8,165,0.08);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .message-block .detail-value {
+      font-size: 14px; font-weight: 400;
+      color: rgba(255,255,255,0.75);
+      line-height: 1.6;
     }
-
-    .detail-text {
-      font-size: 13px;
-      color: #222;
-      display: flex;
-      align-items: center;
+    .divider {
+      height: 1px;
+      background: rgba(255,255,255,0.04);
+      margin: 20px 0;
     }
-
-    .detail-text .label {
-      display: block;
-      font-size: 13px;
-      color: rgba(0,0,0,0.55);
-    }
-
-    .detail-text .label p {
-      margin: 0px 5px;
-      font-weight: 700;
-      color: var(--purple);
-      margin-top: 4px;
-      display: flex;
-      align-items: center;
-    }
-
     .note {
-      margin-top: 14px;
-      font-size: 13px;
-      color: #333;
-      line-height: 1.45;
+      font-size: 12px;
+      color: rgba(255,255,255,0.3);
+      line-height: 1.6;
     }
-
     .card-footer {
-      background:  var(--purple);
-      color: #f0e9ff;
-      padding: 18px 22px;
+      padding: 18px 28px;
+      border-top: 1px solid rgba(255,255,255,0.04);
       text-align: center;
     }
-
     .card-footer p {
-      margin: 0;
-      font-size: 14px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.2);
+      line-height: 1.5;
     }
-    .muted-small {
-      font-size: 12px;
-      color: rgba(240,233,255,0.85);
-      margin-top: 6px;
-    }
-
-    @media (max-width: 480px) {
-      .details {
-        grid-template-columns: 1fr;
-      }
-      .logo {
-        width: 64px;
-        height: 64px;
-        flex: 0 0 64px;
-      }
+    .card-footer a {
+      color: rgba(255,230,91,0.6);
+      text-decoration: none;
     }
   </style>
 </head>
 <body>
   <div class="wrapper">
-    <article class="card" role="article" aria-label="Login notification">
-      <header class="card-header">
-        {{-- <img src="{{ asset('images/header/Team-Gym.png') }}" alt="Logo"> --}}
-        <img src="{{$message->embed(public_path("images/header/Team-Gym.png"))}}" alt="Logo">
-        <div class="title">
-          <h1>Notifications to you</h1>
+    <div class="card">
+      <div class="card-header">
+        <img class="logo-mark" src="{{$message->embed(public_path("images/header/Team-Gym.png"))}}" alt="Team Gym">
+        <div class="brand">
+          <h1>TEAM GYM</h1>
+          <p>Report Notification</p>
         </div>
-      </header>
+      </div>
       <div class="card-body">
         <div class="greeting">
           Hello <strong>{{ $userName ?? '' }}</strong>,
         </div>
-        <div class="details" role="list">
-          <div class="detail-item" role="listitem">
-            <div class="detail-text">
-              <span class="label">{{$description}}</span>
-            </div>
-          </div>
+        <div class="message-block">
+          <span class="detail-label">Details</span>
+          <span class="detail-value">{{$description}}</span>
         </div>
-        <p class="note">Good day.</p>
+        <div class="divider"></div>
+        <p class="note">If you have any questions regarding this report, please contact your administrator.</p>
       </div>
-      <footer class="card-footer">
-        <p>هذا إشعار آلي — If you didn't sign in, please secure your account.</p>
-        <div class="muted-small">Company Website — {{ url('/') }}</div>
-      </footer>
-    </article>
+      <div class="card-footer">
+        <p>Automated report from <a href="{{ url('/') }}">Team Gym</a></p>
+      </div>
+    </div>
   </div>
 </body>
 </html>

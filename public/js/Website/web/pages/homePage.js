@@ -19,6 +19,7 @@ let menuBar1 = document.querySelector(".bar-1");
 let menuBar2 = document.querySelector(".bar-2");
 let menuBar3 = document.querySelector(".bar-3");
 let pRow = document.querySelectorAll('.table .body .row p');
+let typingTimer;
 
 function msgNotFound() {
   let mainMsg = document.createElement("div");
@@ -131,31 +132,13 @@ function search(text, stateSearch, resultSearch) {
     },
     body: JSON.stringify({ name: text, fname: fname, lname: lname })
   });
-  if (text == "report" || text == "تقرير") {
-    search.then(response => {
-      if (!response.ok) throw new Error('Network response was not ok');
-      return response.blob();
-    }).then(blob => {
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'report.pdf';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
-    }).catch(error => {
-      console.error('Download failed:', error);
+  search.then(response => response.json()).then(data => {
+    data.forEach(item => {
+      resultSearched(text, item.route, item.data.img, item.page, resultSearch);
     });
-  } else {
-    search.then(response => response.json()).then(data => {
-      data.forEach(item => {
-        resultSearched(text, item.route, item.data.img, item.page, resultSearch);
-      });
-      if (stateSearch) searched(text, stateSearch);
-    }).catch(error => {
-    });
-  };
+    if (stateSearch) searched(text, stateSearch);
+  }).catch(error => {
+  });
 };
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -299,29 +282,9 @@ menu.addEventListener("click", () => {
   };
 });
 
-btnStateColorPage.addEventListener("click", () => {
-  document.body.classList.toggle("light");
-  if (!document.body.classList.contains("light")) {
-    btnStateColorPage.innerHTML = `<i class="fa-solid fa-moon"></i>`;
-    btnStateColorPage.classList.add("active");
-    localStorage.setItem("state-mode-team-gym", "dark");
-  } else {
-    btnStateColorPage.innerHTML = `<i class="fa-solid fa-sun"></i>`;
-    localStorage.setItem("state-mode-team-gym", "light");
-    btnStateColorPage.classList.remove("active");
-  };
-});
-
 document.addEventListener("DOMContentLoaded", () => {
-  if (localStorage.getItem("state-mode-team-gym") == "light") {
-    btnStateColorPage.innerHTML = `<i class="fa-solid fa-sun"></i>`;
-    btnStateColorPage.classList.remove("active");
-    document.body.classList.add("light");
-  } else {
-    btnStateColorPage.innerHTML = `<i class="fa-solid fa-moon"></i>`;
-    btnStateColorPage.classList.add("active");
-    document.body.classList.remove("light");
-  };
+  document.body.classList.remove("light");
+  localStorage.setItem("state-mode-team-gym", "dark");
   if (localStorage.getItem("stat-side-bar") == "show") {
     sideBar.classList.add("hidden-side-bar");
     menuBar1.classList.add("add-bar-1");

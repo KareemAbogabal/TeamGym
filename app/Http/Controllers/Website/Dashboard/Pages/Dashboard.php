@@ -40,8 +40,11 @@ class Dashboard extends Controller {
       'july','august','september','october','november','december'
     ];
     foreach ($months as $m) {
-      $lineage[] = $item->{$m} ?? 0;
-      if ($m === $date) break;
+      if ($m === $date) {
+        $lineage[] = $item->{$m} ?? 0;
+      } else {
+        $lineage[] = null;
+      };
     };
     return $lineage;
   }
@@ -117,14 +120,14 @@ class Dashboard extends Controller {
     $client = Client::where("code", Cookie::get('login_client'))->first();
     $Client = Client::whereRaw('LOWER(fname) = ?', [$fname])->whereRaw('LOWER(lname) = ?', [$lname])->where("code", $client->code)->first();
     $Lineage = LineageInBody::whereRaw('LOWER(name) = ?', [$name])->where("code", $client->code)->first();
-    $Payment = Payment::whereHas('client', function($q) use ($fname, $lname) {$q->whereRaw('LOWER(fname) = ?', [$fname])->whereRaw('LOWER(lname) = ?', [$lname])->where("code_client", $client->code);})->first();
+    $Payment = Payment::whereHas('client', function($q) use ($fname, $lname, $client) {$q->whereRaw('LOWER(fname) = ?', [$fname])->whereRaw('LOWER(lname) = ?', [$lname])->where("code_client", $client->code);})->first();
     $Supplement = Payment::whereRaw('LOWER(order_name) = ?', [$name])->where("code_client", $client->code)->first();
     $System = Payment::whereRaw('LOWER(order_name) = ?', [$name])->where("code_client", $client->code)->first();
     $Record = Record::whereRaw('LOWER(name_client) = ?', [$name])->orWhereRaw('LOWER(name_employee) = ?', [$name])->where("code_client", $client->code)->first();
     $Activity = Activity::whereRaw('LOWER(name) = ?', [$name])->where("code_client", $client->code)->first();
     $models = compact(
       'Client', 'Lineage', 'Supplement', 'System',
-      'Record', 'Activity', 'Payment', 'report'
+      'Record', 'Activity', 'Payment'
     );
     $routes = [
       'Client' => route('plans'),
@@ -135,7 +138,6 @@ class Dashboard extends Controller {
       'Record' => route('plans'),
       'Activity' => route('schedule'),
       'Payment' => route('supplementStore'),
-      'report' => $pdf,
     ];
     $pages = [
       'Client' => 'plans',
@@ -146,7 +148,6 @@ class Dashboard extends Controller {
       'Record' => 'plans',
       'Activity' => 'schedule',
       'Payment' => 'supplementStore',
-      'report' => 'download',
     ];
     foreach ($models as $key => $value) {
       if ($value) {

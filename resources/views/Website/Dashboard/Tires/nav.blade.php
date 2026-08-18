@@ -10,7 +10,7 @@
       </label>
     </div>
   </div>
-  <form action="" method="post">
+  <form action="" method="post" class="form-search">
     <input type="text" class="search"placeholder="{{__('messages.search-thing')}}">
     <button type="submit">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
@@ -34,24 +34,40 @@
   <div class="account-main">
     <button type="button" @if (!empty($notifications) && $notifications->isNotEmpty() && optional($client->settings)->class_reminders == true) class="notification-btn there-is" @else class="notification-btn" @endif>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="100%" height="100%" aria-hidden="true">
-        <path d="M12 2a3 3 0 0 0-3 3v1.3C7.5 7.1 6 9.6 6 12v3l-1 1v1h14v-1l-1-1v-3c0-2.4-1.5-4.9-3-5.7V5a3 3 0 0 0-3-3z" fill="none" stroke="#dfdfdf" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M9.5 18.6 A2.5 2.5 0 0 0 14.5 18.6 L14.5 18.6 Z" fill="#dfdfdf"/>
+        <path d="M12 2a3 3 0 0 0-3 3v1.3C7.5 7.1 6 9.6 6 12v3l-1 1v1h14v-1l-1-1v-3c0-2.4-1.5-4.9-3-5.7V5a3 3 0 0 0-3-3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M9.5 18.6 A2.5 2.5 0 0 0 14.5 18.6 L14.5 18.6 Z" fill="currentColor"/>
       </svg>
+      @if (!empty($notifications) && $notifications->isNotEmpty() && optional($client->settings)->class_reminders == true)
+        <span class="notification-badge">{{ $notifications->count() }}</span>
+      @endif
     </button>
     <div class="notifications">
-      @if (optional($client->settings)->class_reminders == true)
+      <div class="notifications__header">
+        <span class="notifications__title">{{ __('messages.notifications') }}</span>
         @if (!empty($notifications) && $notifications->isNotEmpty())
-          @foreach ($notifications as $item)
-            <div class="notification">
-              {!!$item->icon!!}
-              <div class="content">
-                <h1>{{$item->name}}</h1>
-                <p>{{$item->description}}</p>
-              </div>
-            </div>
-          @endforeach
+          <span class="notifications__count">{{ $notifications->count() }}</span>
         @endif
-      @endif
+      </div>
+      <div class="notifications__list">
+        @if (optional($client->settings)->class_reminders == true)
+          @if (!empty($notifications) && $notifications->isNotEmpty())
+            @foreach ($notifications as $item)
+              <div class="notification">
+                <div class="notification__icon">{!!$item->icon!!}</div>
+                <div class="notification__body">
+                  <h1>{{$item->name}}</h1>
+                  <p>{{$item->description}}</p>
+                </div>
+              </div>
+            @endforeach
+          @else
+            <div class="notifications__empty">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              <span>{{ __('messages.no_notifications') }}</span>
+            </div>
+          @endif
+        @endif
+      </div>
     </div>
     <div class="account-icon">
       <img src="{{$client->img ? asset('images/subscribers/' . $client->img) : asset('images/header/Team-Gym.png')}}" alt="No Img Logo">
@@ -122,7 +138,6 @@
         </svg>
       </button>
       <div class="options">
-        <button type="button" class="state-color-page"><i class="fa-solid fa-sun"></i></button>
         <button type="button"><i class="fa-solid fa-credit-card"></i></button>
         <button type="button"><i class="fa-solid fa-dumbbell"></i></button>
       </div>

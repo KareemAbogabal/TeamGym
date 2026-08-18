@@ -9,17 +9,6 @@
     <h1>{{__('messages.employees')}}</h1>
   </div>
   <x-components::main-card state="edit" dataFollow="edit-card">
-    <div class="header-bg">
-        <img src="{{ asset('images/bg-profile-clients/bg-clients.jpg') }}" alt="No Img" loading="lazy">
-        <button type="button">
-          <svg width="40" height="40" viewBox="0 0 64 64" aria-hidden="true">
-            <g stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none">
-              <line x1="12" y1="12" x2="52" y2="52"/>
-              <line x1="52" y1="12" x2="12" y2="52"/>
-            </g>
-          </svg>
-        </button>
-      </div>
       <div class="body-card">
         <div class="img img-card">
           <img src="{{ asset('images/header/Team-Gym.png') }}" class="img-card" alt="No Img" loading="lazy">
@@ -73,7 +62,6 @@
       </div>
     </x-components::main-card>
   <x-components::main-card state="list" dataFollow="list-card">
-    <div class="header-bg"></div>
     <div class="body-card">
         <div class="head">
           <div class="img">
@@ -192,17 +180,6 @@
             <button class="show-details-employee" data-follow="employee-card">{{__('messages.details')}}</button>
           </div>
           <x-components::main-card state="employee" dataFollow="employee-card">
-              <div class="header-bg">
-                <img src="{{asset('images/bg-profile-clients/bg-clients.jpg')}}" alt="No Img" loading="lazy">
-                <button type="button">
-                  <svg width="40" height="40" viewBox="0 0 64 64" aria-hidden="true">
-                    <g stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none">
-                      <line x1="12" y1="12" x2="52" y2="52"/>
-                      <line x1="52" y1="12" x2="12" y2="52"/>
-                    </g>
-                  </svg>
-                </button>
-              </div>
               <div class="body-card">
                 <div class="img">
                   <img src="{{ $item->img ? asset('images/employee/' . $item->img) : asset('images/header/Team-Gym.png') }}" class="img-profile" alt="No Img" loading="lazy">

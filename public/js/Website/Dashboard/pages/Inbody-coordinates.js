@@ -124,13 +124,13 @@ async function annotateSourceAndShow(source) {
     FAT_MASS_ORIG: "#33aaff", BMI_ORIG: "#9933ff", PBF_ORIG: "#33cc66",
     SMM_ORIG: "#cc33aa", KCAL_ORIG: "#33cccc", ORIG_LEAN: "#66ccff",
     ORIG_FAT: "#ff66cc", LEFT_ARM_FAT_ORIG: "#66ff66", RIGHT_ARM_FAT_ORIG: "#66ff66",
-    LEFT_LEG_FAT_ORIG: "#66ff66", RIGHT_LEG_FAT_ORIG: "#66ff66",
+    LEFT_LEG_FAT_ORIG: "#66ff66", RIGHT_LEG_FAT_ORIG: "#66ff66", TRUNK_FAT_ORIG: "#66ff66",
   };
   const expectedKeys = [
     'WEIGHT_ORIG','TBW_ORIG','PROTEIN_ORIG','FAT_MASS_ORIG','BMI_ORIG','PBF_ORIG',
     'SMM_ORIG','KCAL_ORIG',
     'ORIG_LEAN','LEFT_ARM_LEAN_ORIG','RIGHT_ARM_LEAN_ORIG','LEFT_LEG_LEAN_ORIG','RIGHT_LEG_LEAN_ORIG',
-    'ORIG_FAT','LEFT_ARM_FAT_ORIG','RIGHT_ARM_FAT_ORIG','LEFT_LEG_FAT_ORIG','RIGHT_LEG_FAT_ORIG'
+    'ORIG_FAT','LEFT_ARM_FAT_ORIG','RIGHT_ARM_FAT_ORIG','LEFT_LEG_FAT_ORIG','RIGHT_LEG_FAT_ORIG','TRUNK_FAT_ORIG'
   ];
   expectedKeys.forEach(key => {
     try {
@@ -163,6 +163,15 @@ const PBF_ORIG = { x: 359, y: 1342, w: 851, h: 50 };
 const SMM_ORIG = { x: 359, y: 958, w: 840, h: 40 };
 const KCAL_ORIG = { x: 1258, y: 811, w: 395, h: 52 };
 
+// Tight right-aligned value boxes for the bar charts, in REF coordinates.
+// The printed value sits in a fixed value column on the full-name row; these
+// boxes were validated by targeted crop OCR ("35 1" / "28.5" / "20.8").
+const CHART_VALUE_BOX = {
+  smm: { x: 700, y: 955, w: 215, h: 68 },
+  bmi: { x: 790, y: 1298, w: 110, h: 42 },
+  pbf: { x: 758, y: 1370, w: 100, h: 40 },
+};
+
 const ORIG_LEAN = { x: 134, y: 1483, w: 531, h: 578 };
 const LEFT_ARM_LEAN_ORIG = { x: 167, y: 1568, w: 155, h: 50 };
 const RIGHT_ARM_LEAN_ORIG = { x: 487, y: 1567, w: 126, h: 50 };
@@ -174,6 +183,7 @@ const LEFT_ARM_FAT_ORIG = { x: 750, y: 1569, w: 149, h: 50 };
 const RIGHT_ARM_FAT_ORIG = { x: 1027, y: 1569, w: 149, h: 50 };
 const LEFT_LEG_FAT_ORIG = { x: 762, y: 1840, w: 124, h: 44 };
 const RIGHT_LEG_FAT_ORIG = { x: 1031, y: 1840, w: 124, h: 44 };
+const TRUNK_FAT_ORIG = { x: 917, y: 1719, w: 145, h: 44 };
 
 // fixCanvas() mutates these constants in place, so snapshot the pristine values
 // once and restore them before every run to keep the offsets idempotent across
@@ -182,7 +192,7 @@ const __BOX_REFS = {
   WEIGHT_ORIG, TBW_ORIG, PROTEIN_ORIG, FAT_MASS_ORIG, BMI_ORIG, PBF_ORIG,
   SMM_ORIG, KCAL_ORIG, ORIG_LEAN, LEFT_ARM_LEAN_ORIG, RIGHT_ARM_LEAN_ORIG,
   LEFT_LEG_LEAN_ORIG, RIGHT_LEG_LEAN_ORIG, ORIG_FAT, LEFT_ARM_FAT_ORIG,
-  RIGHT_ARM_FAT_ORIG, LEFT_LEG_FAT_ORIG, RIGHT_LEG_FAT_ORIG,
+  RIGHT_ARM_FAT_ORIG, LEFT_LEG_FAT_ORIG, RIGHT_LEG_FAT_ORIG, TRUNK_FAT_ORIG,
 };
 const __BOX_PRIMORDIAL = {};
 for (const k of Object.keys(__BOX_REFS)) {
@@ -638,6 +648,8 @@ function wordComboDecimal(cluster) {
 // are preferred (the report's real values have 1 decimal; scale markers are
 // whole numbers). Returns { value, kind } or null.
 async function readValueByLabelAnchor(fullWords, labelRegexes, anchorBox, rawCanvas, minVal, maxVal, field) {
+  const dbg = (window.__anchorReaderDebug = window.__anchorReaderDebug || {});
+  dbg[field] = { labels: [], clusters: [], result: null };
   if (!Array.isArray(fullWords) || !fullWords.length) return null;
   const scaled = scaleOrigBoxToCanvas(anchorBox, rawCanvas);
   const padY = Math.round(scaled.h * 1.2) + 10;
@@ -651,6 +663,7 @@ async function readValueByLabelAnchor(fullWords, labelRegexes, anchorBox, rawCan
     if (midY < scaled.y - padY || midY > scaled.y + scaled.h + padY) return false;
     return labelRegexes.some((rx) => rx.test((w.text || "").trim()));
   });
+  dbg[field].labels = labels.map((l) => ({ text: l.text, bbox: l.bbox, conf: l.confidence, midY: (l.bbox.y0 + l.bbox.y1) / 2 }));
 
   let bestDecimal = null;
   let bestDecimalDist = Infinity;
@@ -697,6 +710,7 @@ async function readValueByLabelAnchor(fullWords, labelRegexes, anchorBox, rawCan
       const candidates = [];
       if (tightVal !== null) candidates.push({ value: tightVal, kind: "tight" });
       if (comboVal !== null) candidates.push({ value: comboVal, kind: "combo" });
+      dbg[field].clusters.push({ label: w.text, bbox, dist, tightVal, comboVal, words: cluster.map((c) => c.text) });
       for (const c of candidates) {
         if (c.value < minVal || c.value > maxVal) continue;
         const isDecimal = c.value !== Math.round(c.value);
@@ -712,8 +726,8 @@ async function readValueByLabelAnchor(fullWords, labelRegexes, anchorBox, rawCan
       }
     }
   }
-  if (bestDecimal) return { value: bestDecimal.value, kind: bestDecimal.kind };
-  if (bestInt) return { value: bestInt.value, kind: bestInt.kind };
+  if (bestDecimal) { dbg[field].result = { value: bestDecimal.value, kind: bestDecimal.kind }; return bestDecimal; }
+  if (bestInt) { dbg[field].result = { value: bestInt.value, kind: bestInt.kind }; return bestInt; }
   return null;
 };
 
@@ -725,6 +739,8 @@ async function readValueByLabelAnchor(fullWords, labelRegexes, anchorBox, rawCan
 // full-name row are often split into letter-garbled words ("OS 5"), so every
 // same-line token right of the labels is clustered and tight-crop re-OCR'd.
 async function readChartRowValue(fullWords, labelRegexes, anchorBox, rawCanvas, minVal, maxVal, field) {
+  const dbg = (window.__chartReaderDebug = window.__chartReaderDebug || {});
+  dbg[field] = { anchor: { ...anchorBox }, labels: [], row: null, tokens: [], clusters: [], bands: [], result: null };
   if (!Array.isArray(fullWords) || !fullWords.length) return null;
   const scaled = scaleOrigBoxToCanvas(anchorBox, rawCanvas);
   const padY = Math.round(scaled.h * 1.2) + 10;
@@ -738,10 +754,14 @@ async function readChartRowValue(fullWords, labelRegexes, anchorBox, rawCanvas, 
     if (midY < scaled.y - padY || midY > scaled.y + scaled.h + padY) return false;
     return labelRegexes.some((rx) => rx.test((w.text || "").trim()));
   });
+  dbg[field].labels = labels.map((l) => ({ text: l.text, bbox: l.bbox, conf: l.confidence }));
   if (!labels.length) return null;
 
-  // Group matching labels into rows; pick the row with the most label words
-  // (the full-name row always beats the single abbreviation word), ties -> lowest.
+  // Group matching labels into rows. A report page has several charts whose
+  // labels share words ("Body", "Mass", "Fat", "Index"), so a row is only
+  // trusted when its label words form one CONTIGUOUS cluster (adjacent x
+  // positions). Stray matches from neighbouring columns are ignored, and the
+  // winner is the row closest to the anchor while carrying the most labels.
   const rows = [];
   for (const l of labels) {
     const midY = (l.bbox.y0 + l.bbox.y1) / 2;
@@ -753,9 +773,34 @@ async function readChartRowValue(fullWords, labelRegexes, anchorBox, rawCanvas, 
     row.words.push(l);
     if (l.bbox.y0 < row.y0) row.y0 = l.bbox.y0;
   }
-  rows.sort((a, b) => b.words.length - a.words.length || b.midY - a.midY);
-  const row = rows[0];
-  const rightmostX1 = Math.max(...row.words.map((l) => l.bbox.x1));
+  const anchorMidY = scaled.y + scaled.h / 2;
+  let row = null;
+  let cluster = null;
+  let bestScore = -Infinity;
+  for (const r of rows) {
+    const sorted = r.words.slice().sort((a, b) => a.bbox.x0 - b.bbox.x0);
+    const sub = [[sorted[0]]];
+    for (let i = 1; i < sorted.length; i++) {
+      const last = sub[sub.length - 1];
+      const prev = last[last.length - 1];
+      const gap = sorted[i].bbox.x0 - prev.bbox.x1;
+      if (gap <= Math.max(120, Math.round(scaled.w * 0.06))) last.push(sorted[i]);
+      else sub.push([sorted[i]]);
+    }
+    let bestC = sub[0];
+    for (const c of sub) if (c.length > bestC.length) bestC = c;
+    const score = bestC.length * 1000 - Math.abs(r.midY - anchorMidY) / 10;
+    if (score > bestScore) {
+      bestScore = score;
+      row = r;
+      cluster = bestC;
+    }
+  }
+  const rightmostX1 = Math.max(...cluster.map((l) => l.bbox.x1));
+  const clusterX0 = Math.min(...cluster.map((l) => l.bbox.x0));
+  const clusterY0 = Math.min(...cluster.map((l) => l.bbox.y0));
+  const clusterY1 = Math.max(...cluster.map((l) => l.bbox.y1));
+  dbg[field].row = { midY: row.midY, y0: row.y0, words: row.words.map((l) => ({ text: l.text, bbox: l.bbox })), cluster: cluster.map((l) => ({ text: l.text, bbox: l.bbox })), rightmostX1 };
 
   const tokens = fullWords.filter((f) => {
     if (!f || !f.bbox || !f.text) return false;
@@ -773,87 +818,191 @@ async function readChartRowValue(fullWords, labelRegexes, anchorBox, rawCanvas, 
     if ((f.text || "").trim().length > 6) return false;
     return true;
   });
-  if (!tokens.length) return null;
+  dbg[field].tokens = tokens.map((t) => ({ text: t.text, bbox: t.bbox }));
 
   // Digits of one value can be split by the gap-clustering below (scale-dependent),
   // so first try ONE crop over every digit-bearing token on the row. A decimal
   // read from this full span is the most reliable bar-tip value.
-  const digitTokens = tokens.filter((t) => /\d/.test(t.text || ""));
-  if (digitTokens.length > 1) {
-    const allBox = {
-      x0: Math.min(...digitTokens.map((c) => c.bbox.x0)),
-      y0: Math.min(...digitTokens.map((c) => c.bbox.y0)),
-      x1: Math.max(...digitTokens.map((c) => c.bbox.x1)),
-      y1: Math.max(...digitTokens.map((c) => c.bbox.y1)),
-    };
-    const allVal = await tightCropRead(allBox, rawCanvas, minVal, maxVal, field);
-    if (allVal !== null && allVal !== Math.round(allVal))
-      return { value: allVal, kind: "tight-all" };
-  }
-
-  const sorted = tokens.slice().sort((a, b) => a.bbox.x0 - b.bbox.x0);
-  const clusters = [[sorted[0]]];
-  for (let i = 1; i < sorted.length; i++) {
-    const last = clusters[clusters.length - 1];
-    const prev = last[last.length - 1];
-    const gap = sorted[i].bbox.x0 - prev.bbox.x1;
-    if (gap <= Math.max(90, Math.round((prev.bbox.x1 - prev.bbox.x0) * 0.5))) {
-      last.push(sorted[i]);
-    } else {
-      clusters.push([sorted[i]]);
-    }
-  }
-
   let bestDecimal = null;
   let bestDecimalDist = Infinity;
   let bestInt = null;
   let bestIntDist = Infinity;
-  for (const cluster of clusters) {
-    const bbox = {
-      x0: Math.min(...cluster.map((c) => c.bbox.x0)),
-      y0: Math.min(...cluster.map((c) => c.bbox.y0)),
-      x1: Math.max(...cluster.map((c) => c.bbox.x1)),
-      y1: Math.max(...cluster.map((c) => c.bbox.y1)),
-    };
-    const dist = bbox.x0 - rightmostX1;
-    let tightVal = await tightCropRead(bbox, rawCanvas, minVal, maxVal, field);
-    const comboVal = wordComboDecimal(cluster);
-    // Bar-dash junk can sneak into a cluster's left edge (e.g. "F/M" before the
-    // value digits). Retry on the digit-bearing sub-bbox only and prefer that
-    // result when it succeeds - it crops exactly the real value glyphs. When the
-    // value itself is letter-garbled ("OS" + "5") the sub-crop yields nothing and
-    // the full-cluster crop is kept instead.
-    const digitTok = cluster.filter((c) => /\d/.test(c.text || ""));
-    if (digitTok.length && digitTok.length < cluster.length) {
-      const subBbox = {
-        x0: Math.min(...digitTok.map((c) => c.bbox.x0)),
-        y0: Math.min(...digitTok.map((c) => c.bbox.y0)),
-        x1: Math.max(...digitTok.map((c) => c.bbox.x1)),
-        y1: Math.max(...digitTok.map((c) => c.bbox.y1)),
+  if (tokens.length) {
+    const digitTokens = tokens.filter((t) => /\d/.test(t.text || ""));
+    if (digitTokens.length > 1) {
+      const allBox = {
+        x0: Math.min(...digitTokens.map((c) => c.bbox.x0)),
+        y0: Math.min(...digitTokens.map((c) => c.bbox.y0)),
+        x1: Math.max(...digitTokens.map((c) => c.bbox.x1)),
+        y1: Math.max(...digitTokens.map((c) => c.bbox.y1)),
       };
-      const subVal = await tightCropRead(subBbox, rawCanvas, minVal, maxVal, field);
-      if (subVal !== null) tightVal = subVal;
+      const allVal = await tightCropRead(allBox, rawCanvas, minVal, maxVal, field);
+      dbg[field].allVal = { val: allVal, bbox: allBox };
+      if (allVal !== null && allVal !== Math.round(allVal))
+        return { value: allVal, kind: "tight-all" };
     }
-    const candidates = [];
-    if (tightVal !== null) candidates.push({ value: tightVal, kind: "tight" });
-    if (comboVal !== null) candidates.push({ value: comboVal, kind: "combo" });
-    for (const c of candidates) {
-      if (c.value < minVal || c.value > maxVal) continue;
-      const isDecimal = c.value !== Math.round(c.value);
-      if (isDecimal) {
-        if (dist < bestDecimalDist) {
-          bestDecimal = c;
-          bestDecimalDist = dist;
+
+    const sorted = tokens.slice().sort((a, b) => a.bbox.x0 - b.bbox.x0);
+    const clusters = [[sorted[0]]];
+    for (let i = 1; i < sorted.length; i++) {
+      const last = clusters[clusters.length - 1];
+      const prev = last[last.length - 1];
+      const gap = sorted[i].bbox.x0 - prev.bbox.x1;
+      if (gap <= Math.max(90, Math.round((prev.bbox.x1 - prev.bbox.x0) * 0.5))) {
+        last.push(sorted[i]);
+      } else {
+        clusters.push([sorted[i]]);
+      }
+    }
+
+    for (const cl of clusters) {
+      const bbox = {
+        x0: Math.min(...cl.map((c) => c.bbox.x0)),
+        y0: Math.min(...cl.map((c) => c.bbox.y0)),
+        x1: Math.max(...cl.map((c) => c.bbox.x1)),
+        y1: Math.max(...cl.map((c) => c.bbox.y1)),
+      };
+      const dist = bbox.x0 - rightmostX1;
+      let tightVal = await tightCropRead(bbox, rawCanvas, minVal, maxVal, field);
+      const comboVal = wordComboDecimal(cl);
+      // Bar-dash junk can sneak into a cluster's left edge (e.g. "F/M" before the
+      // value digits). Retry on the digit-bearing sub-bbox only and prefer that
+      // result when it succeeds - it crops exactly the real value glyphs. When the
+      // value itself is letter-garbled ("OS" + "5") the sub-crop yields nothing and
+      // the full-cluster crop is kept instead.
+      const digitTok = cl.filter((c) => /\d/.test(c.text || ""));
+      if (digitTok.length && digitTok.length < cl.length) {
+        const subBbox = {
+          x0: Math.min(...digitTok.map((c) => c.bbox.x0)),
+          y0: Math.min(...digitTok.map((c) => c.bbox.y0)),
+          x1: Math.max(...digitTok.map((c) => c.bbox.x1)),
+          y1: Math.max(...digitTok.map((c) => c.bbox.y1)),
+        };
+        const subVal = await tightCropRead(subBbox, rawCanvas, minVal, maxVal, field);
+        if (subVal !== null) tightVal = subVal;
+      }
+      const candidates = [];
+      if (tightVal !== null) candidates.push({ value: tightVal, kind: "tight" });
+      if (comboVal !== null) candidates.push({ value: comboVal, kind: "combo" });
+      dbg[field].clusters.push({ bbox, dist, tightVal, comboVal, candidates, words: cl.map((c) => c.text) });
+      for (const c of candidates) {
+        if (c.value < minVal || c.value > maxVal) continue;
+        const isDecimal = c.value !== Math.round(c.value);
+        if (isDecimal) {
+          if (dist < bestDecimalDist) {
+            bestDecimal = c;
+            bestDecimalDist = dist;
+          }
+        } else if (dist < bestIntDist) {
+          bestInt = c;
+          bestIntDist = dist;
         }
-      } else if (dist < bestIntDist) {
-        bestInt = c;
-        bestIntDist = dist;
       }
     }
   }
-  if (bestDecimal) return { value: bestDecimal.value, kind: bestDecimal.kind };
-  if (bestInt) return { value: bestInt.value, kind: bestInt.kind };
+
+  // Token reads fail when OCR merges the bar + value glyphs into one garbage
+  // word (IMG2: "Skeletal Muscle Mass | | 35 1" comes back as "BENNIE EE.").
+  // Fall back to cropping the label row's band geometrically and OCR-ing the
+  // bar tip. Only DECIMAL reads are accepted (real values have decimals; scale
+  // markers are whole numbers), scanning from the tip inward.
+  // Band geometry: the bar-tip VALUE column sits well to the right of the
+  // full-name labels. On the full-page pass the value digits usually OCR as a
+  // merged garbage word (SMM: "35 1" -> "BENNIE EE."), but that word still marks
+  // the value's right edge, so anchor the band's x1 to the rightmost same-row
+  // token (plus a margin) instead of a label-cluster extrapolation. The old
+  // extrapolation ended mid-digit and let bar-scale garbage ("140.15") win.
+  let bandY0 = clusterY0;
+  let bandY1 = clusterY1;
+  let rightmostTokenX1 = rightmostX1;
+  for (const t of tokens) {
+    if (t.bbox.x0 < rightmostX1) continue;
+    if (t.bbox.y0 < bandY0) bandY0 = t.bbox.y0;
+    if (t.bbox.y1 > bandY1) bandY1 = t.bbox.y1;
+    if (t.bbox.x1 > rightmostTokenX1) rightmostTokenX1 = t.bbox.x1;
+  }
+  const bandH = Math.max(1, bandY1 - bandY0);
+  const bandX1 = Math.min(
+    rawCanvas.width - 1,
+    rightmostTokenX1 + Math.max(Math.round(bandH * 2), Math.round(scaled.w * 0.25))
+  );
+  // Widest crop first: it spans the whole labels->value row, so the value's
+  // digits parse before any right-side bar garbage. Narrower attempts fall back.
+  const attempts = [
+    { label: "band-full", x0: rightmostX1 },
+    { label: "band-half", x0: rightmostX1 + Math.round((bandX1 - rightmostX1) * 0.5) },
+    { label: "band-third", x0: rightmostX1 + Math.round((bandX1 - rightmostX1) * 0.66) },
+    { label: "band-2third", x0: rightmostX1 + Math.round((bandX1 - rightmostX1) * 0.33) },
+  ];
+  // Try the geometric band even when a tight read exists: a band DECIMAL beats
+  // any integer tight read, which is often scale/merge junk (PBF: tight "7" from
+  // the merged "20.8" glyphs). Tight decimals still win - they are the strongest
+  // signal and the band crop is only needed when they are absent or integer.
+  let bandHit = null;
+  let bandKind = null;
+  // Fixed per-field value boxes first (proven crop reads); the geometric band's
+  // right edge can land inside bar graphics and pick up junk (PBF read "4.7").
+  if (CHART_VALUE_BOX[field]) {
+    const fb = CHART_VALUE_BOX[field];
+    const scaled = scaleOrigBoxToCanvas(fb, rawCanvas);
+    const val = await readChartValueBand(rawCanvas, scaled.x, scaled.y, scaled.x + scaled.w, scaled.y + scaled.h, minVal, maxVal, field);
+    dbg[field].bands.push({ label: "fixed-box", x0: scaled.x, x1: scaled.x + scaled.w, y0: scaled.y, y1: scaled.y + scaled.h, val });
+    if (val !== null) { bandHit = val; bandKind = "fixed-box"; }
+  }
+  for (const a of attempts) {
+    if (bandHit !== null) break;
+    const val = await readChartValueBand(
+      rawCanvas,
+      a.x0,
+      bandY0,
+      bandX1,
+      bandY1,
+      minVal,
+      maxVal,
+      field
+    );
+    dbg[field].bands.push({ ...a, x1: bandX1, y0: bandY0, y1: bandY1, val });
+    if (val !== null) { bandHit = val; bandKind = a.label; }
+  }
+  if (bestDecimal) { dbg[field].result = { value: bestDecimal.value, kind: bestDecimal.kind }; return bestDecimal; }
+  if (bandHit !== null) { dbg[field].result = { value: bandHit, kind: bandKind }; return { value: bandHit, kind: bandKind }; }
+  if (bestInt) { dbg[field].result = { value: bestInt.value, kind: bestInt.kind }; return bestInt; }
   return null;
+};
+
+// Crop a horizontal band on the label row and OCR only digit/decimal glyphs.
+// The value sits at the bar tip on the label row, so a band starting left of
+// the labels would only add noise. Whole-number reads are rejected on purpose:
+// the real bar-tip values carry a decimal, scale markers never do.
+async function readChartValueBand(rawCanvas, x0, y0, x1, y1, minVal, maxVal, field) {
+  const px = 10;
+  const py = 8;
+  const x = Math.max(0, x0 - px);
+  const y = Math.max(0, y0 - py);
+  const w = Math.min(rawCanvas.width - x, x1 - x0 + 2 * px);
+  const h = Math.min(rawCanvas.height - y, y1 - y0 + 2 * py);
+  if (w < 8 || h < 8) return null;
+  const crop = cropCanvas(rawCanvas, x, y, w, h);
+  const config = {
+    logger: () => {},
+    tessedit_char_whitelist: "0123456789.,%",
+    tessedit_pageseg_mode: "7",
+  };
+  let best = null;
+  for (const [label, cv] of [["n", crop], ["x1.5", scaleCanvasTo(crop, 1.5)], ["x2", scaleCanvasTo(crop, 2)], ["x3", scaleCanvasTo(crop, 3)]]) {
+    try {
+      const res = await Tesseract.recognize(cv, "eng", config);
+      const text = (res.data.text || "").replace(/[_\r\n]/g, " ").trim();
+      if (!text) continue;
+      const parsed = parseNumberInRange(text, minVal, maxVal);
+      const conf = Number(res.data.confidence || 0);
+      if (parsed === null) continue;
+      if (parsed === Math.round(parsed)) continue;
+      if (!isReasonableCandidate(parsed, text, minVal, maxVal, field)) continue;
+      if (!best || conf > best.conf) best = { value: parsed, conf, variant: label };
+    } catch (e) { /* try next variant */ }
+  }
+  return best ? best.value : null;
 };
 
 // Tolerant single-word label matcher (handles OCR noise like "Weiqht"). Only
@@ -1246,6 +1395,7 @@ async function preprocessToCanvas(file, scale = 3, applyThreshold = true) {
       fixCanvas(RIGHT_ARM_FAT_ORIG, { x: 3, y: 2, w: 3 });
       fixCanvas(LEFT_LEG_FAT_ORIG, { x: 2.5, y: 2.6, w: 20 });
       fixCanvas(RIGHT_LEG_FAT_ORIG, { x: 2.5, y: 2.6, w: 20 });
+      fixCanvas(TRUNK_FAT_ORIG, { x: 2.2, y: 1.5, w: 13, h: 13 });
     };
     img.onerror = reject;
     reader.readAsDataURL(file);
@@ -2079,6 +2229,7 @@ function showDebugOverlay(rawCanvas, boxesObj = {}, rawBoxTexts = {}, words = nu
       RIGHT_ARM_FAT_ORIG: "#66ff66",
       LEFT_LEG_FAT_ORIG: "#66ff66",
       RIGHT_LEG_FAT_ORIG: "#66ff66",
+      TRUNK_FAT_ORIG: "#66ff66",
     };
 
     // نرسم الصناديق: scaleOrigBoxToCanvas يرجع إحداثيات بالنسبة لـrawCanvas
@@ -2402,7 +2553,7 @@ function startBoxVisualAnimation(rawCanvas, boxesObj = {}, rawBoxTexts = {}, wor
       FAT_MASS_ORIG: "#33aaff", BMI_ORIG: "#9933ff", PBF_ORIG: "#33cc66",
       SMM_ORIG: "#cc33aa", KCAL_ORIG: "#33cccc", ORIG_LEAN: "#66ccff",
       ORIG_FAT: "#ff66cc", LEFT_ARM_FAT_ORIG: "#66ff66", RIGHT_ARM_FAT_ORIG: "#66ff66",
-      LEFT_LEG_FAT_ORIG: "#66ff66", RIGHT_LEG_FAT_ORIG: "#66ff66"
+      LEFT_LEG_FAT_ORIG: "#66ff66", RIGHT_LEG_FAT_ORIG: "#66ff66", TRUNK_FAT_ORIG: "#66ff66"
     };
     boxStates = [];
     const sheetAngleNow = displaySheetAngle();
@@ -2643,6 +2794,7 @@ async function run() {
         RIGHT_ARM_FAT_ORIG,
         LEFT_LEG_FAT_ORIG,
         RIGHT_LEG_FAT_ORIG,
+        TRUNK_FAT_ORIG,
       },
       window.__rawBoxTextsForDebug || {},
       null,
@@ -2652,6 +2804,7 @@ async function run() {
       WEIGHT_ORIG, TBW_ORIG, PROTEIN_ORIG, FAT_MASS_ORIG, BMI_ORIG, PBF_ORIG, SMM_ORIG, KCAL_ORIG,
       ORIG_LEAN, LEFT_ARM_LEAN_ORIG, RIGHT_ARM_LEAN_ORIG, LEFT_LEG_LEAN_ORIG, RIGHT_LEG_LEAN_ORIG,
       ORIG_FAT, LEFT_ARM_FAT_ORIG, RIGHT_ARM_FAT_ORIG, LEFT_LEG_FAT_ORIG, RIGHT_LEG_FAT_ORIG,
+      TRUNK_FAT_ORIG,
     }, window.__rawBoxTextsForDebug || {}, null, { maxWidth: 900 });
 
     // ثم بعد اكتمال full OCR (إذا أردت رسم حدود كلمات OCR أيضاً) استدعِ مرة أخرى:
@@ -2880,8 +3033,8 @@ async function run() {
         [/^Skeletal$/, /^Muscle$/, /^Mass$/],
         SMM_ORIG,
         rawCanvas,
-        10,
-        300,
+        8,
+        80,
         "smm"
       );
       const cur = smmRes && smmRes.value;
@@ -3191,7 +3344,16 @@ async function run() {
 
     const tbwParsed = tbwValue !== null ? tbwValue : tbwFallback;
     const proteinParsed = proteinValue !== null ? proteinValue : proteinRes.value;
-    const smmParsed = smmValue !== null ? smmValue : smmFallback;
+    // SMM: the chart-row / label-anchor blocks above can reassign smmRes to the
+    // true bar-tip value after the small-crop read. Prefer that corrected result;
+    // fall back to the early crop value only when it is human-plausible, then to
+    // the nearby-word fallback.
+    const smmParsed =
+      smmRes && smmRes.value !== null && smmRes.value >= 8 && smmRes.value <= 80
+        ? smmRes.value
+        : smmValue !== null && smmValue >= 8 && smmValue <= 80
+        ? smmValue
+        : smmFallback;
     const weightParsed =
       weightValue !== null ? weightValue : weightFallback;
     // ===== تحسين BMI و PBF باستخدام full OCR كـ fallback أقوى =====
@@ -3407,6 +3569,41 @@ async function run() {
     const rightArmSmall = await trySmallSeg(RIGHT_ARM_FAT_ORIG);
     const leftLegSmall = await trySmallSeg(LEFT_LEG_FAT_ORIG);
     const rightLegSmall = await trySmallSeg(RIGHT_LEG_FAT_ORIG);
+    const trunkFatSmall = await trySmallSeg(TRUNK_FAT_ORIG);
+    // segmental lean: same small explicit crops (the layout parser from the
+    // lean crop words is unreliable when the sheet is tilted, so the direct
+    // crop reads win whenever they land inside the plausible segment range).
+    const leftArmLeanSmall = await trySmallSeg(LEFT_ARM_LEAN_ORIG);
+    const rightArmLeanSmall = await trySmallSeg(RIGHT_ARM_LEAN_ORIG);
+    const leftLegLeanSmall = await trySmallSeg(LEFT_LEG_LEAN_ORIG);
+    const rightLegLeanSmall = await trySmallSeg(RIGHT_LEG_LEAN_ORIG);
+    // Prefer the direct crop read when it is confident and plausible; the
+    // template boxes are precise enough on the reference photo that a garbage
+    // crop read almost always falls far outside the segment's plausible range.
+    function pickSeg(small, parsed, lo, hi) {
+      const sv = small && small.value;
+      if (sv !== null && sv !== undefined && sv >= lo && sv <= hi) {
+        const conf = small.confidence;
+        if (conf === undefined || conf >= 40) return +sv.toFixed(2);
+      }
+      if (parsed !== null && parsed !== undefined) {
+        const n = Number(parsed);
+        if (Number.isFinite(n)) return +n.toFixed(2);
+        return parsed;
+      }
+      return parsed;
+    };
+    // Full-page word tokens carry the segmental-lean values reliably (the
+    // ORIG-box crop boxes drift across photos). Prefer that parse whenever it
+    // lands inside the segment's plausible range, else fall back to the old
+    // small-crop / layout logic.
+    function pickLeanSeg(fullVal, small, parsed, lo, hi) {
+      if (fullVal !== null && fullVal !== undefined) {
+        const n = Number(fullVal);
+        if (Number.isFinite(n) && n >= lo && n <= hi) return +n.toFixed(2);
+      }
+      return pickSeg(small, parsed, lo, hi);
+    };
 
     // console.log("FAT WORDS", fatRes.data.words.slice(0, 80));
     const fatLayout = parseFatWordsLayout(fatRes.data.words || []);
@@ -3434,7 +3631,7 @@ async function run() {
       LEFT_ARM_LEAN_ORIG, RIGHT_ARM_LEAN_ORIG,
       LEFT_LEG_LEAN_ORIG, RIGHT_LEG_LEAN_ORIG,
       LEFT_ARM_FAT_ORIG, RIGHT_ARM_FAT_ORIG,
-      LEFT_LEG_FAT_ORIG, RIGHT_LEG_FAT_ORIG,
+      LEFT_LEG_FAT_ORIG, RIGHT_LEG_FAT_ORIG, TRUNK_FAT_ORIG,
     };
     // Convert a {x0,y0,x1,y1} OCR-style bbox into a raw {x,y,w,h} box.
     const bboxToBox = (b) =>
@@ -3461,6 +3658,7 @@ async function run() {
       RIGHT_ARM_FAT_ORIG: (rightArmSmall && rightArmSmall.bbox) || (fatCoords.right_arm && (wordsToRaw([{ bbox: fatCoords.right_arm }], fatScaled)[0].bbox)),
       LEFT_LEG_FAT_ORIG: (leftLegSmall && leftLegSmall.bbox) || (fatCoords.left_leg && (wordsToRaw([{ bbox: fatCoords.left_leg }], fatScaled)[0].bbox)),
       RIGHT_LEG_FAT_ORIG: (rightLegSmall && rightLegSmall.bbox) || (fatCoords.right_leg && (wordsToRaw([{ bbox: fatCoords.right_leg }], fatScaled)[0].bbox)),
+      TRUNK_FAT_ORIG: (trunkFatSmall && trunkFatSmall.bbox) || (fatCoords.trunk && (wordsToRaw([{ bbox: fatCoords.trunk }], fatScaled)[0].bbox)),
     };
     // Override the template-based boxes with the exact label-anchored number
     // positions found from the full-image OCR. This is what centers each
@@ -3612,6 +3810,74 @@ async function run() {
         return null;
       };
 
+      // Reconstruct an X.YY segmental value from an OCR token the same way the
+      // fat parser does, but also handle a leading-dots decoration that shows
+      // up on tilted photos ("..871kg" -> "8.71", ".8.61kg" -> "8.61").
+      function normalizeSegToken(raw) {
+        if (raw === null || raw === undefined) return null;
+        let s = String(raw)
+          .replace(/[,，]/g, ".")
+          .replace(/[:：]/g, ".")
+          .replace(/_/g, "")
+          .replace(/\s+/g, "");
+        s = s.replace(/[^0-9.]/g, "");
+        if (!s) return null;
+        const m = s.match(/^\.*(\d+)(?:\.(\d+))?$/);
+        if (!m) return null;
+        const intPart = m[1];
+        const decPart = m[2] !== undefined ? m[2] : null;
+        if (decPart !== null) {
+          const n = parseFloat(intPart + "." + decPart);
+          return Number.isNaN(n) ? null : n;
+        }
+        if (intPart.length === 1) return parseFloat("0." + intPart);
+        if (intPart.length === 2) return parseFloat(intPart[0] + "." + intPart[1]);
+        if (intPart.length >= 3) {
+          return parseFloat(intPart.slice(0, intPart.length - 2) + "." + intPart.slice(intPart.length - 2));
+        }
+        return null;
+      }
+
+      // Locate the lean value token for one segment from the FULL-page words
+      // (raw-canvas bboxes) near the template box, and normalize it to X.YY.
+      function fullWordSegmentValue(guideOrigBox, lo, hi) {
+        try {
+          if (!Array.isArray(fullWords)) return null;
+          const sc = scaleOrigBoxToCanvas(guideOrigBox, rawCanvas);
+          const gx = sc.x + sc.w / 2;
+          const gy = sc.y + sc.h / 2;
+          const cands = [];
+          for (const w of fullWords) {
+            if (!w || !w.bbox || !/\d/.test(w.text || "")) continue;
+            const cx = (w.bbox.x0 + w.bbox.x1) / 2;
+            const cy = (w.bbox.y0 + w.bbox.y1) / 2;
+            const dy = Math.abs(cy - gy);
+            const dx = Math.abs(cx - gx);
+            if (dy > 420 || dx > 750) continue;
+            const parsed = normalizeSegToken(w.text);
+            if (parsed === null || parsed < lo || parsed > hi) continue;
+            cands.push({
+              parsed,
+              dy,
+              dx,
+              digitLen: (String(w.text).match(/\d/g) || []).length,
+              kg: /kg/i.test(w.text),
+              conf: w.confidence || 0,
+            });
+          }
+          if (!cands.length) return null;
+          cands.sort((a, b) => {
+            if (a.kg !== b.kg) return a.kg ? -1 : 1;
+            if (a.dy !== b.dy) return a.dy - b.dy;
+            if (b.digitLen !== a.digitLen) return b.digitLen - a.digitLen;
+            return a.dx - b.dx;
+          });
+          return cands[0].parsed;
+        } catch (e) {
+          return null;
+        }
+      }
+
       const out = {
         left_arm_lean_kg: null,
         right_arm_lean_kg: null,
@@ -3619,7 +3885,22 @@ async function run() {
         left_leg_lean_kg: null,
         right_leg_lean_kg: null,
         coords: {},
+        fw_seg: {},
       };
+
+      // Full-page word parse wins: it is exact across both reference photos
+      // even when the lean-crop OCR and the small ORIG-box crops degrade.
+      const SEG_GUIDES = {
+        left_arm_lean_kg: { box: LEFT_ARM_LEAN_ORIG, lo: 0.5, hi: 30 },
+        right_arm_lean_kg: { box: RIGHT_ARM_LEAN_ORIG, lo: 0.5, hi: 30 },
+        left_leg_lean_kg: { box: LEFT_LEG_LEAN_ORIG, lo: 2, hi: 40 },
+        right_leg_lean_kg: { box: RIGHT_LEG_LEAN_ORIG, lo: 2, hi: 40 },
+      };
+      for (const [k, g] of Object.entries(SEG_GUIDES)) {
+        const v = fullWordSegmentValue(g.box, g.lo, g.hi);
+        if (v !== null) out.fw_seg[k] = v;
+      }
+
 
       if (toks.length) {
         toks.sort((a, b) => a.cy - b.cy);
@@ -4136,15 +4417,15 @@ async function run() {
           // trunk (أقوى فالباك بمربع أكبر)
           if (
             out.trunk_fat_kg === null &&
-            typeof ORIG_FAT !== "undefined"
+            typeof TRUNK_FAT_ORIG !== "undefined"
           ) {
             const v5 = findNumericNearBox(
               fullWords,
-              ORIG_FAT,
+              TRUNK_FAT_ORIG,
               rawCanvas,
               0.5,
-              9999,
-              1200
+              200,
+              700
             );
             if (v5 !== null) {
               const nv = normalizeFatTokenForParsing(v5);
@@ -4625,15 +4906,31 @@ async function run() {
     // rightLegLean3D.innerHTML = ((leanParsed.right_leg_lean_kg / max) * 100).toFixed(1) + "%";
     // leftLegLean3D.innerHTML = ((leanParsed.left_leg_lean_kg / max) * 100).toFixed(1) + "%";
 
-    leftArmLean.innerHTML = leanParsed.left_arm_lean_kg;
-    rightArmLean.innerHTML = leanParsed.right_arm_lean_kg;
-    rightLegLean.innerHTML = leanParsed.right_leg_lean_kg;
-    leftLegLean.innerHTML = leanParsed.left_leg_lean_kg;
+    // Direct crop reads win over the (tilt-sensitive) layout parser whenever
+    // they land inside the segment's plausible range with a confident OCR.
+    const leanFullSeg = leanParsed.fw_seg || {};
+    const segFinal = {
+      left_arm_lean_kg: pickLeanSeg(leanFullSeg.left_arm_lean_kg, leftArmLeanSmall, leanParsed.left_arm_lean_kg, 0.5, 30),
+      right_arm_lean_kg: pickLeanSeg(leanFullSeg.right_arm_lean_kg, rightArmLeanSmall, leanParsed.right_arm_lean_kg, 0.5, 30),
+      left_leg_lean_kg: pickLeanSeg(leanFullSeg.left_leg_lean_kg, leftLegLeanSmall, leanParsed.left_leg_lean_kg, 2, 40),
+      right_leg_lean_kg: pickLeanSeg(leanFullSeg.right_leg_lean_kg, rightLegLeanSmall, leanParsed.right_leg_lean_kg, 2, 40),
+      left_arm_fat_kg: pickSeg(leftArmSmall, fatParsedLikeLean.left_arm_fat_kg, 0.05, 10),
+      right_arm_fat_kg: pickSeg(rightArmSmall, fatParsedLikeLean.right_arm_fat_kg, 0.05, 10),
+      left_leg_fat_kg: pickSeg(leftLegSmall, fatParsedLikeLean.left_leg_fat_kg, 0.05, 30),
+      right_leg_fat_kg: pickSeg(rightLegSmall, fatParsedLikeLean.right_leg_fat_kg, 0.05, 30),
+      trunk_lean_kg: leanParsed.trunk_lean_kg,
+      trunk_fat_kg: pickSeg(trunkFatSmall, fatParsedLikeLean.trunk_fat_kg, 0.05, 200),
+    };
 
-    leftArmFat.innerHTML = fatParsedLikeLean.left_arm_fat_kg;
-    rightArmFat.innerHTML = fatParsedLikeLean.right_arm_fat_kg;
-    rightLegFat.innerHTML = fatParsedLikeLean.right_leg_fat_kg;
-    leftLegFat.innerHTML = fatParsedLikeLean.left_leg_fat_kg;
+    leftArmLean.innerHTML = segFinal.left_arm_lean_kg;
+    rightArmLean.innerHTML = segFinal.right_arm_lean_kg;
+    rightLegLean.innerHTML = segFinal.right_leg_lean_kg;
+    leftLegLean.innerHTML = segFinal.left_leg_lean_kg;
+
+    leftArmFat.innerHTML = segFinal.left_arm_fat_kg;
+    rightArmFat.innerHTML = segFinal.right_arm_fat_kg;
+    rightLegFat.innerHTML = segFinal.right_leg_fat_kg;
+    leftLegFat.innerHTML = segFinal.left_leg_fat_kg;
 
     const lineages = {
       weight: general.weight_kg,
@@ -4645,15 +4942,15 @@ async function run() {
       fat_mass: general.fat_mass_kg,
       protein: general.protein_kg,
 
-      left_arm_lean: leanParsed.left_arm_lean_kg,
-      right_arm_lean: leanParsed.right_arm_lean_kg,
-      right_leg_lean: leanParsed.right_leg_lean_kg,
-      left_leg_lean: leanParsed.left_leg_lean_kg,
+      left_arm_lean: segFinal.left_arm_lean_kg,
+      right_arm_lean: segFinal.right_arm_lean_kg,
+      right_leg_lean: segFinal.right_leg_lean_kg,
+      left_leg_lean: segFinal.left_leg_lean_kg,
 
-      left_arm_fat: fatParsedLikeLean.left_arm_fat_kg,
-      right_arm_fat: fatParsedLikeLean.right_arm_fat_kg,
-      right_leg_fat: fatParsedLikeLean.right_leg_fat_kg,
-      left_leg_fat: fatParsedLikeLean.left_leg_fat_kg
+      left_arm_fat: segFinal.left_arm_fat_kg,
+      right_arm_fat: segFinal.right_arm_fat_kg,
+      right_leg_fat: segFinal.right_leg_fat_kg,
+      left_leg_fat: segFinal.left_leg_fat_kg
     };
 
     console.log(fatParsedLikeLean.right_leg_fat_kg);
@@ -4677,7 +4974,7 @@ async function run() {
       };
     };
 
-    (async () => {
+    await (async () => {
       for (const [key, value] of Object.entries(lineages)) {
         await sendAllLineages(key, value);
       }
@@ -4694,19 +4991,19 @@ async function run() {
       protein_kg: general.protein_kg,
       segmental: {
         lean: {
-          left_arm_lean_kg: leanParsed.left_arm_lean_kg,
-          right_arm_lean_kg: leanParsed.right_arm_lean_kg,
-          trunk_lean_kg: leanParsed.trunk_lean_kg,
-          left_leg_lean_kg: leanParsed.left_leg_lean_kg,
-          right_leg_lean_kg: leanParsed.right_leg_lean_kg,
+          left_arm_lean_kg: segFinal.left_arm_lean_kg,
+          right_arm_lean_kg: segFinal.right_arm_lean_kg,
+          trunk_lean_kg: segFinal.trunk_lean_kg,
+          left_leg_lean_kg: segFinal.left_leg_lean_kg,
+          right_leg_lean_kg: segFinal.right_leg_lean_kg,
           coords: leanParsed.coords || {},
         },
         fat: {
-          left_arm_fat_kg: fatParsedLikeLean.left_arm_fat_kg,
-          right_arm_fat_kg: fatParsedLikeLean.right_arm_fat_kg,
-          trunk_fat_kg: fatParsedLikeLean.trunk_fat_kg,
-          left_leg_fat_kg: fatParsedLikeLean.left_leg_fat_kg,
-          right_leg_fat_kg: fatParsedLikeLean.right_leg_fat_kg,
+          left_arm_fat_kg: segFinal.left_arm_fat_kg,
+          right_arm_fat_kg: segFinal.right_arm_fat_kg,
+          trunk_fat_kg: segFinal.trunk_fat_kg,
+          left_leg_fat_kg: segFinal.left_leg_fat_kg,
+          right_leg_fat_kg: segFinal.right_leg_fat_kg,
         },
       },
       debug: {
@@ -4735,8 +5032,31 @@ async function run() {
           rightArm: rightArmSmall,
           leftLeg: leftLegSmall,
           rightLeg: rightLegSmall,
+          trunk: trunkFatSmall,
+        },
+        small_segment_raws_lean: {
+          leftArm: leftArmLeanSmall,
+          rightArm: rightArmLeanSmall,
+          leftLeg: leftLegLeanSmall,
+          rightLeg: rightLegLeanSmall,
         },
         fat_layout_parsed: fatLayout,
+        lean_layout_parsed: leanParsed,
+        seg_final: segFinal,
+        chart_reader_debug: window.__chartReaderDebug || null,
+        anchor_reader_debug: window.__anchorReaderDebug || null,
+        lean_crop_raw_text: (leanRes.data.text || "")
+          .replace(/[_\n\r]/g, " ")
+          .trim()
+          .slice(0, 900),
+        lean_res_words: (leanRes.data.words || []).map((w) => ({ text: w.text, bbox: w.bbox, conf: w.confidence })),
+        fat_res_words: (fatRes.data.words || []).map((w) => ({ text: w.text, bbox: w.bbox, conf: w.confidence })),
+        full_words_near_lean: (fullRes.data.words || [])
+          .filter((w) => {
+            const my = (w.bbox.y0 + w.bbox.y1) / 2;
+            return my > 7700 && my < 9400;
+          })
+          .map((w) => ({ text: w.text, bbox: w.bbox, conf: w.confidence })),
         parsed_full_excerpt: (fullText || "").slice(0, 2000),
         full_words_count: (fullRes.data.words || []).length,
         located: Object.fromEntries(
@@ -4752,23 +5072,26 @@ async function run() {
     window.__finalDebug = final;
     const img = new FormData();
     img.append('img', currentFile);
-    fetch('/save-img', {
-      method: 'POST',
-      headers: {
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-      },
-      body: img
-    }).then(response => {
-      if (!response.ok) {
-        console.error('Failed to update status');
-      };
-    }).catch(error => {
-      console.error('Error:', error);
-    });
-    // keep the annotated paper (sheet slope + boxes) visible so the user can
-    // verify the detection after OCR completes
+    try {
+      const imgRes = await fetch('/save-img', {
+        method: 'POST',
+        headers: {
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: img
+      });
+      if (!imgRes.ok) {
+        console.error('Failed to save image', imgRes.status);
+      }
+    } catch (imgErr) {
+      console.error('Error saving image:', imgErr);
+    }
+    if (window.TeamGymNotify) {
+      window.TeamGymNotify({ type: 'success', message: 'saved-successfully' });
+    }
     btnShowImgInBody.classList.add("show-button-img");
     statusEl.textContent = "انتهى — شاهد الصورة المعروضة (حدود الورقة والانحدار).";
+    setTimeout(() => { window.location.reload(); }, 1500);
   } catch (err) {
     console.error(err);
     statusEl.textContent = "خطأ: " + (err.message || err);

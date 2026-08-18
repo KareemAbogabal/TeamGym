@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>InBody chart-reader test</title>
+<style>
+  body { font-family: monospace; margin: 8px; background:#111; color:#eee; }
+  pre { white-space: pre-wrap; font-size: 11px; max-height: 95vh; overflow: auto; border: 1px solid #444; padding: 8px; }
+  .img-up { display: none; }
+</style>
+</head>
+<body>
+  <pre id="out">waiting...</pre>
+  <input type="file" class="inbodyUpload" id="body">
+  <button type="button" class="show-img-inBody">show</button>
+  <button type="button" class="remove-img-inBody">x</button>
+  <span id="status"></span>
+  <div class="img-up"><div class="content"><div class="img"></div></div></div>
+
+  <script src="js/Website/Dashboard/pages/Inbody-coordinates.js?v=charttest"></script>
+  <script>
+    const out = document.getElementById("out");
+    const log = (msg) => { out.textContent += msg + "\n"; };
+
+    async function run() {
+      try {
+        const q = new URLSearchParams(location.search);
+        const imgName = q.get("img") || "IMG20250908193729.jpg";
+        const r = await fetch("images/" + imgName);
+        if (!r.ok) throw new Error("fetch -> " + r.status);
+        const blob = await r.blob();
+        const file = new File([blob], imgName, { type: "image/jpeg" });
+        log("preprocessing...");
+        const c = await preprocessToCanvas(file, 3, true);
+        const raw = c.rawCanvas;
+        const th = c.threshCanvas;
+        log(`canvas ${raw.width}x${raw.height}`);
+
+        log("full-page OCR thresh...");
+        const frThresh = await Tesseract.recognize(th, "eng", { logger: () => {} });
+        log("full-page OCR raw...");
+        const frRaw = await Tesseract.recognize(raw, "eng", { logger: () => {} });
+        const fullRes = mergeFullResults(frThresh, frRaw);
+        log(`words ${(fullRes.data.words || []).length}`);
+
+        for (const f of [
+          { name: "smm", rxs: [/^Skeletal$/, /^Muscle$/, /^Mass$/], orig: SMM_ORIG, min: 8, max: 80 },
+          { name: "bmi", rxs: [/^Body$/, /^Mass$/, /^Index$/], orig: BMI_ORIG, min: 8, max: 60 },
+          { name: "pbf", rxs: [/^Percent$/, /^Body$/, /^Fat$/], orig: PBF_ORIG, min: 2, max: 60 },
+        ]) {
+          log(`--- ${f.name} ---`);
+          const chart = await readChartRowValue(fullRes.data.words || [], f.rxs, f.orig, raw, f.min, f.max, f.name);
+          const dbg = (window.__chartReaderDebug || {})[f.name] || {};
+          log(`  RESULT ${JSON.stringify(chart)}`);
+          log(`  row ${JSON.stringify(dbg.row && { midY: dbg.row.midY, y0: dbg.row.y0, rightmostX1: dbg.row.rightmostX1 })}`);
+          log(`  tokens ${(dbg.tokens || []).map((t) => t.text + "@" + t.bbox.x0 + "-" + t.bbox.x1).join(" ")}`);
+          log(`  allVal ${JSON.stringify(dbg.allVal)}`);
+          log(`  clusters ${(dbg.clusters || []).map((c) => JSON.stringify({ words: c.words, tightVal: c.tightVal, comboVal: c.comboVal })).join(" ")}`);
+          log(`  bands ${(dbg.bands || []).map((b) => b.label + ":" + b.x0 + "-" + b.x1 + "->" + b.val).join(" ")}`);
+        }
+
+        log("--- lean band words (full-page) ---");
+        const leanBand = (fullRes.data.words || [])
+          .filter((w) => w && w.bbox && /\d/.test(w.text || ""))
+          .filter((w) => w.bbox.y0 > 0.55 * raw.height && w.bbox.y1 < 0.85 * raw.height)
+          .map((w) => ({
+            text: w.text,
+            conf: Math.round(w.confidence),
+            x0: Math.round(w.bbox.x0),
+            x1: Math.round(w.bbox.x1),
+            y0: Math.round(w.bbox.y0),
+            y1: Math.round(w.bbox.y1),
+          }))
+          .sort((a, b) => a.y0 - b.y0 || a.x0 - b.x0);
+        for (const w of leanBand) log(JSON.stringify(w));
+        window.__harnessDone = true;
+      } catch (e) {
+        log("ERROR " + e.message);
+        window.__harnessDone = true;
+      }
+    }
+
+    const loadTesseract = () => new Promise((resolve, reject) => {
+      if (typeof Tesseract !== "undefined") return resolve();
+      const s = document.createElement("script");
+      s.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error("failed to load tesseract.js"));
+      document.head.appendChild(s);
+    });
+
+    loadTesseract().then(run).catch((e) => log("ERROR: " + e.message));
+  </script>
+</body>
+</html>

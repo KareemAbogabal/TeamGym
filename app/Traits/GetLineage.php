@@ -8,12 +8,15 @@ use Carbon\Carbon;
 
 trait GetLineage {
   public function get($ModelClass, $name, $state = true) {
-    $lineage;
+    $lineage = null;
     $nameLineages = mb_strtolower($name);
     if ($state) {
       $item = $ModelClass::where("code", Cookie::get('login_client'))->where("name", "$name")->first();
     } else {
-      $item = $ModelClass::whereRaw('LOWER(name) = ?', "$nameLineages")->first();
+      $item = $ModelClass::whereRaw('LOWER(name) = ?', ["$nameLineages"])->first();
+    };
+    if (!$item) {
+      return null;
     };
     $date = strtolower(Carbon::now('Africa/Cairo')->format('F'));
     $months = [
@@ -28,20 +31,28 @@ trait GetLineage {
     };
     return $lineage;
   }
-  public function getArray($ModelClass, $name, $state = true):array {
+  public function getArray($ModelClass, $name, $state = true, $currentMonthOnly = false):array {
     $lineage = [];
     $nameLineages = mb_strtolower($name);
     if ($state) {
       $item = $ModelClass::where("code", Cookie::get('login_client'))->where("name", "$name")->first();
     } else {
-      $item = $ModelClass::whereRaw('LOWER(name) = ?', "$nameLineages")->first();
+      $item = $ModelClass::whereRaw('LOWER(name) = ?', ["$nameLineages"])->first();
+    };
+    if (!$item) {
+      return array_fill(0, 12, null);
     };
     $months = [
       'january','february','march','april','may','june',
       'july','august','september','october','november','december'
     ];
+    $date = strtolower(Carbon::now('Africa/Cairo')->format('F'));
     foreach ($months as $m) {
-      $lineage[] = $item->{$m} ?? null;
+      if ($currentMonthOnly) {
+        $lineage[] = ($m === $date) ? ($item->{$m} ?? null) : null;
+      } else {
+        $lineage[] = $item->{$m} ?? null;
+      };
     };
     return $lineage;
   }

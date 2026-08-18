@@ -101,6 +101,7 @@ class Users extends Controller {
     };
     $employee->documentation = $request->has("documentation-employee") ? "true" : "false";
     $employee->save();
+    notifySuccess(__('messages.updated-successfully'));
     return back();
   }
   public function updateClient(UpdateClientRequest $request) {
@@ -115,6 +116,7 @@ class Users extends Controller {
     };
     $client->documentation = $request->has("documentation") ? "true" : "false";
     $client->save();
+    notifySuccess(__('messages.updated-successfully'));
     return back();
   }
   public function destroy(DestroyUserRequest $request) {
@@ -126,5 +128,7 @@ class Users extends Controller {
       $column = Client::where("id", $id)->first();
     };
     $column->delete();
+    notifySuccess(__('messages.deleted-successfully'));
+    return back();
   }
 }

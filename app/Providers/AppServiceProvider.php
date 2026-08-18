@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use App\Models\Front\Client;
 use App\Models\Front\LineageInBody;
 use App\Models\Front\ImgInBody;
@@ -27,13 +28,14 @@ use App\Models\Back\PaymentRegistry;
 use App\Traits\Notifications;
 use Illuminate\Support\Facades\Broadcast;
 use App\Traits\IncomeStatements;
+use App\Services\NotificationService;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use Carbon\Carbon;
 
 class AppServiceProvider extends ServiceProvider {
   use Notifications, IncomeStatements;
   public function register(): void {
-    //
+    $this->app->singleton(NotificationService::class);
   }
   public function boot(): void {
     Broadcast::routes();
@@ -58,25 +60,61 @@ class AppServiceProvider extends ServiceProvider {
       $lineageInBody = LineageInBody::where("code", Cookie::get('login_client'));
       $imgInBody = ImgInBody::where("code", Cookie::get('login_client'))->first();
       $now = Carbon::now('Africa/Cairo');
-      $day = $now->format('j');
-      $month = strtolower($now->format('F'));
-      $hour = $now->format('g A');
       $day = $now->format('d');
-      $monthNum = $now->format('m');
+      $month = strtolower($now->format('F'));
       $year = $now->format('Y');
-      $lockKey = "yearly_delete_done_{$year}";
-      if ((int)$monthNum == "12" && (int)$hour >= "6" && $day == "31" && !Cache::has($lockKey)) {
-        Cache::put($lockKey, true, now()->addYear());
-        if ($imgInBody && File::exists(public_path("Images/inBody/" . $imgInBody->img))) {
-          File::delete(public_path("Images/inBody/" . $imgInBody->img));
+      $lastYearInbody = (int) ($client->year_inbody ?? $year);
+      if ($lastYearInbody < (int)$year) {
+        try {
+          $monthsArr = [
+            'january','february','march','april','may','june',
+            'july','august','september','october','november','december'
+          ];
+          $metricsArr = [
+            'weight', 'BMI', 'PBF', 'SMM', 'KCAL', 'water', 'fat_mass', 'protein',
+            'left_arm_lean', 'right_arm_lean', 'left_leg_lean', 'right_leg_lean',
+            'left_arm_fat', 'right_arm_fat', 'left_leg_fat', 'right_leg_fat'
+          ];
+          $rows = LineageInBody::where("code", $client->code)->get()->keyBy('name');
+          $archive = [];
+          foreach ($metricsArr as $metric) {
+            $row = $rows->get($metric);
+            foreach ($monthsArr as $m) {
+              $archive[$metric][$m] = $row ? ($row->{$m} ?? null) : null;
+            };
+          };
+          $imgPath = null;
+          if ($imgInBody && File::exists(public_path("Images/inBody/" . $imgInBody->img))) {
+            $imgPath = public_path("Images/inBody/" . $imgInBody->img);
+          };
+          Mail::send('Mail.yearlyInbody', [
+            'client' => $client,
+            'archive' => $archive,
+            'year' => $lastYearInbody,
+          ], function ($message) use ($client, $imgPath, $lastYearInbody) {
+            $message->to($client->email)->subject('Your Team Gym InBody Yearly Report — ' . $lastYearInbody);
+            if ($imgPath) {
+              $message->attach($imgPath, ['as' => 'inbody_' . $lastYearInbody . '.jpg']);
+            };
+          });
+        } catch (\Throwable $e) {
+          Log::error('yearly inbody archive failed: ' . $e->getMessage(), ['exception' => $e]);
         };
         $lineageInBody->delete();
-        $imgInBody->query()->delete();
+        if ($imgInBody) {
+          if (File::exists(public_path("Images/inBody/" . $imgInBody->img))) {
+            File::delete(public_path("Images/inBody/" . $imgInBody->img));
+          };
+          $imgInBody->delete();
+        };
+        $client->year_inbody = (int)$year;
+        $client->save();
       };
       if ($system && $day > "1" && $system->amount == $system->paid && $system->paymonth !== $month) {
         $system->paid = 0;
         $system->save();
       };
+      $this->app->make(NotificationService::class)->cleanStaleNotifications($client);
       $notifications = $this->notificationSystem("client");
       $view->with([
         'client' => $client,
@@ -157,6 +195,7 @@ class AppServiceProvider extends ServiceProvider {
       };
       $settingCompany = SettingCompany::find(1);
       $employee = Employee::where("code", $employeeCode->code)->with("setting")->first();
+      $this->app->make(NotificationService::class)->cleanEmployeeNotifications($employee);
       $notifications = $this->notificationSystem("employee");
       $view->with([
         'settingCompany' => $settingCompany,

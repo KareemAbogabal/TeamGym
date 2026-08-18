@@ -83,6 +83,7 @@ class SettingCompanys extends Controller {
       $employee->img = null;
       $employee->save();
     };
+    notifySuccess(__('messages.updated-successfully'));
     return back();
   }
 }

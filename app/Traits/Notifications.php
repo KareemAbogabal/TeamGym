@@ -11,6 +11,7 @@ use App\Models\Back\Payment;
 use App\Models\Back\Supplement;
 use App\Models\Back\System;
 use App\Models\Back\Imports;
+use App\Models\Front\LineageInBody;
 use App\Traits\IncomeStatements;
 use Carbon\Carbon;
 
@@ -157,21 +158,24 @@ trait Notifications {
             $notification->save();
           };
         };
-        if (trim(strtolower($a->month)) != trim(strtolower($month))) {
-          $notification = new Notification();
-          $notification->code = rand(100000, time());
-          $notification->code_client = $client->code;
-          $notification->name = __('messages.inbody_title');
-          $notification->type = "InBody";
-          $notification->description = __('messages.inbody_followup');
-          $notification->icon = $this->getIconSvg("iconInBody");
-          $existsQuery = Notification::where('code_client', $notification->code_client)
-            ->where('type', $notification->type)
-            ->where('name', $notification->name)
-            ->where('description', $notification->description);
-          if (!$existsQuery->exists()) {
-            $notification->save();
-          };
+      };
+      $hasCurrentMonthInBody = LineageInBody::where('code', $client->code)
+        ->whereNotNull($month)
+        ->exists();
+      if (!$hasCurrentMonthInBody) {
+        $notification = new Notification();
+        $notification->code = rand(100000, time());
+        $notification->code_client = $client->code;
+        $notification->name = __('messages.inbody_title');
+        $notification->type = "InBody";
+        $notification->description = __('messages.inbody_followup');
+        $notification->icon = $this->getIconSvg("iconInBody");
+        $existsQuery = Notification::where('code_client', $notification->code_client)
+          ->where('type', $notification->type)
+          ->where('name', $notification->name)
+          ->where('description', $notification->description);
+        if (!$existsQuery->exists()) {
+          $notification->save();
         };
       };
     };

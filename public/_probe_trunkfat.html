@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trunk fat real-path probe</title>
+<style>body{font-family:monospace;background:#111;color:#eee}pre{white-space:pre-wrap;max-height:90vh;overflow:auto}</style>
+</head>
+<body>
+  <div id="dom">
+    <input type="file" id="body" class="inbodyUpload" name="img">
+    <span id="status"></span>
+    <button type="button" class="show-img-inBody">show</button>
+    <button type="button" class="remove-img-inBody">x</button>
+    <span class="weight"></span><span class="BMI"></span><span class="PBF"></span>
+    <span class="SMM"></span><span class="KCAL"></span><span class="water"></span>
+    <span class="fat_mass"></span><span class="protein"></span>
+    <span class="right-arm-lean-kg"></span><span class="left-arm-lean-kg"></span>
+    <span class="right-leg-lean-kg"></span><span class="left-leg-lean-kg"></span>
+    <span class="right-arm-fat-kg"></span><span class="left-arm-fat-kg"></span>
+    <span class="right-leg-fat-kg"></span><span class="left-leg-fat-kg"></span>
+    <div class="img-up"><div class="content"><div class="img"></div></div></div>
+  </div>
+  <pre id="out">waiting...</pre>
+
+  <script src="js/Website/Dashboard/pages/Inbody-coordinates.js?v=trunkfat"></script>
+
+  <script>
+    const q = new URLSearchParams(location.search);
+    const imgName = q.get("img") || "IMG20250908193729.jpg";
+    const out = document.getElementById("out");
+    const log = (m) => { out.textContent = typeof m === "string" ? m : JSON.stringify(m, null, 1); };
+
+    const loadTesseract = () => new Promise((resolve, reject) => {
+      if (typeof Tesseract !== "undefined") return resolve();
+      const s = document.createElement("script");
+      s.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error("failed to load tesseract.js"));
+      document.head.appendChild(s);
+    });
+
+    async function run() {
+      try {
+        const r = await fetch("images/" + imgName);
+        if (!r.ok) throw new Error("fetch " + imgName + " -> " + r.status);
+        const blob = await r.blob();
+        const file = new File([blob], imgName, { type: "image/jpeg" });
+        const canvases = await preprocessToCanvas(file, 3, true);
+        const rawCanvas = canvases.rawCanvas;
+        window.__sheet_bounds = detectSheetBounds(rawCanvas);
+        resetFixCanvasBoxes();
+        fixCanvas(TRUNK_FAT_ORIG, { x: 2.2, y: 1.5, w: 13, h: 13 });
+        const res = await expandAndFindNumber(TRUNK_FAT_ORIG, rawCanvas, 0.0, 200.0, 5, "seg");
+        log({
+          img: imgName,
+          orig: window.__orig_img_w + "x" + window.__orig_img_h,
+          canvas: rawCanvas.width + "x" + rawCanvas.height,
+          sheet: window.__sheet_bounds,
+          trunk_box_fixed: TRUNK_FAT_ORIG,
+          result: res,
+          pickSeg_eligible: res && res.value !== null && res.value >= 0.05 && res.value <= 200 && (res.confidence === undefined || res.confidence >= 40),
+        });
+        window.__probeDone = true;
+      } catch (e) {
+        log("ERROR: " + (e.message || e));
+        window.__probeDone = true;
+      }
+    }
+    loadTesseract().then(run).catch((e) => { log("ERROR: " + e.message); window.__probeDone = true; });
+  </script>
+</body>
+</html>

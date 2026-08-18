@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>IMG2 leg probe</title>
+<style>
+  body { font-family: monospace; margin: 8px; background:#111; color:#eee; }
+  pre { white-space: pre-wrap; font-size: 11px; max-height: 95vh; overflow: auto; border: 1px solid #444; padding: 8px; }
+  .img-up { display: none; }
+</style>
+</head>
+<body>
+  <pre id="out">waiting...</pre>
+  <input type="file" class="inbodyUpload" id="body">
+  <button type="button" class="show-img-inBody">show</button>
+  <button type="button" class="remove-img-inBody">x</button>
+  <span id="status"></span>
+  <div class="img-up"><div class="content"><div class="img"></div></div></div>
+
+  <script src="js/Website/Dashboard/pages/Inbody-coordinates.js?v=legprobe"></script>
+  <script>
+    const out = document.getElementById("out");
+    const log = (m) => { out.textContent += m + "\n"; };
+
+    const variants = [
+      (c) => c,
+      (c) => createEnhancedCanvas(c),
+      (c) => createOtsuThresholdCanvas(c),
+      (c) => createAdaptiveThresholdCanvas(c),
+    ];
+    const vNames = ["raw", "enh", "otsu", "adap"];
+
+    async function ocrCrop(raw, box, scale) {
+      const c = cropCanvas(raw, box.x, box.y, box.w, box.h);
+      const big = document.createElement("canvas");
+      big.width = Math.round(c.width * scale);
+      big.height = Math.round(c.height * scale);
+      const g = big.getContext("2d");
+      g.imageSmoothingEnabled = false;
+      g.drawImage(c, 0, 0, big.width, big.height);
+      const res = [];
+      for (let v = 0; v < variants.length; v++) {
+        try {
+          const src = variants[v](big);
+          const r = await Tesseract.recognize(src, "eng", {
+            logger: () => {},
+            tessedit_char_whitelist: "0123456789.,:kg",
+            tessedit_pageseg_mode: "7",
+          });
+          res.push(vNames[v] + "@" + scale + "x conf=" + Math.round(r.data.confidence) + " txt=\"" + (r.data.text || "").replace(/[\r\n]/g, " ").trim() + "\"");
+        } catch (e) {
+          res.push(vNames[v] + "@" + scale + "x ERR " + e.message);
+        }
+      }
+      return res;
+    }
+
+    async function run() {
+      try {
+        const q = new URLSearchParams(location.search);
+        const imgName = q.get("img") || "IMG20250908193729.jpg";
+        const r = await fetch("images/" + imgName);
+        if (!r.ok) throw new Error("fetch -> " + r.status);
+        const blob = await r.blob();
+        const file = new File([blob], imgName, { type: "image/jpeg" });
+        log("preprocessing...");
+        const c = await preprocessToCanvas(file, 3, true);
+        const raw = c.rawCanvas;
+        log(`canvas ${raw.width}x${raw.height}`);
+
+        const boxes = {
+          "L-leg a": { x: 420, y: 9150, w: 900, h: 260 },
+          "L-leg b": { x: 400, y: 9130, w: 950, h: 260 },
+          "L-leg c": { x: 600, y: 9180, w: 700, h: 240 },
+          "L-leg d": { x: 380, y: 9120, w: 1000, h: 280 },
+          "R-leg a": { x: 1910, y: 9170, w: 700, h: 240 },
+          "R-leg b": { x: 2000, y: 9150, w: 700, h: 240 },
+          "R-leg c": { x: 2050, y: 9190, w: 650, h: 220 },
+          "R-leg d": { x: 1900, y: 9130, w: 800, h: 280 },
+          "R-leg e": { x: 2100, y: 9200, w: 560, h: 190 },
+          "R-leg f": { x: 2200, y: 9200, w: 500, h: 200 },
+        };
+        for (const [name, box] of Object.entries(boxes)) {
+          log("=== " + name + " " + JSON.stringify(box) + " ===");
+          for (const scale of [2, 3]) {
+            const res = await ocrCrop(raw, box, scale);
+            for (const line of res) log("  " + line);
+          }
+        }
+        window.__harnessDone = true;
+      } catch (e) {
+        log("ERROR " + e.message);
+        window.__harnessDone = true;
+      }
+    }
+
+    const loadTesseract = () => new Promise((resolve, reject) => {
+      if (typeof Tesseract !== "undefined") return resolve();
+      const s = document.createElement("script");
+      s.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error("failed to load tesseract.js"));
+      document.head.appendChild(s);
+    });
+
+    loadTesseract().then(run).catch((e) => log("ERROR: " + e.message));
+  </script>
+</body>
+</html>

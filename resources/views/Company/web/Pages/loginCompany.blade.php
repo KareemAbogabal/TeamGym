@@ -10,15 +10,12 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" href="{{asset("css/Company/pages/loginCompany.css")}}">
+  <link rel="stylesheet" href="{{asset("css/notification.css")}}">
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
   <title>Team Gym | Login Company</title>
 </head>
 <body>
-  <div class="warnings-container">
-    @foreach ($errors->all() as $error)
-      <x-components::warning :text="$error" />
-    @endforeach
-  </div>
+  <x-components::notifications />
   <main>
     <div class="img">
       <img src="{{asset("images/content/login-company.png")}}" alt="No Img Login">
@@ -64,6 +61,6 @@
     </form>
   </main>
   <script src="{{asset("js/Company/pages/loginCompany.js")}}"></script>
-  <script src="{{asset("js/warning.js")}}"></script>
+  <script src="{{asset("js/notification.js")}}"></script>
 </body>
 </html>

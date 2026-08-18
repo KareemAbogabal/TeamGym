@@ -16,6 +16,10 @@ const Utils = {
 };
 
 function makeChartBar(element) {
+  if (!element || typeof Chart === 'undefined') {
+    console.warn('Chart.js is not available; skipping chart render.');
+    return;
+  }
   const isArabic = document.documentElement.getAttribute("lang") === "ar";
   const ctx1Att = element.getAttribute("data-revenues");
   const ctx2Att = element.getAttribute("data-expenses");
@@ -104,6 +108,10 @@ function makeChartBar(element) {
 };
 
 function makeChartPolarArea(element) {
+  if (!element || typeof Chart === 'undefined') {
+    console.warn('Chart.js is not available; skipping polar-area chart.');
+    return;
+  }
   const isArabic = html.getAttribute("lang") === "ar";
   const ctx1Att = element.getAttribute("data-percentage");
   const doughnutConfig = {
@@ -167,17 +175,21 @@ function makeChartPolarArea(element) {
   new Chart(element, doughnutConfig);
 };
 
-makeChartBar(char1);
-makeChartPolarArea(char2);
+if (typeof Chart !== 'undefined') {
+  makeChartBar(char1);
+  makeChartPolarArea(char2);
+}
 
-input.addEventListener('input', () => {
+if (input) {
+  input.addEventListener('input', () => {
   const term = input.value.trim().toLowerCase();
-  rows.forEach(row => {
-    const text = Array.from(row.children).map(el => el.textContent.trim().toLowerCase()).join(' ');
-    if (text.includes(term)) {
-      row.style.display = 'flex';
-    } else {
-      row.style.display = 'none';
-    };
+    rows.forEach(row => {
+      const text = Array.from(row.children).map(el => el.textContent.trim().toLowerCase()).join(' ');
+      if (text.includes(term)) {
+        row.style.display = 'flex';
+      } else {
+        row.style.display = 'none';
+      };
+    });
   });
-});
+}

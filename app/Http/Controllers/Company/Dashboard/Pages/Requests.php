@@ -51,6 +51,9 @@ class Requests extends Controller {
     $action = $request->input('action');
     $employee = Auth::guard('employee')->user();
     $requestsPayment = RequestsPayment::where("code", $request->input("code_request_payment"))->first();
+    if (!$requestsPayment) {
+      return back()->withErrors(['error' => 'Request payment not found']);
+    };
     $client = Client::where("code", $requestsPayment->code_client)->first();
     if ($action == "acceptance") {
       $getSupplement = Supplement::where("code", $request->input("code_supplements"))->first();
@@ -113,6 +116,7 @@ class Requests extends Controller {
     };
     $history = new History();
     $history->recordHistory("$employee->fname $employee->lname", null, $employee->code, "acceptance", $request->input("amount"), $request->input("order_name"), "$employee->fname $employee->lname");
+    notifySuccess(__('messages.updated-successfully'));
     return back();
   }
   public function customerRequests(Request $request) {
@@ -133,6 +137,9 @@ class Requests extends Controller {
     $employee = Auth::guard('employee')->user();
     $client = Client::whereRaw('LOWER(fname) = ?', [mb_strtolower($request->input("fname"))])->whereRaw('LOWER(lname) = ?', [mb_strtolower($request->input("lname"))])->first();
     $customerRequests = CustomerRequests::find($request->input("id_request"));
+    if (!$customerRequests) {
+      return back()->withErrors(['error' => 'Customer request not found']);
+    };
     $getSupplement = Supplement::where("code", $request->input("code_order"))->first();
     $getSystem = System::where("code", $request->input("code_order"))->first();
     if ($action == "acceptance" && $customerRequests->state == "request") {
@@ -142,6 +149,9 @@ class Requests extends Controller {
       $payday = Carbon::now()->format('l');
       $requestsPayment = new RequestsPayment();
       if ($customerRequests->type == "system" && $client) {
+        if (!$getSystem) {
+          return redirect()->back()->with('error', __('messages.system-empty'));
+        };
         $requestsPayment->addRequest($client->code, $request->input("order_name"), $request->input("code_order"), null, $getSystem->amount, $payday, $employee->code);
       } else if ($customerRequests->type == "system" && !$client) {
         if (!$getSystem) {
@@ -220,6 +230,9 @@ class Requests extends Controller {
         $customerRequests->code_payment = $payment->code;
         $customerRequests->save();
       } else if ($customerRequests->type == "supplement" && ($client || $customerRequests)) {
+        if (!$getSupplement) {
+          return redirect()->back()->with('error', __('messages.supplement-empty'));
+        };
         $requestsPayment->addRequest($client ? $client->code : $customerRequests->code, $request->input("order_name"), $request->input("code_order"), null, $getSupplement->amount, $payday, $employee->code);
         $month = strtolower(Carbon::now('Africa/Cairo')->format('F'));
         $payment = new Payment();
@@ -268,18 +281,19 @@ class Requests extends Controller {
         };
       };
     } else if ($action == "reject" && $customerRequests->state == "request") {
-      $requestsPayment->state = "reject";
-      $requestsPayment->save();
+      $customerRequests->state = "reject";
+      $customerRequests->save();
     } else {
       return back()->withErrors(['error' => 'Request rejected']);
     };
     $history = new History();
     if ($getSystem) {
       $history->recordHistory("$employee->fname $employee->lname", null, $employee->code, "acceptance", $getSystem->amount, $request->input("order_name"), "$employee->fname $employee->lname");
-    } else {
+    } else if ($getSupplement) {
       $history->recordHistory("$employee->fname $employee->lname", null, $employee->code, "acceptance", $getSupplement->amount, $request->input("order_name"), "$employee->fname $employee->lname");
     };
     // $CustomerRequests->delete();
+    notifySuccess(__('messages.updated-successfully'));
     return back();
   }
 }

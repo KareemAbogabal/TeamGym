@@ -1,0 +1,520 @@
+@import url("/css/variables.css");
+
+
+.table {
+  background: linear-gradient(160deg, rgba(32, 32, 32, 0.7), rgba(12, 12, 12, 0.9)) !important;
+  border: 1px solid rgba(255, 230, 91, 0.14);
+  border-radius: 10px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4);
+}
+
+.width-table {
+  width: 60% !important;
+}
+
+.table .header {
+  padding: 5px 10px;
+  width: 100%;
+  height: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgb(255, 230, 91);
+}
+
+.table .header h4 {
+  position: relative;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: capitalize;
+  text-align: center;
+  width: 100%;
+  color: rgb(15, 15, 15);
+}
+
+.table .header h4:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: 0px;
+  width: 1px;
+  height: 100%;
+  background-color: var(--colorPearnt);
+}
+
+/* --- Table Body --- */
+.table .body:not(:has(.choose)) {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.table .body:has(.choose) {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-y: auto;
+}
+
+.table .body .choose p {
+  color: var(--colorReverse);
+}
+
+/* --- Scrollbar --- */
+.table .body::-webkit-scrollbar {
+  background-color: transparent;
+  width: 5px;
+}
+
+.table .body::-webkit-scrollbar-thumb {
+  background-color: var(--colorAverage);
+  border-radius: 20px;
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  -ms-border-radius: 20px;
+  -o-border-radius: 20px;
+}
+
+/* --- Table Row --- */
+.table .body .row {
+  padding: 10px 0px;
+  width: 95%;
+  min-height: 80px;
+  border-bottom: 1px solid var(--colorReverse);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* --- Row Content / Details --- */
+.table .body .row .content {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--colorParagraph);
+}
+
+.table .body .row .details {
+  margin: 25px 0px;
+}
+
+.table .body .row .details ul {
+  margin: 10px;
+}
+
+.table .body .row .details ul li {
+  margin: 10px;
+  color: var(--colorReverse);
+  text-transform: capitalize;
+}
+
+.table .body .row .details ul li button {
+  padding: 7px 13px;
+  background-color: var(--colorAverage);
+  color: black;
+  border-radius: 10px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
+  text-transform: capitalize;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+
+/* --- Row Content Row (inline buttons) --- */
+.table .body .row .content-row {
+  margin: 0px 10px;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.table .body .row .content-row button {
+  width: fit-content;
+  background-color: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.table .body .row .content-row button:hover {
+  background-color: transparent;
+}
+
+/* --- Row Paragraphs --- */
+.table .body .row p {
+  font-size: 14px;
+  margin: 0px 10px;
+  width: 100%;
+  text-align: center;
+  text-transform: capitalize;
+  color: var(--colorReverse);
+}
+
+.table .body .row p:has(img) {
+  font-size: 14px;
+  width: 100%;
+  text-align: center;
+  text-transform: capitalize;
+  color: var(--colorReverse);
+  display: flex;
+  justify-content: start;
+  align-items: center;
+}
+
+.table .body .row p img {
+  margin: 0px 10px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  -ms-border-radius: 50%;
+  -o-border-radius: 50%;
+  border: 1px solid transparent;
+  outline: 1px solid var(--colorReverse);
+  object-fit: cover;
+}
+
+/* --- Row Buttons (non-SVG, pill style) --- */
+.table .body .row button:not(:has(svg)) {
+  --primary-color: var(--colorAverage);
+  --secondary-color: var(--colorPearnt);
+  --hover-color: var(--colorGold);
+  --arrow-width: 10px;
+  --arrow-stroke: 2px;
+  width: 90%;
+  border: 0;
+  color: var(--secondary-color);
+  padding: 10px;
+  background: var(--primary-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.6em;
+  font-weight: bold;
+  border-radius: 20px;
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  -ms-border-radius: 20px;
+  -o-border-radius: 20px;
+  transition: 0.2s;
+  -webkit-transition: 0.2s;
+  -moz-transition: 0.2s;
+  -ms-transition: 0.2s;
+  -o-transition: 0.2s;
+  cursor: pointer;
+}
+
+/* --- Row Buttons (SVG icon, transparent) --- */
+.table .body .row button:has(svg) {
+  background-color: transparent;
+  border: none;
+  outline: none;
+  transition: all 0.2s ease-in;
+  -webkit-transition: all 0.2s ease-in;
+  -moz-transition: all 0.2s ease-in;
+  -ms-transition: all 0.2s ease-in;
+  -o-transition: all 0.2s ease-in;
+  cursor: pointer;
+}
+
+/* --- Arrow Button Components --- */
+.table .body .row button .arrow-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.table .body .row button .arrow {
+  position: relative;
+  margin-top: 1px;
+  width: var(--arrow-width);
+  height: var(--arrow-stroke);
+  background: var(--primary-color);
+  transition: 0.2s;
+  -webkit-transition: 0.2s;
+  -moz-transition: 0.2s;
+  -ms-transition: 0.2s;
+  -o-transition: 0.2s;
+}
+
+.table .body .row button .arrow::before {
+  content: "";
+  position: absolute;
+  top: -3px;
+  right: 3px;
+  border: solid var(--secondary-color);
+  border-width: 0 var(--arrow-stroke) var(--arrow-stroke) 0;
+  display: inline-block;
+  padding: 3px;
+  transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+  -moz-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  -o-transform: rotate(-45deg);
+  transition: 0.2s;
+  -webkit-transition: 0.2s;
+  -moz-transition: 0.2s;
+  -ms-transition: 0.2s;
+  -o-transition: 0.2s;
+}
+
+/* --- Button Hover States --- */
+.table .body .row button:hover {
+  background-color: var(--hover-color);
+}
+
+.table .body .row button:hover .arrow {
+  background: var(--secondary-color);
+}
+
+.table .body .row button:hover .arrow:before {
+  right: 0;
+}
+
+/* --- Detail Row Toggle --- */
+.show-det-row {
+  height: auto !important;
+  min-height: 100% !important;
+  overflow: visible !important;
+}
+
+.show-btn-det {
+  transform: rotate(180deg) !important;
+  -webkit-transform: rotate(180deg) !important;
+  -moz-transform: rotate(180deg) !important;
+  -ms-transform: rotate(180deg) !important;
+  -o-transform: rotate(180deg) !important;
+}
+
+/* ===========================
+   Data-State Badge Variants
+   =========================== */
+
+.table .row p[data-state="exit"] {
+  padding: 3px 10px;
+  font-size: 14px;
+  width: 90%;
+  text-align: center;
+  text-transform: capitalize;
+  background-color: #82eb58;
+  color: white;
+  border-radius: 50px;
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  -ms-border-radius: 50px;
+  -o-border-radius: 50px;
+}
+
+.table .row p[data-state="entrance"] {
+  padding: 3px 10px;
+  font-size: 14px;
+  width: 90%;
+  text-align: center;
+  text-transform: capitalize;
+  background-color: #eb5858;
+  color: white;
+  border-radius: 50px;
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  -ms-border-radius: 50px;
+  -o-border-radius: 50px;
+}
+
+.table .row p[data-state="login"] {
+  padding: 3px 8px;
+  background-color: rgba(192, 98, 247, 0.904);
+  color: #441f5a;
+  border-radius: 50px;
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  -ms-border-radius: 50px;
+  -o-border-radius: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.table .row p[data-state="PRO"] {
+  padding: 3px 8px;
+  background-color: rgba(255, 154, 107, 0.904);
+  color: #5a1f1f;
+  border-radius: 50px;
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  -ms-border-radius: 50px;
+  -o-border-radius: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.table .row p[data-state="paid"] {
+  padding: 3px 8px;
+  background-color: rgba(174, 255, 107, 0.904);
+  color: #2b5a1f;
+  border-radius: 50px;
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  -ms-border-radius: 50px;
+  -o-border-radius: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.table .row p[data-state="easy"] {
+  padding: 3px 8px;
+  background-color: rgba(174, 255, 107, 0.904);
+  color: #2b5a1f;
+  border-radius: 50px;
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  -ms-border-radius: 50px;
+  -o-border-radius: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.table .row p[data-state="middle"] {
+  padding: 3px 8px;
+  background-color: rgba(107, 134, 255, 0.904);
+  color: #281f5a;
+  border-radius: 50px;
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  -ms-border-radius: 50px;
+  -o-border-radius: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.table .row p[data-state="Expenses"] {
+  padding: 3px 8px;
+  background-color: rgba(255, 83, 60, 0.904);
+  color: #5a1f1f;
+  border-radius: 50px;
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  -ms-border-radius: 50px;
+  -o-border-radius: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.table .row p[data-state="Revenues"] {
+  padding: 3px 8px;
+  background-color: rgba(127, 255, 76, 0.904);
+  color: #245a1f;
+  border-radius: 50px;
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  -ms-border-radius: 50px;
+  -o-border-radius: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.table .row p[data-state="request"] {
+  padding: 3px 8px;
+  background-color: rgba(255, 76, 76, 0.904);
+  color: #5a1f1f;
+  border-radius: 50px;
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  -ms-border-radius: 50px;
+  -o-border-radius: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.table .row p[data-state="waiting"] {
+  padding: 3px 8px;
+  background-color: rgba(228, 255, 76, 0.904);
+  color: #595a1f;
+  border-radius: 50px;
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  -ms-border-radius: 50px;
+  -o-border-radius: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.table .row p[data-state="sold"] {
+  padding: 3px 8px;
+  background-color: rgba(127, 255, 76, 0.904);
+  color: #245a1f;
+  border-radius: 50px;
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  -ms-border-radius: 50px;
+  -o-border-radius: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.table .row p[data-state="acceptance"] {
+  padding: 3px 8px;
+  background-color: rgba(76, 255, 130, 0.904);
+  color: #245a1f;
+  border-radius: 50px;
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  -ms-border-radius: 50px;
+  -o-border-radius: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.table .row p[data-state="reject"] {
+  padding: 3px 8px;
+  background-color: rgba(255, 76, 76, 0.904);
+  color: #5a1f1f;
+  border-radius: 50px;
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  -ms-border-radius: 50px;
+  -o-border-radius: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.table .row p[data-state="import"] {
+  padding: 3px 8px;
+  background-color: rgba(153, 153, 153, 0.904);
+  color: #d4d4d4;
+  border-radius: 50px;
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  -ms-border-radius: 50px;
+  -o-border-radius: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

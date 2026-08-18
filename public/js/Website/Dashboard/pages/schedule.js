@@ -1,117 +1,226 @@
-let unactive = document.querySelectorAll(".unactive");
-let exercises = document.querySelector(".exercises");
-let nameExercises = document.querySelector(".name-exercises");
-let description = document.querySelector(".description");
-let btnGoExercise = document.querySelectorAll(".go-exercise");
-let tableExercise = document.querySelector(".table");
-let tableExerciseBody = document.querySelector(".table .body");
-let showExerciseShape = document.querySelector(".show-exercises .body .shape");
-let btnExercisesGo = document.querySelector(".btn-exercises-go");
+let exerciseCards = document.querySelectorAll('.exercise-card');
+let detailPanel = document.getElementById('exerciseDetailPanel');
+let detailName = detailPanel ? detailPanel.querySelector('.detail-name') : null;
+let detailDescription = detailPanel ? detailPanel.querySelector('.detail-description') : null;
+let shapesBody = detailPanel ? detailPanel.querySelector('.shapes-body') : null;
+let detailMedia = detailPanel ? detailPanel.querySelector('.detail-media') : null;
+let mediaContainer = detailPanel ? detailPanel.querySelector('.media-container') : null;
+let detailImg = detailPanel ? detailPanel.querySelector('.detail-img') : null;
+let btnExercisesGo = detailPanel ? detailPanel.querySelector('.btn-exercises-go') : null;
 let input = document.querySelector('.search-input');
-let rows  = document.querySelectorAll('.table .row');
+let rows = document.querySelectorAll('.table .row');
 let isRunning = false;
 let hasStarted = false;
 let started = false;
-let stopFn = null;
-let dataExercise = [];
-let code;
+let selectedCode = null;
+let selectedElements = [];
+let currentMediaBtn = null;
 
-unactive.forEach(item => {
-  item.onclick = () => {
-    item.classList.add("reject");
-    setTimeout(() => {
-      item.classList.remove("reject");
-    }, 710);
-  };
-})
+exerciseCards.forEach(card => {
+  card.addEventListener('click', (e) => {
+    if (e.target.closest('.shape-media-btn')) return;
+    const isUnactive = card.classList.contains('unactive');
+    if (isUnactive) {
+      card.classList.add('reject');
+      setTimeout(() => card.classList.remove('reject'), 710);
+      return;
+    }
 
-function createExercises(name, numGroups, numSets, videoExercises) {
-  let tableExerciseBodyChoose = document.querySelector(".table .body .choose");
-  if (tableExerciseBodyChoose) {
-    tableExerciseBodyChoose.remove();
-  };
-  const exercise = document.createElement('div');
-  exercise.classList.add('row');
-  const p1 = document.createElement('p');
-  p1.textContent = name;
-  p1.className = "search";
-  exercise.appendChild(p1);
-  const p2 = document.createElement('p');
-  p2.textContent = numGroups;
-  exercise.appendChild(p2);
-  const p3 = document.createElement('p');
-  p3.textContent = numSets;
-  exercise.appendChild(p3);
-  const button = document.createElement('button');
-  button.className = 'add-video';
-  button.textContent = 'Show Video';
-  button.setAttribute("data-video", videoExercises);
-  const arrowWrapper = document.createElement('div');
-  arrowWrapper.classList.add('arrow-wrapper');
-  const arrow = document.createElement('div');
-  arrow.classList.add('arrow');
-  arrowWrapper.appendChild(arrow);
-  button.appendChild(arrowWrapper);
-  exercise.appendChild(button);
-  tableExerciseBody.appendChild(exercise);
-};
+    exerciseCards.forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
 
-function addVideo() {
-  let addVideo = document.querySelectorAll(".add-video");
-  addVideo.forEach((button) => {
-    if (!button.classList.contains("event-bound")) {
-      button.classList.add("event-bound");
-      button.onclick = () => {
-        let video = button.getAttribute("data-video");
-        showExerciseShape.innerHTML = "";
-        let createVideo = document.createElement("video");
-        createVideo.src = video;
-        createVideo.setAttribute("controls", "");
-        createVideo.setAttribute("controlsList", "nodownload");
-        showExerciseShape.appendChild(createVideo);
-      };
-    };
+    const name = card.getAttribute('data-name');
+    const description = card.getAttribute('data-description');
+    const code = card.getAttribute('data-code');
+    const statement = card.getAttribute('data-statement');
+    let elements = [];
+    try {
+      elements = JSON.parse(card.getAttribute('data-elements'));
+    } catch (err) {}
+
+    selectedCode = code;
+    selectedElements = elements;
+
+    if (detailName) detailName.textContent = name || '';
+    if (detailDescription) detailDescription.textContent = description || '';
+
+    if (detailMedia) detailMedia.classList.remove('visible');
+    currentMediaBtn = null;
+
+    if (shapesBody) shapesBody.innerHTML = '';
+    elements.forEach((el, idx) => {
+      const row = document.createElement('div');
+      row.className = 'row';
+
+      const pName = document.createElement('p');
+      pName.textContent = el.name || '';
+      pName.className = 'search';
+      row.appendChild(pName);
+
+      const pRatio = document.createElement('p');
+      pRatio.textContent = el.ratio || '';
+      row.appendChild(pRatio);
+
+      const pSets = document.createElement('p');
+      pSets.textContent = el.sets || '';
+      row.appendChild(pSets);
+
+      const btnsWrap = document.createElement('div');
+      btnsWrap.className = 'shape-media-btns';
+
+      const attachments = el.attachments || [];
+      const hasImg = attachments.length > 0 && attachments[0].img && attachments[0].img !== '';
+      const hasVideo = attachments.length > 0 && attachments[0].video && attachments[0].video !== '';
+
+      const imgBtn = document.createElement('button');
+      imgBtn.type = 'button';
+      imgBtn.className = 'shape-media-btn';
+      imgBtn.title = 'Show image';
+      imgBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
+      if (!hasImg) {
+        imgBtn.style.opacity = '0.3';
+        imgBtn.style.pointerEvents = 'none';
+      }
+      imgBtn.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        showImage(attachments[0].img);
+        btnsWrap.querySelectorAll('.shape-media-btn').forEach(b => b.classList.remove('active-btn'));
+        imgBtn.classList.add('active-btn');
+        shapesBody.querySelectorAll('.row').forEach(r => r.classList.remove('active-row'));
+        row.classList.add('active-row');
+        currentMediaBtn = imgBtn;
+      });
+      btnsWrap.appendChild(imgBtn);
+
+      const videoBtn = document.createElement('button');
+      videoBtn.type = 'button';
+      videoBtn.className = 'shape-media-btn';
+      videoBtn.title = 'Show video';
+      videoBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>';
+      if (!hasVideo) {
+        videoBtn.style.opacity = '0.3';
+        videoBtn.style.pointerEvents = 'none';
+      }
+      videoBtn.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        showVideo(attachments[0].video);
+        btnsWrap.querySelectorAll('.shape-media-btn').forEach(b => b.classList.remove('active-btn'));
+        videoBtn.classList.add('active-btn');
+        shapesBody.querySelectorAll('.row').forEach(r => r.classList.remove('active-row'));
+        row.classList.add('active-row');
+        currentMediaBtn = videoBtn;
+      });
+      btnsWrap.appendChild(videoBtn);
+
+      row.appendChild(btnsWrap);
+      shapesBody.appendChild(row);
+    });
+
+    if (detailPanel) {
+      detailPanel.classList.add('visible');
+    }
+
+    if (btnExercisesGo) {
+      if (statement === 'true') {
+        btnExercisesGo.textContent = tGo || 'Go';
+        started = true;
+      } else {
+        started = false;
+      }
+    }
   });
-};
+});
 
-function addImg(src) {
-  showExerciseShape.innerHTML = "";
-  let img = document.createElement("img");
-  img.src = src;
-  showExerciseShape.appendChild(img);
-};
+function showImage(src) {
+  if (!detailMedia || !mediaContainer) return;
+  const existingVideo = mediaContainer.querySelector('video');
+  if (existingVideo) existingVideo.remove();
+  detailImg.src = src || defaultExerciseImg || '';
+  detailImg.style.display = 'block';
+  detailMedia.classList.add('visible');
+}
+
+function showVideo(src) {
+  if (!detailMedia || !mediaContainer) return;
+  if (!src || src === '') return;
+  detailImg.style.display = 'none';
+  let video = mediaContainer.querySelector('video');
+  if (!video) {
+    video = document.createElement('video');
+    video.setAttribute('controls', '');
+    video.setAttribute('controlsList', 'nodownload');
+    mediaContainer.appendChild(video);
+  }
+  video.src = src;
+  video.style.display = 'block';
+  detailMedia.classList.add('visible');
+}
+
+if (btnExercisesGo) {
+  btnExercisesGo.addEventListener('click', () => {
+    if (started && selectedCode) {
+      if (!hasStarted) {
+        startCount(4500);
+        isRunning = true;
+        hasStarted = true;
+        btnExercisesGo.textContent = 'Pause';
+
+        const data = new FormData();
+        data.append('code', selectedCode);
+        fetch('/insert-pay-day', {
+          method: 'POST',
+          headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          },
+          body: data
+        }).then(r => r.json()).then(d => console.log(d)).catch(err => console.error(err));
+      } else {
+        if (isRunning) {
+          _pauseTimer();
+          isRunning = false;
+          btnExercisesGo.textContent = 'Resume';
+        } else {
+          _startTimer();
+          isRunning = true;
+          btnExercisesGo.textContent = 'Pause';
+        }
+      }
+    }
+  });
+}
 
 function startCount(count) {
   const unit = count > 1 ? 'seconds' : 'hours';
   const totalSeconds = unit === 'seconds' ? count : count * 3600;
-  const progressBar = document.getElementById("timer");
-  const timeLabel = document.getElementById("time-label");
+  const progressBar = document.getElementById('timer');
+  const timeLabel = document.getElementById('time-label');
   let timerId;
-  const KEY_START = "timerStart";
-  const KEY_ELAPSED = "timerElapsed";
-  const KEY_ENDED = "timerEnded";
-  const KEY_PAUSED = "timerPaused";
+  const KEY_START = 'timerStart';
+  const KEY_ELAPSED = 'timerElapsed';
+  const KEY_ENDED = 'timerEnded';
+  const KEY_PAUSED = 'timerPaused';
+
   function saveState(start, elapsed, ended, paused) {
     localStorage.setItem(KEY_START, start);
     localStorage.setItem(KEY_ELAPSED, elapsed);
     localStorage.setItem(KEY_ENDED, ended);
     localStorage.setItem(KEY_PAUSED, paused);
-  };
+  }
+
   function loadState() {
     return {
       start: parseInt(localStorage.getItem(KEY_START), 10) || 0,
       elapsed: parseInt(localStorage.getItem(KEY_ELAPSED), 10) || 0,
-      ended: localStorage.getItem(KEY_ENDED) === "true",
-      paused: localStorage.getItem(KEY_PAUSED) === "true",
+      ended: localStorage.getItem(KEY_ENDED) === 'true',
+      paused: localStorage.getItem(KEY_PAUSED) === 'true',
     };
-  };
+  }
+
   function render(elapsed) {
-    progressBar.max   = totalSeconds;
+    progressBar.max = totalSeconds;
     progressBar.value = elapsed;
     if (elapsed === 0) {
-      timeLabel.textContent = unit === 'seconds'
-        ? count + 's'
-        : count + 'h';
+      timeLabel.textContent = unit === 'seconds' ? count + 's' : count + 'h';
     } else {
       if (unit === 'seconds') {
         timeLabel.textContent = elapsed + 's';
@@ -120,22 +229,22 @@ function startCount(count) {
         const mm = String(Math.floor(remaining / 60)).padStart(2, '0');
         const ss = String(remaining % 60).padStart(2, '0');
         timeLabel.textContent = mm + ':' + ss;
-      };
-    };
+      }
+    }
     const pct = (elapsed / totalSeconds) * 100;
-    timeLabel.style.left = elapsed === 0
-      ? '0%'
-      : `calc(${pct}% - 15px)`;
-  };
+    timeLabel.style.left = elapsed === 0 ? '0%' : 'calc(' + pct + '% - 15px)';
+  }
+
   function tick() {
     const state = loadState();
-    const now   = Date.now();
+    const now = Date.now();
     let elapsed = Math.floor((now - state.start) / 1000);
     if (elapsed >= totalSeconds) elapsed = totalSeconds;
     render(elapsed);
     saveState(state.start, elapsed, elapsed >= totalSeconds, false);
     if (elapsed >= totalSeconds) clearInterval(timerId);
-  };
+  }
+
   function startTimer() {
     const state = loadState();
     let startTime;
@@ -144,19 +253,22 @@ function startCount(count) {
     } else {
       startTime = Date.now();
       state.elapsed = 0;
-    };
+    }
     saveState(startTime, state.elapsed, false, false);
     render(state.elapsed);
     clearInterval(timerId);
     timerId = setInterval(tick, 1000);
-  };
+  }
+
   function pauseTimer() {
     clearInterval(timerId);
     const state = loadState();
     saveState(state.start, state.elapsed, false, true);
-  };
+  }
+
   window._startTimer = startTimer;
   window._pauseTimer = pauseTimer;
+
   (function init() {
     const state = loadState();
     if (state.start && !state.ended) {
@@ -169,145 +281,14 @@ function startCount(count) {
     }
   })();
   startTimer();
-};
+}
 
-btnGoExercise.forEach((button) => {
-  button.onclick = (e) => {
-    let imgSrc = button.getAttribute("data-img");
-    let dataCode = button.getAttribute("data-code");
-    code = dataCode;
-    const data = new FormData();
-    data.append("code", code);
-    fetch('/get-exercises', {
-      method: 'POST',
-      headers: {
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-      },
-      body: data
-    }).then(response => response.json()).then(data => {
-      dataExercise.push(data);
-      let mainExercise = e.target.closest(`.exercise`);
-      let h1Exercise = mainExercise.querySelector("h1");
-      let pExercise = mainExercise.querySelector("p");
-      nameExercises.innerHTML = h1Exercise.innerHTML;
-      description.innerHTML = pExercise.getAttribute("data-description");
-    }).catch(error => {
-      console.error('Error:', error);
+if (input) {
+  input.addEventListener('input', () => {
+    const term = input.value.trim().toLowerCase();
+    rows.forEach(row => {
+      const text = Array.from(row.children).map(el => el.textContent.trim().toLowerCase()).join(' ');
+      row.style.display = text.includes(term) ? 'flex' : 'none';
     });
-    addImg(imgSrc);
-    exercises.classList.add("hidden-exercises");
-    tableExercise.classList.add("width-table");
-    btnExercisesGo.innerHTML = "Start exercising";
-    started = true;
-  };
-});
-
-btnExercisesGo.onclick = () => {
-  if (started) {
-    if (!hasStarted) {
-      dataExercise.forEach(item => {
-        item.forEach(element => {
-          let linkVideo = "";
-          element.attachments.forEach(attachment => {
-            linkVideo = attachment.video;
-          });
-          createExercises(element.name, element.ratio, element.sets, linkVideo);
-        });
-      });
-      addVideo();
-      // startCount(1);
-      startCount(4500);
-      isRunning = true;
-      hasStarted = true;
-      btnExercisesGo.innerHTML = "Pause";
-      const data = new FormData();
-      data.append("code", code);
-      fetch('/insert-pay-day', {
-        method: 'POST',
-        headers: {
-          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        },
-        body: data
-      }).then(response => response.json()).then(data => {
-        console.log(data);
-      }).catch(error => {
-        console.error('Error:', error);
-      });
-    } else {
-      if (isRunning) {
-        _pauseTimer();
-        isRunning = false;
-        btnExercisesGo.innerHTML = "Resume";
-      } else {
-        _startTimer();
-        isRunning = true;
-        btnExercisesGo.innerHTML = "Pause";
-      };
-    };
-  } else if (btnExercisesGo.getAttribute("data-statement") == "true") {
-    code = btnExercisesGo.getAttribute("data-code");
-    let dataName = btnExercisesGo.getAttribute("data-name");
-    let dataDescription = btnExercisesGo.getAttribute("data-description");
-    const data = new FormData();
-    data.append("code", code);
-    fetch('/get-exercises', {
-      method: 'POST',
-      headers: {
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-      },
-      body: data
-    }).then(response => response.json()).then(data => {
-      exercises.classList.add("hidden-exercises");
-      tableExercise.classList.add("width-table");
-      btnExercisesGo.innerHTML = "Start exercising";
-      dataExercise = data;
-      dataExercise.forEach(element => {
-        let linkVideo = "";
-        element.attachments.forEach(attachment => {
-          linkVideo = attachment.video;
-        });
-        createExercises(element.name, element.ratio, element.sets, linkVideo);
-      });
-    }).catch(error => {
-      console.error('Error:', error);
-    });
-    addVideo();
-    startCount(1);
-    startCount(4500);
-    isRunning = true;
-    hasStarted = true;
-    btnExercisesGo.innerHTML = "Pause";
-    fetch('/insert-pay-day', {
-      method: 'POST',
-      headers: {
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-      },
-      body: data
-    }).then(response => response.json()).then(data => {
-      console.log(data);
-    }).catch(error => {
-      console.error('Error:', error);
-    });
-    if (isRunning) {
-      _pauseTimer();
-      isRunning = false;
-      btnExercisesGo.innerHTML = "Resume";
-    } else {
-      _startTimer();
-      isRunning = true;
-      btnExercisesGo.innerHTML = "Pause";
-    };
-  };
-};
-
-input.addEventListener('input', () => {
-  const term = input.value.trim().toLowerCase();
-  rows.forEach(row => {
-    const text = Array.from(row.children).map(el => el.textContent.trim().toLowerCase()).join(' ');
-    if (text.includes(term)) {
-      row.style.display = 'flex';
-    } else {
-      row.style.display = 'none';
-    };
   });
-});
+}

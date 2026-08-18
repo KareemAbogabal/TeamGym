@@ -19,6 +19,7 @@ class ContactUs extends Controller {
     if ($order) {
       $order->delete();
     };
-    return back()->with('success', __('messages.delete-done'));
+    notifySuccess(__('messages.delete-done'));
+    return back();
   }
 }

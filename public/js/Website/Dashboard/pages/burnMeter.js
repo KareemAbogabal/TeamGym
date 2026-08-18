@@ -776,6 +776,9 @@ function saveData(name, minutes, distance, start_latitude, start_longitude, end_
     };
     const data = await response.json().catch(()=>null);
     console.log('Saved successfully', data);
+    if (window.TeamGymNotify) {
+      window.TeamGymNotify({ type: 'success', message: 'saved-successfully' });
+    }
   })
   .catch(error => {
     console.error('Network/Error:', error);

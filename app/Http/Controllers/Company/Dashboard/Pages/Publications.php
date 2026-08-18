@@ -55,6 +55,7 @@ class Publications extends Controller {
       $featureSystem->code_system = $randSystem;
       $featureSystem->save();
     };
+    notifySuccess(__('messages.saved-successfully'));
     return back();
   }
   public function updateSystem(Request $request) {
@@ -105,6 +106,7 @@ class Publications extends Controller {
         };
       };
     };
+    notifySuccess(__('messages.updated-successfully'));
     return back();
   }
   public function removeSystem(Request $request) {
@@ -113,6 +115,7 @@ class Publications extends Controller {
     ]);
     $system = System::where("code", $request->input("code"))->first();
     $system->delete();
+    notifySuccess(__('messages.deleted-successfully'));
     return back();
   }
   // public function addSupplement(Request $request) {
@@ -190,6 +193,7 @@ class Publications extends Controller {
       };
     };
     $supplement->save();
+    notifySuccess(__('messages.updated-successfully'));
     return back();
   }
   public function destroySupplements(Request $request) {
@@ -202,6 +206,7 @@ class Publications extends Controller {
       File::delete($dir);
     };
     $supplement->delete();
+    notifySuccess(__('messages.deleted-successfully'));
     return back();
   }
   // public function addSnack(Request $request) {

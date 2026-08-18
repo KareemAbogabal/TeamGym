@@ -31,9 +31,9 @@ class Health extends Controller {
     foreach ($itemsMinor as $m) {
       $minor[$m] = $this->get(LineageInBody::class, $m);
     };
-    $muscles = $this->getArray(LineageInBody::class, "SMM");
-    $fat = $this->getArray(LineageInBody::class, "fat_mass");
-    $water = $this->getArray(LineageInBody::class, "water");
+    $muscles = $this->getArray(LineageInBody::class, "SMM", true, false);
+    $fat = $this->getArray(LineageInBody::class, "fat_mass", true, false);
+    $water = $this->getArray(LineageInBody::class, "water", true, false);
     $imgInBody = ImgInBody::where("code", Cookie::get('login_client'))->first();
     $client = Client::where("code", Cookie::get('login_client'))->first();
     return view('Website.Dashboard.Pages.health', compact('client', 'basis', 'minor', 'muscles', 'fat', 'water', 'imgInBody'));

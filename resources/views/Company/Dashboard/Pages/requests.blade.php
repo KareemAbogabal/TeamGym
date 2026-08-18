@@ -13,10 +13,10 @@
           @endphp
           <img src="{{optional($employee)->img ? asset('images/employee/' . optional($employee)->img) : asset('images/header/Team-Gym.png')}}" class="img-profile" alt="No Img" loading="lazy">
           <div class="content">
-            <h1>{{$employee->fname}} {{$employee->lname}}</h1>
+            <h1>{{optional($employee)->fname}} {{optional($employee)->lname}}</h1>
             <p>employee</p>
           </div>
-          @if ($employee->documentation == "true")
+          @if (optional($employee)->documentation == "true")
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="20" height="20">
               <defs>
                 <path id="tooth" d="M 0,-110 C 5,-106 10,-98 14,-84 L 6,-62 C 3,-56 0,-54 0,-54 C 0,-54 -3,-56 -6,-62 L -14,-84 C -10,-98 -5,-106 0,-110 Z" />
@@ -105,17 +105,6 @@
       </div>
     </x-components::main-card>
   <x-components::main-card state="edit" dataFollow="edit-card">
-      <div class="header-bg">
-        <img src="{{ asset('images/bg-profile-clients/bg-clients.jpg') }}" alt="No Img" loading="lazy">
-        <button type="button">
-          <svg width="40" height="40" viewBox="0 0 64 64" aria-hidden="true">
-            <g stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none">
-              <line x1="12" y1="12" x2="52" y2="52"/>
-              <line x1="52" y1="12" x2="12" y2="52"/>
-            </g>
-          </svg>
-        </button>
-      </div>
       <div class="body-card">
         <div class="img img-card">
           <img src="{{ asset('images/header/Team-Gym.png') }}" alt="No Img" loading="lazy">

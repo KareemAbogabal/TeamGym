@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trunk probe</title>
+<style>body{font-family:monospace;background:#111;color:#eee}pre{white-space:pre-wrap;max-height:90vh;overflow:auto}</style>
+</head>
+<body>
+<pre id="out">waiting...</pre>
+<script>
+const q = new URLSearchParams(location.search);
+const img = q.get("img") || "IMG20250908193729.jpg";
+const mode = q.get("mode") || "fatpanel";
+const out = document.getElementById("out");
+const log = (m) => { out.textContent = typeof m === "string" ? m : JSON.stringify(m, null, 1); };
+
+const loadTesseract = () => new Promise((resolve, reject) => {
+  if (typeof Tesseract !== "undefined") return resolve();
+  const s = document.createElement("script");
+  s.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+  s.onload = () => resolve();
+  s.onerror = () => reject(new Error("failed to load tesseract.js"));
+  document.head.appendChild(s);
+});
+
+function ocrCanvas(canvas, conf) {
+  return Tesseract.recognize(canvas, "eng", conf || { logger: () => {} }).then(r => ({
+    text: (r.data.text || "").replace(/[_\r\n]/g, " ").trim(),
+    conf: Number(r.data.confidence || 0),
+    words: (r.data.words || []).map(w => ({ text: w.text, bbox: w.bbox, conf: w.confidence })),
+  }));
+}
+
+async function run() {
+  try {
+    const r = await fetch("images/" + img);
+    if (!r.ok) throw new Error("fetch " + img + " -> " + r.status);
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    const image = new Image();
+    await new Promise((res, rej) => { image.onload = res; image.onerror = rej; image.src = url; });
+    const W = image.naturalWidth, H = image.naturalHeight;
+    const SCALE = 9300 / W;
+
+    // Draw full image scaled to 9300-wide canvas (matches pipeline raw canvas w/o deskew).
+    const full = document.createElement("canvas");
+    full.width = Math.round(W * SCALE); full.height = Math.round(H * SCALE);
+    full.getContext("2d").drawImage(image, 0, 0, full.width, full.height);
+
+    // Regions in RAW (9300-wide) coordinates; convert to full-canvas pixels.
+    const REGIONS = {
+      fatpanel: { x: 3400, y: 7700, w: 2300, h: 1800, mode: "6" },
+      trunkrow: { x: 3500, y: 8550, w: 2100, h: 420, mode: "6" },
+      trunkval: { x: 4000, y: 8700, w: 900, h: 260, mode: "7" },
+      trunkabove: { x: 3900, y: 8420, w: 900, h: 280, mode: "7" },
+      trunkband: { x: 3800, y: 8420, w: 1100, h: 500, mode: "6" },
+    };
+    const region = REGIONS[mode] || REGIONS.fatpanel;
+
+    const crop = (box) => {
+      const c = document.createElement("canvas");
+      c.width = box.w; c.height = box.h;
+      c.getContext("2d").drawImage(full, box.x, box.y, box.w, box.h, 0, 0, box.w, box.h);
+      return c;
+    };
+
+    const result = {};
+    result.mode = mode;
+    result.region = region;
+
+    // Raw crop OCR (no threshold)
+    result.raw = await ocrCanvas(crop(region), { logger: () => {}, tessedit_pageseg_mode: region.mode });
+
+    // Otsu-thresholded crop OCR
+    const thresh = (src) => {
+      const g = document.createElement("canvas");
+      g.width = src.width; g.height = src.height;
+      const cg = g.getContext("2d");
+      cg.drawImage(src, 0, 0);
+      const id = cg.getImageData(0, 0, g.width, g.height);
+      const d = id.data;
+      const hist = new Array(256).fill(0);
+      for (let i = 0; i < d.length; i += 4) {
+        const y = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+        hist[Math.round(y)]++;
+      }
+      let sum = 0; for (let i = 0; i < 256; i++) sum += hist[i];
+      let sumB = 0, wB = 0, maxVar = 0, thr = 128;
+      for (let t = 0; t < 256; t++) {
+        wB += hist[t]; if (!wB) continue;
+        const wF = sum - wB; if (!wF) break;
+        sumB += t * hist[t];
+        const mB = sumB / wB, mF = (sum - sumB) / wF;
+        const v = wB * wF * (mB - mF) * (mB - mF);
+        if (v > maxVar) { maxVar = v; thr = t; }
+      }
+      for (let i = 0; i < d.length; i += 4) {
+        const y = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+        const p = y > thr ? 255 : 0;
+        d[i] = d[i + 1] = d[i + 2] = p;
+      }
+      cg.putImageData(id, 0, 0);
+      return g;
+    };
+    result.otsu = await ocrCanvas(thresh(crop(region)), { logger: () => {}, tessedit_pageseg_mode: region.mode });
+
+    result.image = { width: W, height: H, scale: SCALE };
+    log(result);
+    window.__probeDone = true;
+  } catch (e) {
+    log("ERROR: " + (e.message || e));
+    window.__probeDone = true;
+  }
+}
+
+loadTesseract().then(run).catch((e) => { log("ERROR: " + e.message); window.__probeDone = true; });
+</script>
+</body>
+</html>

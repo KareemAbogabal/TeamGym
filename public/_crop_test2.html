@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>InBody crop OCR test 2</title>
+<style>
+  body { font-family: monospace; margin: 8px; background:#111; color:#eee; }
+  pre { white-space: pre-wrap; font-size: 11px; max-height: 95vh; overflow: auto; border: 1px solid #444; padding: 8px; }
+  .img-up { display: none; }
+</style>
+</head>
+<body>
+  <pre id="out">waiting...</pre>
+  <input type="file" class="inbodyUpload" id="body">
+  <button type="button" class="show-img-inBody">show</button>
+  <button type="button" class="remove-img-inBody">x</button>
+  <span id="status"></span>
+  <div class="img-up"><div class="content"><div class="img"></div></div></div>
+
+  <script src="js/Website/Dashboard/pages/Inbody-coordinates.js?v=croptest2"></script>
+  <script>
+    const out = document.getElementById("out");
+    const log = (msg) => { out.textContent += msg + "\n"; };
+
+    async function ocrCrop(canvas, x, y, w, h, label, scales) {
+      const crop = cropCanvas(canvas, x, y, w, h);
+      for (const sl of scales) {
+        const cv = sl === 1 ? crop : scaleCanvasTo(crop, sl);
+        const config = {
+          logger: () => {},
+          tessedit_char_whitelist: "0123456789.,%kg",
+          tessedit_pageseg_mode: "7",
+        };
+        try {
+          const res = await Tesseract.recognize(cv, "eng", config);
+          const text = (res.data.text || "").replace(/[\r\n]/g, " | ").trim();
+          const conf = Number(res.data.confidence || 0);
+          log(`  ${label} ${sl}x: conf=${conf.toFixed(0)} txt="${text}"`);
+        } catch (e) {
+          log(`  ${label} ${sl}x: ERR ${e.message}`);
+        }
+      }
+    }
+
+    async function run() {
+      try {
+        const r = await fetch("images/IMG20250908193729.jpg");
+        if (!r.ok) throw new Error("fetch -> " + r.status);
+        const blob = await r.blob();
+        const file = new File([blob], "IMG20250908193729.jpg", { type: "image/jpeg" });
+        log("preprocessing...");
+        const c = await preprocessToCanvas(file, 3, true);
+        const raw = c.rawCanvas;
+        const th = c.threshCanvas;
+        log(`canvas ${raw.width}x${raw.height}`);
+
+        const sc = [1, 2, 3, 4];
+        log("--- SMM variants ---");
+        await ocrCrop(th, 3300, 4700, 700, 260, "SMM a", sc);
+        await ocrCrop(th, 3000, 4700, 1100, 280, "SMM b", sc);
+        await ocrCrop(raw, 3300, 4720, 650, 240, "SMM c(raw)", sc);
+        await ocrCrop(raw, 3100, 4700, 900, 260, "SMM d(raw)", sc);
+        log("--- BMI variants ---");
+        await ocrCrop(th, 3500, 6320, 600, 220, "BMI a", sc);
+        await ocrCrop(th, 3300, 6320, 800, 240, "BMI b", sc);
+        await ocrCrop(th, 3150, 6300, 1000, 260, "BMI c", sc);
+        await ocrCrop(raw, 3400, 6330, 700, 220, "BMI d(raw)", sc);
+        await ocrCrop(raw, 3550, 6340, 450, 190, "BMI e(raw tight)", [2, 3, 4, 6]);
+        log("--- PBF variants ---");
+        await ocrCrop(th, 3350, 6680, 500, 220, "PBF a", sc);
+        await ocrCrop(th, 3150, 6660, 800, 240, "PBF b", sc);
+        await ocrCrop(raw, 3300, 6690, 550, 210, "PBF c(raw)", sc);
+        await ocrCrop(raw, 3150, 6680, 700, 220, "PBF d(raw)", sc);
+        await ocrCrop(raw, 3400, 6700, 420, 180, "PBF e(raw tight)", [2, 3, 4, 6]);
+        window.__harnessDone = true;
+      } catch (e) {
+        log("ERROR " + e.message);
+        window.__harnessDone = true;
+      }
+    }
+
+    const loadTesseract = () => new Promise((resolve, reject) => {
+      if (typeof Tesseract !== "undefined") return resolve();
+      const s = document.createElement("script");
+      s.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error("failed to load tesseract.js"));
+      document.head.appendChild(s);
+    });
+
+    loadTesseract().then(run).catch((e) => log("ERROR: " + e.message));
+  </script>
+</body>
+</html>

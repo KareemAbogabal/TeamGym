@@ -10,14 +10,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" href="{{asset("css/Website/web/public.css")}}">
   <link rel="stylesheet" href="{{asset("css/Website/web/pages/login.css")}}">
+  <link rel="stylesheet" href="{{asset("css/notification.css")}}">
   <title>Team Gym | Login</title>
 </head>
 <body>
-  <div class="warnings-container">
-    @foreach ($errors->all() as $error)
-      <x-components::warning :text="$error" />
-    @endforeach
-  </div>
+  <x-components::notifications />
   <main>
     <form action="{{route("signUp")}}" method="post">
       @csrf
@@ -132,6 +129,6 @@
     let btnSiginUp = "{{__('messages.card-button-sigin-up')}}";
   </script>
   <script src="{{asset("js/login.js")}}"></script>
-  <script src="{{asset("js/warning.js")}}"></script>
+  <script src="{{asset("js/notification.js")}}"></script>
 </body>
 </html>

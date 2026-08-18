@@ -175,7 +175,8 @@ class Exercises extends Controller {
         };
       };
     };
-    return redirect()->back()->with('success', 'Activities saved successfully.');
+    notifySuccess(__('messages.saved-successfully'));
+    return redirect()->back();
   }
   public function checkShape(Request $request) {
     $name = trim($request->input('name', ''));
@@ -234,7 +235,8 @@ class Exercises extends Controller {
       $element->sets = (string)$quantity[$index];
       $element->save();
     };
-    return redirect()->back()->with('success', 'Activities saved successfully.');
+    notifySuccess(__('messages.saved-successfully'));
+    return redirect()->back();
   }
   public function updateCoulmn(Request $request) {
     $request->validate([
@@ -251,12 +253,14 @@ class Exercises extends Controller {
     $oldVideo = $attachments->video;
     if (!$attachments) {
       Log::warning('updateCoulmn: attachments not found', ['id' => $id]);
-      return redirect()->back()->with('error', 'attachments not found.');
+      notifyError('attachments not found.');
+      return redirect()->back();
     };
     $element = ActivityElements::find($attachments->code);
     if (!$element) {
       Log::warning('updateCoulmn: element not found for attachment', ['attachment_id' => $id, 'element_code' => $attachments->code]);
-      return redirect()->back()->with('error', 'element not found.');
+      notifyError('element not found.');
+      return redirect()->back();
     };
     $name = Str::slug($element->name);
     $filesExercises = FilesExercises::where('name', $name)->first();
@@ -300,7 +304,8 @@ class Exercises extends Controller {
           $filesExercises->save();
         };
       };
-      return redirect()->back()->with('success', 'تم تحديث الملف بنجاح.');
+      notifySuccess(__('messages.updated-successfully'));
+      return redirect()->back();
     } catch (\Throwable $e) {
       Log::error('updateCoulmn exception', [
         'message' => $e->getMessage(),
@@ -308,7 +313,8 @@ class Exercises extends Controller {
         'input' => $request->all(),
         'attachment_id' => $id,
       ]);
-      return redirect()->back()->with('error', 'حدث خطأ أثناء معالجة الملف. راجع السجل.');
+      notifyError('حدث خطأ أثناء معالجة الملف. راجع السجل.');
+      return redirect()->back();
     };
   }
   public function destroy(Request $request) {
@@ -363,6 +369,7 @@ class Exercises extends Controller {
       };
       $element->delete();
     };
+    notifySuccess(__('messages.deleted-successfully'));
     return redirect()->route("exercise");
   }
 }

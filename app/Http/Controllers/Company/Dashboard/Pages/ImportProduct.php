@@ -115,6 +115,7 @@ class ImportProduct extends Controller {
         $imports->save();
       };
     };
+    notifySuccess(__('messages.saved-successfully'));
     return back();
   }
   public function destroySupplementsAndImports(Request $request) {
@@ -129,6 +130,7 @@ class ImportProduct extends Controller {
     };
     $supplement->delete();
     $imports->delete();
+    notifySuccess(__('messages.deleted-successfully'));
     return back();
   }
 }

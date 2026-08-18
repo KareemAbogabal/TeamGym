@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Segmental region viewer</title>
+<style>
+body { margin: 0; background: #222; color: #fff; font-family: monospace; }
+canvas { display: block; margin: 8px auto; background: #000; border: 1px solid #555; }
+.row { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+.block { text-align: center; }
+.block h3 { margin: 6px 0; font-size: 14px; }
+.toggle { text-align: center; margin: 6px; }
+</style>
+</head>
+<body>
+<div class="toggle">
+<button id="up">-</button><button id="down">+</button>
+scale: <span id="scale">2</span>x
+</div>
+<div class="row" id="row"></div>
+<script>
+let scale = 2;
+const imgs = ["IMG20250908193729.jpg", "test_img.jpg"];
+async function render() {
+  const row = document.getElementById("row");
+  row.innerHTML = "";
+  for (const name of imgs) {
+    const r = await fetch("images/" + name);
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
+    URL.revokeObjectURL(url);
+    const W = img.naturalWidth, H = img.naturalHeight;
+    const y0 = Math.round(H * 0.62), y1 = Math.round(H * 0.87);
+    const block = document.createElement("div");
+    block.className = "block";
+    const h3 = document.createElement("h3");
+    h3.textContent = name + " " + W + "x" + H;
+    block.appendChild(h3);
+    const canvas = document.createElement("canvas");
+    canvas.width = W * scale; canvas.height = (y1 - y0) * scale;
+    const ctx = canvas.getContext("2d");
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(img, 0, y0, W, y1 - y0, 0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = "rgba(255,0,0,0.6)";
+    for (let fx = 0; fx <= 1.0; fx += 0.1) {
+      ctx.beginPath(); ctx.moveTo(fx * canvas.width, 0); ctx.lineTo(fx * canvas.width, canvas.height); ctx.stroke();
+    }
+    block.appendChild(canvas);
+    row.appendChild(block);
+  }
+}
+document.getElementById("up").onclick = () => { scale = Math.max(1, scale - 1); document.getElementById("scale").textContent = scale; render(); };
+document.getElementById("down").onclick = () => { scale += 1; document.getElementById("scale").textContent = scale; render(); };
+render();
+</script>
+</body>
+</html>

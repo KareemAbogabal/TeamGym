@@ -67,6 +67,7 @@ class SettingClients extends Controller {
       $client->img = null;
       $client->save();
     };
+    notifySuccess(__('messages.updated-successfully'));
     return back();
   }
 }

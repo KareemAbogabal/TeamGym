@@ -1,12 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap');
-@import url('../variables.css');
+:root {
+  --fallback-sans: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  --fallback-ar: "Tahoma", "Arial", sans-serif;
+}
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Varela Round", sans-serif;
+  font-family: var(--fallback-sans);
   font-weight: 400;
   font-style: normal;
 }

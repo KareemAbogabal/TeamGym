@@ -33,6 +33,7 @@ class ContactUsController extends Controller {
     $order->phone = $request->input("phone");
     $order->subject = $request->input("subject");
     $order->save();
-    return redirect()->back()->with('success', __('messages.contact-sent'));
+    notifySuccess(__('messages.contact-sent'));
+    return redirect()->back();
   }
 }

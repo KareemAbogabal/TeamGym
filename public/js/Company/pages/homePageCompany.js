@@ -148,31 +148,13 @@ function search(text, stateSearch, resultSearch) {
     },
     body: JSON.stringify({ name: text, fname: fname, lname: lname })
   });
-  if (text == "report" || text == "تقرير") {
-    search.then(response => {
-      if (!response.ok) throw new Error('Network response was not ok');
-      return response.blob();
-    }).then(blob => {
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'report.pdf';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
-    }).catch(error => {
-      console.error('Download failed:', error);
+  search.then(response => response.json()).then(data => {
+    data.forEach(item => {
+      resultSearched(text, item.route, item.data.img, item.page, resultSearch);
     });
-  } else {
-    search.then(response => response.json()).then(data => {
-      data.forEach(item => {
-        resultSearched(text, item.route, item.data.img, item.page, resultSearch);
-      });
-      if (stateSearch) searched(text, stateSearch);
-    }).catch(error => {
-    });
-  };
+    if (stateSearch) searched(text, stateSearch);
+  }).catch(error => {
+  });
 };
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -239,9 +221,11 @@ if (window.innerWidth <= 1115) {
   };
 };
 
-closeProfile.forEach((button, index) => {
+closeProfile.forEach((button) => {
   button.addEventListener("click", (e) => {
+    e.stopPropagation();
     const mainCard = button.closest('.main-card');
+    if (!mainCard) return;
     mainCard.classList.remove("show-main-card");
   });
 });
@@ -387,29 +371,9 @@ menu.addEventListener("click", () => {
   };
 });
 
-btnStateColorPage.addEventListener("click", () => {
-  document.body.classList.toggle("light");
-  if (!document.body.classList.contains("light")) {
-    btnStateColorPage.innerHTML = `<i class="fa-solid fa-moon"></i>`;
-    btnStateColorPage.classList.add("active");
-    localStorage.setItem("state-mode-team-gym", "dark");
-  } else {
-    btnStateColorPage.innerHTML = `<i class="fa-solid fa-sun"></i>`;
-    localStorage.setItem("state-mode-team-gym", "light");
-    btnStateColorPage.classList.remove("active");
-  };
-});
-
 document.addEventListener("DOMContentLoaded", () => {
-  if (localStorage.getItem("state-mode-team-gym") == "light") {
-    btnStateColorPage.innerHTML = `<i class="fa-solid fa-sun"></i>`;
-    btnStateColorPage.classList.remove("active");
-    document.body.classList.add("light");
-  } else {
-    btnStateColorPage.innerHTML = `<i class="fa-solid fa-moon"></i>`;
-    btnStateColorPage.classList.add("active");
-    document.body.classList.remove("light");
-  };
+  document.body.classList.remove("light");
+  localStorage.setItem("state-mode-team-gym", "dark");
   if (localStorage.getItem("stat-side-bar") == "show") {
     sideBar.classList.add("hidden-side-bar");
     menuBar1.classList.add("add-bar-1");
@@ -478,52 +442,55 @@ handleImageChange(uploadImgEmployee, uploadImgFile);
 
 // Pusher.logToConsole = true;
 
-var echo = new Echo({
-  broadcaster: 'pusher',
-  key: KEY,
-  cluster: CLUSTER,
-  forceTLS: true,
-  auth: {
-    headers: {
-      'X-CSRF-TOKEN': token
+if (typeof Echo !== 'undefined' && typeof KEY !== 'undefined') {
+  var echo = new Echo({
+    broadcaster: 'pusher',
+    key: KEY,
+    cluster: CLUSTER,
+    forceTLS: true,
+    auth: {
+      headers: {
+        'X-CSRF-TOKEN': token
+      },
+      withCredentials: true
     },
-    withCredentials: true
-  },
-});
-
-echo.private(`requests.${userId}`).listen('.NewRequestCreated', (e) => {
-  let button;
-  if (e.page === "records") {
-    totalCount.records += e.count;
-    button = document.querySelector('.records-link');
-    button.setAttribute('data-badge', totalCount.records);
-  } else if (e.page === "requests") {
-    totalCount.requests += e.count;
-    button = document.querySelector('.requests-link');
-    button.setAttribute('data-badge', totalCount.requests);
-  } else if (e.page === "imports") {
-    totalCount.imports += e.count;
-    button = document.querySelector('.imports-link');
-    button.setAttribute('data-badge', totalCount.imports);
-  } else if (e.page === "historys") {
-    totalCount.historys += e.count;
-    button = document.querySelector('.historys-link');
-    button.setAttribute('data-badge', totalCount.historys);
-  };
-});
-document.addEventListener('DOMContentLoaded', () => {
-  let rejectPage = JSON.parse(sessionStorage.getItem("rejectedPage")) || [];
-  fetch('/count-request', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'X-CSRF-TOKEN': token || ''
-    },
-    body: JSON.stringify({page: rejectPage})
-  }).then(response => response.json()).then(data => {
-    console.log(data);
-  }).catch(error => {
-    console.error('Error:', error);
   });
-});
+
+  echo.private(`requests.${userId}`).listen('.NewRequestCreated', (e) => {
+    let button;
+    if (e.page === "records") {
+      totalCount.records += e.count;
+      button = document.querySelector('.records-link');
+      button.setAttribute('data-badge', totalCount.records);
+    } else if (e.page === "requests") {
+      totalCount.requests += e.count;
+      button = document.querySelector('.requests-link');
+      button.setAttribute('data-badge', totalCount.requests);
+    } else if (e.page === "imports") {
+      totalCount.imports += e.count;
+      button = document.querySelector('.imports-link');
+      button.setAttribute('data-badge', totalCount.imports);
+    } else if (e.page === "historys") {
+      totalCount.historys += e.count;
+      button = document.querySelector('.historys-link');
+      button.setAttribute('data-badge', totalCount.historys);
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    let rejectPage = JSON.parse(sessionStorage.getItem("rejectedPage")) || [];
+    fetch('/count-request', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-CSRF-TOKEN': token || ''
+      },
+      body: JSON.stringify({ page: rejectPage })
+    }).then(response => response.json()).then(data => {
+      console.log(data);
+    }).catch(error => {
+      console.error('Error:', error);
+    });
+  });
+}

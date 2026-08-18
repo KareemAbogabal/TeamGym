@@ -366,8 +366,19 @@ showProfile.forEach((button, index) => {
 });
 
 
-showDetailsEmployee.forEach((button, index) => {
-  button.addEventListener("click", () => {
+showDetailsEmployee.forEach((button) => {
+  button.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const cardEmployees = button.closest('.card-employees');
+    const card = cardEmployees ? cardEmployees.querySelector('.main-card[data-state="employee"]') : null;
+    if (!card) return;
+
+    document.querySelectorAll('.main-card[data-state="employee"]').forEach(item => {
+      item.classList.remove('show-main-card');
+    });
+    card.classList.add('show-main-card');
   });
 });
 

@@ -1,5 +1,5 @@
 let html = document.querySelector("html");
-let light = localStorage.getItem("state-mode-team-gym");
+let light = "dark";
 let char1 = document.getElementById("chart-1");
 let char2 = document.getElementById("chart-2");
 let char3 = document.getElementById("chart-3");
@@ -20,6 +20,7 @@ function makeChartCircle(element) {
           'rgba(126, 255, 100, 1)',
           'rgba(255, 97, 97, 1)',
         ],
+        borderRadius: 6,
         borderWidth: 0,
         cutout: '80%',
       }]
@@ -54,6 +55,8 @@ function makeChartPoint(element) {
         backgroundColor: 'rgba(255, 207, 76, 0.2)',
         data: JSON.parse(ctx1Att),
         borderColor: 'rgba(255, 207, 76, 1)',
+        borderCapStyle: 'round',
+        borderJoinStyle: 'round',
         pointBackgroundColor: '#fffc688a',
         tension: 0.4,
         pointBorderWidth: 1,
@@ -115,11 +118,13 @@ function makeChartBar(element) {
           label: 'Water',
           data: JSON.parse(ctx1Att),
           backgroundColor: 'rgba(66, 165, 245, 1)',
+          borderRadius: 6,
         },
         {
           label: 'Fats',
           data: JSON.parse(ctx2Att),
           backgroundColor: 'rgba(255, 167, 38, 1)',
+          borderRadius: 6,
         }
       ]
     },

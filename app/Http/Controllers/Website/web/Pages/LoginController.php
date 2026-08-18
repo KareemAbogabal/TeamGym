@@ -49,10 +49,12 @@ class LoginController extends Controller {
       $system = System::where("defult", "true")->first();
       $employee = Employee::find(1);
       if (!$system) {
-        return redirect()->back()->with('error', __('messages.system-empty'));
+        notifyError(__('messages.system-empty'));
+        return redirect()->back();
       };
       if (!$employee) {
-        return redirect()->back()->with('error', __('messages.employee-empty'));
+        notifyError(__('messages.employee-empty'));
+        return redirect()->back();
       };
       $fname = $request->input('fname');
       $lname = $request->input('lname');

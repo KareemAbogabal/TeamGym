@@ -16,7 +16,14 @@ use App\Models\Back\History;
 use App\Models\Back\CustomerRequests;
 
 class Client extends Authenticatable {
-  protected $fillable = ['code', 'fname', 'lname', 'email', 'phone', 'state', 'category', 'documentation', 'img',];
+  protected $fillable = ['code', 'fname', 'lname', 'email', 'phone', 'state', 'category', 'documentation', 'img', 'year_inbody',];
+  protected static function booted(): void {
+    static::creating(function ($client) {
+      if (empty($client->year_inbody)) {
+        $client->year_inbody = (int) now()->format('Y');
+      };
+    });
+  }
   public function activities() {
     return $this->hasMany(Activity::class, 'code_client', 'code');
   }

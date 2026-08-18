@@ -91,6 +91,7 @@ class Records extends Controller {
     } else {
       return back()->withErrors(['error' => 'Employee is not present']);
     };
+    notifySuccess(__('messages.updated-successfully'));
     return back();
   }
   public function recordExit(Request $request) {
@@ -389,6 +390,7 @@ class Records extends Controller {
     $record->record($code, "$fname $lname", "exit", $amount ? $amount : ($systems && empty($request->input("amount")) ? abs($systems->amount) : "exit"), $attachment ? $attachment : null, $employee->code, "$employee->fname $employee->lname", $employee->phone, $employee->job_role, false);
     $history = new History();
     $history->recordHistory("$fname $lname", $code, $employee->code, "exit", $amount ? $amount : ($systems && empty($request->input("amount")) ? abs($systems->amount) : "exit"), $attachment ? $attachment : null, null, "$employee->fname $employee->lname");
+    notifySuccess(__('messages.updated-successfully'));
     return back();
   }
   public function autoRecord(Request $request) {
@@ -453,6 +455,7 @@ class Records extends Controller {
       $description = "Hello, the request has been sent [ {$request->input('order_name')} ] and is awaiting approval. Have a nice day.";
       $this->makeNotification($name, $type, $description, $client->code, null, "iconPayment");
     };
+    notifySuccess(__('messages.saved-successfully'));
     return back();
   }
   public function registrationRequestsPayment(Request $request) {
@@ -488,6 +491,7 @@ class Records extends Controller {
       $description = "Hello, you have paid [ {$request->input('amount')} ] for product [ {$paymentsClient->name} ] Now you are achieving your goals step by step. Have a nice day.";
       $this->makeNotification($name, $type, $description, $client->code, null, "iconPayment");
     };
+    notifySuccess(__('messages.saved-successfully'));
     return back();
   }
   public function getSupplementClient(Request $request) {
@@ -584,6 +588,7 @@ class Records extends Controller {
       $message->embed(public_path('images/header/Team-Gym.png'));
       $message->to($email)->subject('Sign up in Team Gym');
     });
+    notifySuccess(__('messages.saved-successfully'));
     return back();
   }
 }

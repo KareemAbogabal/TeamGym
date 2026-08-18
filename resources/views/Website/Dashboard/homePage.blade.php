@@ -12,7 +12,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{asset("css/table.css")}}">
   <link rel="stylesheet" href="{{asset("css/Website/Dashboard/pages/homePage.css")}}">
+  <link rel="stylesheet" href="{{asset("css/notification.css")}}">
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
   <script>
     let lableCanava = "{{__('messages.card-profile-lable')}}";
@@ -38,11 +40,7 @@
   <header>
     @include('Website.Dashboard.Tires.nav')
   </header>
-  <div class="warnings-container">
-    @foreach ($errors->all() as $error)
-      <x-components::warning :text="$error" />
-    @endforeach
-  </div>
+  <x-components::notifications />
   <main>
     @include('Website.Dashboard.Tires.sideBar')
     <section class="section-@yield('class')">
@@ -50,6 +48,6 @@
     </section>
   </main>
   <script src="{{asset("js/Website/Dashboard/homePage.js")}}"></script>
-  <script src="{{asset("js/warning.js")}}"></script>
+  <script src="{{asset("js/notification.js")}}"></script>
 </body>
 </html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Box probe</title>
+<style>body{font-family:monospace;background:#111;color:#eee}pre{white-space:pre-wrap;max-height:90vh;overflow:auto}</style>
+</head>
+<body>
+<pre id="out">waiting...</pre>
+<script>
+const q = new URLSearchParams(location.search);
+const img = q.get("img") || "IMG20250908193729.jpg";
+const out = document.getElementById("out");
+const log = (m) => { out.textContent = typeof m === "string" ? m : JSON.stringify(m, null, 1); };
+
+const loadTesseract = () => new Promise((resolve, reject) => {
+  if (typeof Tesseract !== "undefined") return resolve();
+  const s = document.createElement("script");
+  s.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+  s.onload = () => resolve();
+  s.onerror = () => reject(new Error("failed to load tesseract.js"));
+  document.head.appendChild(s);
+});
+
+const REF_W = 2100, REF_H = 2560;
+
+function fixCanvas(origBox, fields) {
+  const origImgW = window.__orig_img_w || REF_W;
+  const origImgH = window.__orig_img_h || REF_H;
+  const baselineW = 3060, baselineH = 4080;
+  const strategy = 1.0;
+  function mitigation() {
+    if (fields.x !== undefined && fields.x !== null) fields.x -= strategy;
+    if (fields.y !== undefined && fields.y !== null) fields.y -= strategy;
+    if (fields.w !== undefined && fields.w !== null) fields.w -= strategy;
+    if (fields.h !== undefined && fields.h !== null) fields.h -= strategy;
+  }
+  if (origImgW > baselineW && origImgH > baselineH) mitigation();
+  if (window.__orig_img_w && window.__orig_img_h && (window.__orig_img_w > REF_W || window.__orig_img_h > REF_H)) {
+    if (fields.x !== undefined && fields.x !== null) origBox.x += (REF_W * fields.x) / 100;
+    if (fields.y !== undefined && fields.y !== null) origBox.y += (REF_H * fields.y) / 100;
+    if (fields.w !== undefined && fields.w !== null) origBox.w += (origBox.w * fields.w) / 100;
+    if (fields.h !== undefined && fields.h !== null) origBox.h += (origBox.h * fields.h) / 100;
+  }
+  return origBox;
+}
+
+function relBoxToCanvas(relBox, rawCanvas) {
+  const canvasW = rawCanvas.width, canvasH = rawCanvas.height;
+  const origImgW = window.__orig_img_w || REF_W;
+  const origImgH = window.__orig_img_h || REF_H;
+  const scaleX = canvasW / origImgW, scaleY = canvasH / origImgH;
+  const scale = scaleX;
+  const usedW = Math.round(origImgW * scale);
+  const usedH = Math.round(origImgH * scale);
+  const offsetX = Math.round((canvasW - usedW) / 2);
+  const offsetY = 0;
+  let x = Math.round(relBox.x * usedW + offsetX);
+  let y = Math.round(relBox.y * usedH + offsetY);
+  let w = Math.round(relBox.w * usedW);
+  let h = Math.round(relBox.h * usedH);
+  if (w < 100) { const d = 100 - w; w = 100; x = Math.max(0, x - Math.floor(d / 2)); }
+  if (h < 100) { const d = 100 - h; h = 100; y = Math.max(0, y - Math.floor(d / 2)); }
+  return { x, y, w, h };
+}
+
+function scaleOrigBoxToCanvas(origBox, rawCanvas) {
+  return relBoxToCanvas({
+    x: origBox.x / REF_W, y: origBox.y / REF_H,
+    w: origBox.w / REF_W, h: origBox.h / REF_H,
+  }, rawCanvas);
+}
+
+async function run() {
+  try {
+    const r = await fetch("images/" + img);
+    if (!r.ok) throw new Error("fetch " + img + " -> " + r.status);
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    const image = new Image();
+    await new Promise((res, rej) => { image.onload = res; image.onerror = rej; image.src = url; });
+    const W = image.naturalWidth, H = image.naturalHeight;
+    window.__orig_img_w = W;
+    window.__orig_img_h = H;
+
+    const SCALE = 9360 / W;
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(W * SCALE);
+    canvas.height = Math.round(H * SCALE);
+    canvas.getContext("2d").drawImage(image, 0, 0, canvas.width, canvas.height);
+
+    // Pristine trunk box (proposed constant)
+    const box = { x: 917, y: 1719, w: 145, h: 44 };
+    const fixed = fixCanvas({ ...box }, { x: 2.2, y: 1.5, w: 13, h: 13 });
+    const scaled = scaleOrigBoxToCanvas(fixed, canvas);
+
+    // Crop and OCR with the same whitelist config as the pipeline
+    const crop = document.createElement("canvas");
+    crop.width = Math.round(scaled.w);
+    crop.height = Math.round(scaled.h);
+    crop.getContext("2d").drawImage(canvas, Math.round(scaled.x), Math.round(scaled.y), Math.round(scaled.w), Math.round(scaled.h), 0, 0, Math.round(scaled.w), Math.round(scaled.h));
+
+    const conf = { logger: () => {}, tessedit_char_whitelist: "0123456789.,%", tessedit_pageseg_mode: "7" };
+    const res = await Tesseract.recognize(crop, "eng", conf);
+    const result = {
+      image: { W, H, SCALE },
+      pristine: box,
+      fixed,
+      scaled,
+      raw_text: (res.data.text || "").replace(/[_\r\n]/g, " ").trim(),
+      conf: Number(res.data.confidence || 0),
+      words: (res.data.words || []).map(w => ({ text: w.text, bbox: w.bbox, conf: w.confidence })),
+    };
+    log(result);
+    window.__probeDone = true;
+  } catch (e) {
+    log("ERROR: " + (e.message || e));
+    window.__probeDone = true;
+  }
+}
+loadTesseract().then(run).catch((e) => { log("ERROR: " + e.message); window.__probeDone = true; });
+</script>
+</body>
+</html>

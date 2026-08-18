@@ -7,11 +7,11 @@ let fnameCardInput = document.querySelectorAll('.fname');
 let lnameCardInput = document.querySelectorAll('.lname');
 let phoneCardInput = document.querySelectorAll('.phone');
 let stateCardInput = document.querySelectorAll('.state');
-let editProfile = document.querySelectorAll(".edit");
-let foodeProfile = document.querySelectorAll(".foode");
-let listProfile = document.querySelectorAll(".list");
+let exerciseProfile = document.querySelectorAll(".plan-btn-exercise");
+let foodeProfile = document.querySelectorAll(".plan-btn-diet");
+let listProfile = document.querySelectorAll(".plan-btn-view");
 let deleteExercises = document.querySelectorAll(".delete");
-let mainCardsEdit = document.querySelector('.main-card[data-state="edit"]');
+let mainCardsEdit = document.querySelector('.main-card[data-state="exercise"]');
 let mainCardsShow = document.querySelector('.main-card[data-state="foode"]');
 let mainCardsList = document.querySelector('.main-card[data-state="list"]');
 let mainCardsDelete = document.querySelector('.main-card[data-state="delete"]');
@@ -31,6 +31,19 @@ let imgCard = document.querySelectorAll('.img-card');
 let fullName = document.querySelectorAll('.full-name-card');
 let btnShapes = document.querySelectorAll('.shape');
 let checkShape = document.querySelectorAll('.check-shape');
+
+const exerciseSearchInput = document.querySelector('.clients-panel .search-input');
+if (exerciseSearchInput) {
+  exerciseSearchInput.addEventListener('input', () => {
+    const term = exerciseSearchInput.value.trim().toLowerCase();
+    const cards = document.querySelectorAll('.clients-grid .client-plan-card');
+    cards.forEach(card => {
+      const nameEl = card.querySelector('.name-client');
+      const text = nameEl ? nameEl.textContent.trim().toLowerCase() : '';
+      card.style.display = (!term || text.includes(term)) ? 'flex' : 'none';
+    });
+  });
+}
 
 btnsRemove.forEach((button, index) => {
   button.onclick = (e) => {
@@ -158,12 +171,7 @@ function contentCard(type, e) {
     console.warn('لم أجد .card-client — تأكد من بنية الـ HTML.');
     return;
   };
-  const row = card.querySelector('.main-content');
-  if (!row) {
-    console.warn('لم أجد .content داخل .card-client — تحقق من بنية الـ HTML.');
-    return;
-  };
-  const nameEl = row.querySelector('.name-client') || card.querySelector('.name-client');
+  const nameEl = card.querySelector('.name-client');
   if (!nameEl) {
     console.warn('لم أجد .name-client — تأكد أن العنصر موجود.');
     return;
@@ -222,8 +230,8 @@ function contentCard(type, e) {
       </g>
     </svg>
   `;
-  let img = row.querySelector("img");
-  let documentationState = row.getAttribute("data-documentation");
+  let img = card.querySelector("img.client-avatar, img");
+  let documentationState = card.getAttribute("data-documentation");
   imgCard.forEach(item => { if (img) item.src = img.src; });
   if (documentationState == "true") {
     mainCardsDocumentation.forEach(item => { item.innerHTML += documentation; });
@@ -254,7 +262,7 @@ function contentCard(type, e) {
   codClient.type = "hidden";
   codClient.value = code_client.value;
   codClient.name = "client_code";
-  if (type === "edit") {
+  if (type === "exercise") {
     forms[forms.length - 1].appendChild(codClient);
   } else if (type === "list") {
     let code = btn.getAttribute("data-code");
@@ -291,6 +299,10 @@ function contentCard(type, e) {
         return;
       }
       mainTable.innerHTML = '';
+      if (!data || data.length === 0) {
+        mainTable.innerHTML = '<div class="table"><div class="header"><h4>No data</h4></div><div class="body"><div class="choose"><p>No data available</p></div></div></div>';
+        return;
+      }
       data.forEach(activity => {
         const mainEl = document.createElement('main');
         const head = document.createElement('div');
@@ -520,7 +532,14 @@ function contentCard(type, e) {
             }); // end headers.forEach
             bodyDiv.appendChild(row);
           }); // end elements.forEach
-        }; // end if elements
+        } else {
+          const chooseDiv = document.createElement('div');
+          chooseDiv.className = 'choose';
+          const chooseP = document.createElement('p');
+          chooseP.textContent = 'No data';
+          chooseDiv.appendChild(chooseP);
+          bodyDiv.appendChild(chooseDiv);
+        }
         tableWrap.appendChild(bodyDiv);
         mainEl.appendChild(head);
         mainEl.appendChild(tableWrap);
@@ -649,9 +668,9 @@ function contentCard(type, e) {
 })(); // end IIFE
 
 
-editProfile.forEach((button, index) => {
+exerciseProfile.forEach((button, index) => {
   button.addEventListener("click", (e) => {
-    contentCard("edit", e);
+    contentCard("exercise", e);
   });
 });
 

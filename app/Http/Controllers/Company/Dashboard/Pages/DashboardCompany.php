@@ -63,6 +63,12 @@ class DashboardCompany extends Controller {
     $lname = mb_strtolower($request->input('lname', ''));
     $result = [];
     $user = Auth::guard('employee')->user();
+    $Client = null;
+    $Employee = null;
+    $History = null;
+    $Lineage = null;
+    $IncomeStatement = null;
+    $Payment = null;
     if (mb_strtolower($user->job_role) == "admin") {
       $Client = Client::whereRaw('LOWER(fname) = ?', [$fname])->whereRaw('LOWER(lname) = ?', [$lname])->first();
       $Employee = Employee::whereRaw('LOWER(fname) = ?', [$fname])->whereRaw('LOWER(lname) = ?', [$lname])->first();
@@ -124,7 +130,7 @@ class DashboardCompany extends Controller {
     $models = compact(
       'Client', 'Employee', 'History', 'Lineage', 'Supplement', 'System', 'Snacks',
       'Record', 'RequestsPayment', 'Imports', 'Activity', 'CustomerRequests',
-      'IncomeStatement', 'Payment', 'report'
+      'IncomeStatement', 'Payment'
     );
     if (mb_strtolower($user->job_role) == "admin") {
       $routes = [
@@ -142,7 +148,6 @@ class DashboardCompany extends Controller {
         'CustomerRequests' => route('requests'),
         'IncomeStatement' => route('analytics'),
         'Payment' => route('analytics'),
-        'report' => $pdf,
       ];
       $pages = [
         'Client' => 'users',
@@ -159,7 +164,6 @@ class DashboardCompany extends Controller {
         'CustomerRequests' => 'requests',
         'IncomeStatement' => 'analytics',
         'Payment' => 'analytics',
-        'report' => 'download',
       ];
     } else {
       $routes = [

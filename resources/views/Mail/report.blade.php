@@ -3,791 +3,380 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Login Notification Card</title>
-  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <title>Team Gym — Company Report</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --colorGold: rgb(209, 187, 59);
-      --colorAverage: rgb(236, 234, 74);
-      --colorPearntSection: rgb(22, 22, 22);
-      --colorPearnt: rgb(15, 15, 15);
-      --colorOfOpacityLight: rgba(165, 164, 164, 0.295);
-      --colorParagraph: rgb(126, 126, 126);
-      --colorReverse: rgb(224, 224, 224);
-      --colorReverseBg: rgb(46, 46, 46);
-      --colorSVGAnalytcis: #82eb58;
-      --colorCheck: #82eb58;
-      --colorError: #ff4a4a;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family:  "Lato", Arial, sans-serif;
-      background: var(--colorPearnt);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      background: #0a0a0a;
       min-height: 100vh;
-      padding: 20px;
+      padding: 40px 20px;
+      color: #e0e0e0;
+      -webkit-font-smoothing: antialiased;
     }
-
-    .main-header-lineage {
-      display: flex;
-      align-items: center;
+    .wrapper { max-width: 900px; margin: 0 auto; }
+    .report-header {
+      text-align: center;
+      padding: 32px 0 40px;
     }
-
-    .main-header-lineage .main-lineage {
-      width: 100%;
-      height: auto;
+    .report-header img {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+    }
+    .report-header h1 {
+      margin: 16px 0 4px;
+      font-size: 22px; font-weight: 700;
+      color: #ffe65b;
+      letter-spacing: 0.5px;
+    }
+    .report-header p {
+      font-size: 13px;
+      color: rgba(255,255,255,0.3);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+    .stat-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      grid-auto-rows: minmax(120px, auto);
-      gap: 20px;
-      align-items: stretch;
-      box-sizing: border-box;
-      grid-auto-flow: dense;
-      padding: 0;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 32px;
     }
-
-    .main-header-lineage .lineage {
-      padding: 10px;
-      margin: 10px;
-      width: 95%;
-      height: 150px;
-      background-color: var(--colorOfOpacityLight);
-      border-radius: 10px;
-      -webkit-border-radius: 10px;
-      -moz-border-radius: 10px;
-      -ms-border-radius: 10px;
-      -o-border-radius: 10px;
-    }
-
-    .main-header-lineage .lineage .header {
-      padding: 10px;
-      width: 93%;
-      height: 50px;
-      background-color: var(--colorPearntSection);
-      border-radius: 7px;
-      -webkit-border-radius: 7px;
-      -moz-border-radius: 7px;
-      -ms-border-radius: 7px;
-      -o-border-radius: 7px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .main-header-lineage .lineage .header h1 {
-      color: var(--colorReverse);
-      font-size: 20px;
-    }
-
-    .main-header-lineage .lineage main {
-      height: fit-content;
-      margin: 5px;
-      padding: 5px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .main-header-lineage .lineage main .content {
-      display: flex;
-      justify-content: space-between;
-      align-items: start;
-      flex-direction: column;
-    }
-
-    .main-header-lineage .lineage main .content h1 {
-      font-size: 25px;
-      margin: 10px 0px;
-      color: var(--colorReverse);
-    }
-
-    .main-header-lineage .lineage main .content p {
-      font-size: 11px;
-      color: var(--colorParagraph);
-    }
-
-    .main-header-lineage .lineage main .content p span {
-      color: var(--colorSVGAnalytcis);
-    }
-
-    .main-header-lineage .lineage main .stock-index {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .main-header-lineage .lineage main .stock-index p {
-      font-size: 11px;
-      color: var(--colorSVGAnalytcis);
-      text-wrap: nowrap;
-    }
-
-    .main-header-lineage .descending .stock-index svg {
-      transform: rotate(5deg) rotateX(-180deg);
-      -webkit-transform: rotate(5deg) rotateX(-180deg);
-      -moz-transform: rotate(5deg) rotateX(-180deg);
-      -ms-transform: rotate(5deg) rotateX(-180deg);
-      -o-transform: rotate(5deg) rotateX(-180deg);
-      fill: var(--colorSVGAnalytcis);
-    }
-
-    .main-header-lineage .descending .stock-index svg path {
-      fill: var(--colorSVGAnalytcis);
-    }
-
-
-    .lineage.descending {
-      --colorSVGAnalytcis: #ff4c4c;
-    }
-
-    .lineage .stock-index svg {
-      color: var(--colorSVGAnalytcis);
-    }
-
-    main:has(.table) {
-      margin-bottom: 40px !important;
-    }
-
-    .table {
-      clear: both !important;
-      height: auto;
-      box-sizing: border-box !important;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-direction: column;
-      background-color: var(--colorOfOpacityLight);
-      border-radius: 10px;
-      -webkit-border-radius: 10px;
-      -moz-border-radius: 10px;
-      -ms-border-radius: 10px;
-      -o-border-radius: 10px;
-      margin-bottom: 12px !important;
-    }
-
-    .table,
-    .table .body {
-      display: block !important;
-      height: auto !important;
-      overflow: visible !important;
-    }
-
-    .table .header {
-      padding: 5px 10px;
-      width: 100%;
-      height: 28px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: var(--colorAverage);
-      border-radius: 10px 10px 0px 0px;
-    }
-
-    .table .header h4 {
+    .stat-card {
+      background: linear-gradient(145deg, #141414, #0d0d0d);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 24px;
       position: relative;
-      font-size: 14px;
-      text-transform: capitalize;
-      text-align: center;
-      width: 100%;
+      overflow: hidden;
     }
-
-    .table .header h4:not(:last-child)::after {
-      content: "";
+    .stat-card::before {
+      content: '';
       position: absolute;
-      right: 0px;
-      width: 1px;
-      height: 100%;
-      background-color: var(--colorPearnt);
+      top: 0; left: 0; right: 0;
+      height: 2px;
     }
-
-    .table .body:not(:has(.choose)) {
+    .stat-card.positive::before { background: linear-gradient(90deg, rgba(82,235,88,0.5), transparent); }
+    .stat-card.negative::before { background: linear-gradient(90deg, rgba(255,76,76,0.5), transparent); }
+    .stat-card .stat-label {
+      font-size: 11px; font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: rgba(255,255,255,0.3);
+      margin-bottom: 8px;
+    }
+    .stat-card .stat-value {
+      font-size: 28px; font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .stat-card .stat-meta {
+      font-size: 12px;
+      color: rgba(255,255,255,0.35);
+    }
+    .stat-card .stat-pct {
+      display: inline-block;
+      font-size: 13px; font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 20px;
+      margin-left: 6px;
+    }
+    .stat-card.positive .stat-pct { background: rgba(82,235,88,0.1); color: #52eb58; }
+    .stat-card.negative .stat-pct { background: rgba(255,76,76,0.1); color: #ff4c4c; }
+    .section-title {
+      font-size: 14px; font-weight: 600;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin: 32px 0 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .data-table {
       width: 100%;
-      height: 100%;
-      display: flex;
-      justify-content: start;
-      align-items: center;
-      flex-direction: column;
-      overflow-y: auto;
+      border-collapse: collapse;
+      margin-bottom: 32px;
     }
-
-    .table .body:has(.choose) {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow-y: auto;
+    .data-table thead th {
+      padding: 12px 16px;
+      font-size: 10px; font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: rgba(255,255,255,0.3);
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.02);
     }
-
-    .table .body .choose p {
-      color: var(--colorReverse);
+    .data-table thead th:first-child { border-radius: 10px 0 0 0; }
+    .data-table thead th:last-child { border-radius: 0 10px 0 0; }
+    .data-table tbody td {
+      padding: 12px 16px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.7);
+      border-bottom: 1px solid rgba(255,255,255,0.03);
     }
-
-    .table .body .row {
-      padding: 10px 0px;
-      width: 100%;
-      height: 30px;
-      border-bottom: 1px solid var(--colorReverse);
-      display: flex !important;
-      justify-content: space-between;
-      align-items: center;
-      page-break-inside: avoid;
-    }
-
-    .table .body .row .content {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .table .body .row .details {
-      margin: 25px 0px;
-    }
-
-    .table .body .row .details ul {
-      margin: 10px;
-    }
-
-    .table .body .row .details ul li {
-      margin: 10px;
-      color: var(--colorReverse);
-      text-transform: capitalize;
-    }
-
-    .table .body .row .details ul li button {
-      padding: 7px 13px;
-      background-color: var(--colorAverage);
-      color: black;
-      border-radius: 10px;
-      -webkit-border-radius: 10px;
-      -moz-border-radius: 10px;
-      -ms-border-radius: 10px;
-      -o-border-radius: 10px;
-      text-transform: capitalize;
-      border: none;
-      outline: none;
-      cursor: pointer;
-    }
-
-    .table .body .row p {
-      font-size: 14px;
-      margin: 0px 10px;
-      width: 100%;
-      text-align: center;
-      text-transform: capitalize;
-      display: inline-block !important;
-      color: var(--colorReverse);
-      vertical-align: middle !important;
-    }
-
-    .table .body .row .content-row {
-      margin: 0px 10px;
-      width: 100%;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-    }
-
-    .table .body .row .content-row button {
-      width: fit-content;
-      background-color: transparent;
-      border: none;
-      outline: none;
-      cursor: pointer;
-    }
-
-    .table .body .row .content-row button:hover {
-      background-color: transparent;
-    }
-
-    .table .body .row p:has(img) {
-      font-size: 14px;
-      width: 100%;
-      text-align: center;
-      text-transform: capitalize;
-      color: var(--colorReverse);
-      display: flex;
-      justify-content: start;
-      align-items: center;
-    }
-
-    .table .body .row p img {
-      margin: 0px 10px;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      -webkit-border-radius: 50%;
-      -moz-border-radius: 50%;
-      -ms-border-radius: 50%;
-      -o-border-radius: 50%;
-      border: 1px solid transparent;
-      outline: 1px solid var(--colorReverse);
-      object-fit: cover;
-    }
-
-    .img-profile {
-      margin: 0px 10px;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      -webkit-border-radius: 50%;
-      -moz-border-radius: 50%;
-      -ms-border-radius: 50%;
-      -o-border-radius: 50%;
-      border: 1px solid transparent;
-      outline: 1px solid var(--colorReverse);
-    }
-
-    .table .body .row .content {
-      color: var(--colorParagraph);
-    }
-
-    .table .row p[data-state="exit"] {
+    .data-table tbody tr:hover { background: rgba(255,255,255,0.015); }
+    .badge {
+      display: inline-block;
       padding: 3px 10px;
-      font-size: 14px;
-      width: 90%;
-      text-align: center;
+      font-size: 11px; font-weight: 600;
+      border-radius: 20px;
       text-transform: capitalize;
-      background-color: #82eb58;
-      color: white;
-      border-radius: 50px;
-      -webkit-border-radius: 50px;
-      -moz-border-radius: 50px;
-      -ms-border-radius: 50px;
-      -o-border-radius: 50px;
     }
-
-    .table .row p[data-state="entrance"] {
-      padding: 3px 10px;
-      font-size: 14px;
-      width: 90%;
+    .badge-green { background: rgba(82,235,88,0.1); color: #52eb58; }
+    .badge-red { background: rgba(255,76,76,0.1); color: #ff4c4c; }
+    .badge-blue { background: rgba(107,134,255,0.1); color: #6b86ff; }
+    .badge-purple { background: rgba(192,98,247,0.1); color: #c062f7; }
+    .badge-orange { background: rgba(255,154,107,0.1); color: #ff9a6b; }
+    .badge-gray { background: rgba(153,153,153,0.1); color: #999; }
+    .report-footer {
       text-align: center;
-      text-transform: capitalize;
-      background-color: #eb5858;
-      color: white;
-      border-radius: 50px;
-      -webkit-border-radius: 50px;
-      -moz-border-radius: 50px;
-      -ms-border-radius: 50px;
-      -o-border-radius: 50px;
+      padding: 24px 0;
+      margin-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.04);
     }
-
-    .table .row p[data-state="login"] {
-      padding: 3px 8px;
-      background-color: rgba(192, 98, 247, 0.904);
-      color: #441f5a;
-      border-radius: 50px;
-      -webkit-border-radius: 50px;
-      -moz-border-radius: 50px;
-      -ms-border-radius: 50px;
-      -o-border-radius: 50px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+    .report-footer p {
+      font-size: 11px;
+      color: rgba(255,255,255,0.2);
     }
-
-    .table .row p[data-state="PRO"] {
-      padding: 3px 8px;
-      background-color: rgba(255, 154, 107, 0.904);
-      color: #5a1f1f;
-      border-radius: 50px;
-      -webkit-border-radius: 50px;
-      -moz-border-radius: 50px;
-      -ms-border-radius: 50px;
-      -o-border-radius: 50px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .table .row p[data-state="paid"] {
-      padding: 3px 8px;
-      background-color: rgba(174, 255, 107, 0.904);
-      color: #2b5a1f;
-      border-radius: 50px;
-      -webkit-border-radius: 50px;
-      -moz-border-radius: 50px;
-      -ms-border-radius: 50px;
-      -o-border-radius: 50px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .table .row p[data-state="easy"] {
-      padding: 3px 8px;
-      background-color: rgba(174, 255, 107, 0.904);
-      color: #2b5a1f;
-      border-radius: 50px;
-      -webkit-border-radius: 50px;
-      -moz-border-radius: 50px;
-      -ms-border-radius: 50px;
-      -o-border-radius: 50px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .table .row p[data-state="middle"] {
-      padding: 3px 8px;
-      background-color: rgba(107, 134, 255, 0.904);
-      color: #281f5a;
-      border-radius: 50px;
-      -webkit-border-radius: 50px;
-      -moz-border-radius: 50px;
-      -ms-border-radius: 50px;
-      -o-border-radius: 50px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .table .row p[data-state="Expenses"] {
-      padding: 3px 8px;
-      background-color: rgba(255, 83, 60, 0.904);
-      color: #5a1f1f;
-      border-radius: 50px;
-      -webkit-border-radius: 50px;
-      -moz-border-radius: 50px;
-      -ms-border-radius: 50px;
-      -o-border-radius: 50px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .table .row p[data-state="Revenues"] {
-      padding: 3px 8px;
-      background-color: rgba(127, 255, 76, 0.904);
-      color: #245a1f;
-      border-radius: 50px;
-      -webkit-border-radius: 50px;
-      -moz-border-radius: 50px;
-      -ms-border-radius: 50px;
-      -o-border-radius: 50px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .table .row p[data-state="request"] {
-      padding: 3px 8px;
-      background-color: rgba(255, 76, 76, 0.904);
-      color: #5a1f1f;
-      border-radius: 50px;
-      -webkit-border-radius: 50px;
-      -moz-border-radius: 50px;
-      -ms-border-radius: 50px;
-      -o-border-radius: 50px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .table .row p[data-state="sold"] {
-      padding: 3px 8px;
-      background-color: rgba(127, 255, 76, 0.904);
-      color: #245a1f;
-      border-radius: 50px;
-      -webkit-border-radius: 50px;
-      -moz-border-radius: 50px;
-      -ms-border-radius: 50px;
-      -o-border-radius: 50px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .table .row p[data-state="acceptance"] {
-      padding: 3px 8px;
-      background-color: rgba(76, 255, 130, 0.904);
-      color: #245a1f;
-      border-radius: 50px;
-      -webkit-border-radius: 50px;
-      -moz-border-radius: 50px;
-      -ms-border-radius: 50px;
-      -o-border-radius: 50px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .table .row p[data-state="acceptance"] {
-      padding: 3px 8px;
-      background-color: rgba(76, 255, 130, 0.904);
-      color: #245a1f;
-      border-radius: 50px;
-      -webkit-border-radius: 50px;
-      -moz-border-radius: 50px;
-      -ms-border-radius: 50px;
-      -o-border-radius: 50px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .table .row p[data-state="reject"] {
-      padding: 3px 8px;
-      background-color: rgba(255, 76, 76, 0.904);
-      color: #5a1f1f;
-      border-radius: 50px;
-      -webkit-border-radius: 50px;
-      -moz-border-radius: 50px;
-      -ms-border-radius: 50px;
-      -o-border-radius: 50px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .table .row p[data-state="import"] {
-      padding: 3px 8px;
-      background-color: rgba(153, 153, 153, 0.904);
-      color: #d4d4d4;
-      border-radius: 50px;
-      -webkit-border-radius: 50px;
-      -moz-border-radius: 50px;
-      -ms-border-radius: 50px;
-      -o-border-radius: 50px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    main h1 {
-      color: white
+    .report-footer a { color: rgba(255,230,91,0.6); text-decoration: none; }
+    @media (max-width: 600px) {
+      .stat-grid { grid-template-columns: 1fr; }
+      .data-table { font-size: 11px; }
+      .data-table thead th, .data-table tbody td { padding: 8px 10px; }
     }
   </style>
 </head>
 <body>
-  <div class="main-header-lineage" style="text-align:center; font-size:0;">
-    <div style="display:inline-block; vertical-align:top; width:40%; margin:1%; font-size:14px;" @if ($expenses["state"] == 1) class="lineage" @else class="lineage descending" @endif >
-      <div class="header">
-        <h1>Expenses</h1>
-      </div>
-      <main>
-        <div class="content">
-          <h1>{{$expenses["total"]}} EGP</h1>
-          <p>You achieved %{{$expenses["lineage"]}} of total income this year.</p>
-        </div>
-        <div class="stock-index">
-          <p>{{$expenses["lineage"]}} %</p>
-        </div>
-      </main>
+  <div class="wrapper">
+    <div class="report-header">
+      <img src="{{ asset('images/header/Team-Gym.png') }}" alt="Team Gym">
+      <h1>Company Report</h1>
+      <p>Annual Financial Overview</p>
     </div>
-    <div style="display:inline-block; vertical-align:top; width:40%; margin:1%; font-size:14px;" @if ($revenues["state"] == 1) class="lineage" @else class="lineage descending" @endif >
-      <div class="header">
-        <h1>Revenues</h1>
+
+    <div class="stat-grid">
+      <div class="stat-card @if ($expenses['state'] == 1) positive @else negative @endif">
+        <div class="stat-label">Expenses</div>
+        <div class="stat-value">{{$expenses['total']}} <small style="font-size:14px; color:rgba(255,255,255,0.3);">EGP</small></div>
+        <div class="stat-meta">
+          {{ $expenses['lineage'] }}%<span class="stat-pct">of total income</span>
+        </div>
       </div>
-      <main>
-        <div class="content">
-          <h1>{{$revenues["total"]}} EGP</h1>
-          <p>You achieved %{{$revenues["lineage"]}} of total income this year.</p>
+      <div class="stat-card @if ($revenues['state'] == 1) positive @else negative @endif">
+        <div class="stat-label">Revenues</div>
+        <div class="stat-value">{{$revenues['total']}} <small style="font-size:14px; color:rgba(255,255,255,0.3);">EGP</small></div>
+        <div class="stat-meta">
+          {{ $revenues['lineage'] }}%<span class="stat-pct">of total income</span>
         </div>
-        <div class="stock-index">
-          <p>{{$revenues["lineage"]}} %</p>
+      </div>
+      <div class="stat-card positive">
+        <div class="stat-label">Supplements</div>
+        <div class="stat-value">{{$supplement}} <small style="font-size:14px; color:rgba(255,255,255,0.3);">EGP</small></div>
+        <div class="stat-meta">
+          {{round(($supplement / $total) * 100, 2)}}%<span class="stat-pct">of total income</span>
         </div>
-      </main>
+      </div>
+      <div class="stat-card positive">
+        <div class="stat-label">Subscriptions</div>
+        <div class="stat-value">{{$system}} <small style="font-size:14px; color:rgba(255,255,255,0.3);">EGP</small></div>
+        <div class="stat-meta">
+          {{round(($system / $total) * 100, 2)}}%<span class="stat-pct">of total income</span>
+        </div>
+      </div>
     </div>
-  </div>
-  <div class="main-header-lineage" style="text-align:center; font-size:0;">
-    <div style="display:inline-block; vertical-align:top; width:40%; margin:1%; font-size:14px;" @if ($expenses["state"] == 1) class="lineage" @else class="lineage descending" @endif >
-      <div class="header">
-        <h1>Supplements</h1>
-      </div>
-      <main>
-        <div class="content">
-          <h1>{{$supplement}} EGP</h1>
-          <p>You achieved %{{round(($supplement / $total) * 100, 2)}} of total income this year.</p>
-        </div>
-        <div class="stock-index">
-          <p>{{round(($supplement / $total) * 100, 2)}} %</p>
-        </div>
-      </main>
-    </div>
-    <div style="display:inline-block; vertical-align:top; width:40%; margin:1%; font-size:14px;" @if ($revenues["state"] == 1) class="lineage" @else class="lineage descending" @endif >
-      <div class="header">
-        <h1>Subscriptions</h1>
-      </div>
-      <main>
-        <div class="content">
-          <h1>{{$system}} EGP</h1>
-          <p>You achieved %{{round(($system / $total) * 100, 2)}} of total income this year.</p>
-        </div>
-        <div class="stock-index">
-          <p>{{round(($system / $total) * 100, 2)}} %</p>
-        </div>
-      </main>
-    </div>
-  </div>
-  <main>
-    <h1>History</h1>
-    <div class="table">
-      <div class="header" style="width:97%; text-align:center; background-color:#ECEA4A; font-size:0;">
-        <h4 style="display:inline-block; width:16%; margin:0; padding:5px 0; font-size:14px; color:#000000; border-right:1px solid #000000;">Name</h4>
-        <h4 style="display:inline-block; width:16%; margin:0; padding:5px 0; font-size:14px; color:#000000; border-right:1px solid #000000;">Code</h4>
-        <h4 style="display:inline-block; width:16%; margin:0; padding:5px 0; font-size:14px; color:#000000; border-right:1px solid #000000;">Price</h4>
-        <h4 style="display:inline-block; width:16%; margin:0; padding:5px 0; font-size:14px; color:#000000; border-right:1px solid #000000;">Status</h4>
-        <h4 style="display:inline-block; width:16%; margin:0; padding:5px 0; font-size:14px; color:#000000; border-right:1px solid #000000;">Attachment</h4>
-        <h4 style="display:inline-block; width:16%; margin:0; padding:5px 0; font-size:14px; color:#000000;">Date</h4>
-      </div>
-      <div class="body">
+
+    <h2 class="section-title">Transaction History</h2>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Code</th>
+          <th>Price</th>
+          <th>Status</th>
+          <th>Attachment</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
         @if ($histories)
           @foreach ($histories as $history)
-            <div class="row" style="width:100%; text-align:center; font-size:0;">
-              <p style="display:inline-block; width:20%; margin:0; padding:5px 0; font-size:14px; color:#fff;">{{ $history->code }}</p>
-              <p style="display:inline-block; width:20%; margin:0; padding:5px 0; font-size:14px; color:#fff;" data-state="{{ $history->state }}">{{ $history->state }}</p>
-              <p style="display:inline-block; width:20%; margin:0; padding:5px 0; font-size:14px; color:#fff;">{{ $history->amount ?? '--' }}</p>
-              <p style="display:inline-block; width:20%; margin:0; padding:5px 0; font-size:14px; color:#fff;">{{ $history->attachment ?? '--' }}</p>
-              <p style="display:inline-block; width:20%; margin:0; padding:5px 0; font-size:14px; color:#fff;">{{ $history->created_at->format('Y-m-d H:i:s') }}</p>
-            </div>
+            <tr>
+              <td>{{ $history->code }}</td>
+              <td>{{ $history->code }}</td>
+              <td>{{ $history->amount ?? '--' }}</td>
+              <td><span class="badge
+                @if (in_array($history->state, ['exit', 'paid', 'easy', 'acceptance', 'Revenues', 'sold'])) badge-green
+                @elseif (in_array($history->state, ['entrance', 'request', 'Expenses', 'reject'])) badge-red
+                @elseif ($history->state == 'login') badge-purple
+                @elseif ($history->state == 'PRO') badge-orange
+                @elseif ($history->state == 'middle') badge-blue
+                @else badge-gray
+                @endif
+              ">{{ $history->state }}</span></td>
+              <td>{{ $history->attachment ?? '--' }}</td>
+              <td>{{ $history->created_at->format('Y-m-d H:i:s') }}</td>
+            </tr>
           @endforeach
         @endif
-      </div>
-    </div>
-  </main>
-  <main>
-    <h1>Income Statement</h1>
-    <div class="table">
-      <div class="header" style="width:97%; text-align:center; background-color:#ECEA4A; font-size:0;">
-        <h4 style="display:inline-block; width:16%; margin:0; padding:5px 0; font-size:14px; color:#000000; border-right:1px solid #000000;">Name</h4>
-        <h4 style="display:inline-block; width:16%; margin:0; padding:5px 0; font-size:14px; color:#000000; border-right:1px solid #000000;">Code</h4>
-        <h4 style="display:inline-block; width:16%; margin:0; padding:5px 0; font-size:14px; color:#000000; border-right:1px solid #000000;">Status</h4>
-        <h4 style="display:inline-block; width:16%; margin:0; padding:5px 0; font-size:14px; color:#000000; border-right:1px solid #000000;">Price</h4>
-        <h4 style="display:inline-block; width:16%; margin:0; padding:5px 0; font-size:14px; color:#000000;">Date</h4>
-      </div>
-      <div class="body">
+      </tbody>
+    </table>
+
+    <h2 class="section-title">Income Statement</h2>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Code</th>
+          <th>Status</th>
+          <th>Price</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
         @if ($incomeStatement)
           @foreach ($incomeStatement as $item)
-            <div class="row" style="width:100%; text-align:center; font-size:0;">
-              <p style="display:inline-block; width:20%; margin:0; padding:5px 0; font-size:14px; color:#fff;">{{$item->name}}</p>
-              <p style="display:inline-block; width:20%; margin:0; padding:5px 0; font-size:14px; color:#fff;">{{$item->code}}</p>
-              <p style="display:inline-block; width:20%; margin:0; padding:5px 0; font-size:14px; color:#fff;" data-state="{{$item->type}}">{{$item->type}}</p>
-              <p style="display:inline-block; width:20%; margin:0; padding:5px 0; font-size:14px; color:#fff;">{{$item->amount}}</p>
-              <p style="display:inline-block; width:20%; margin:0; padding:5px 0; font-size:14px; color:#fff;">{{$item->created_at}}</p>
-            </div>
+            <tr>
+              <td>{{$item->name}}</td>
+              <td>{{$item->code}}</td>
+              <td><span class="badge
+                @if (in_array($item->type, ['Revenues', 'paid', 'exit'])) badge-green
+                @elseif (in_array($item->type, ['Expenses', 'entrance'])) badge-red
+                @else badge-gray
+                @endif
+              ">{{$item->type}}</span></td>
+              <td>{{$item->amount}}</td>
+              <td>{{$item->created_at}}</td>
+            </tr>
           @endforeach
         @endif
-      </div>
-    </div>
-  </main>
-  <main>
-    <h1>Imports</h1>
-    <div class="table">
-      <div class="header" style="width:97%; text-align:center; background-color:#ECEA4A; font-size:0;">
-        <h4 style="display:inline-block; width:16%; margin:0; padding:5px 0; font-size:14px; color:#000000; border-right:1px solid #000000;">Name</h4>
-        <h4 style="display:inline-block; width:16%; margin:0; padding:5px 0; font-size:14px; color:#000000; border-right:1px solid #000000;">Code</h4>
-        <h4 style="display:inline-block; width:16%; margin:0; padding:5px 0; font-size:14px; color:#000000; border-right:1px solid #000000;">Status</h4>
-        <h4 style="display:inline-block; width:16%; margin:0; padding:5px 0; font-size:14px; color:#000000; border-right:1px solid #000000;">Quantity</h4>
-        <h4 style="display:inline-block; width:16%; margin:0; padding:5px 0; font-size:14px; color:#000000; border-right:1px solid #000000;">Price</h4>
-        <h4 style="display:inline-block; width:16%; margin:0; padding:5px 0; font-size:14px; color:#000000;">Date</h4>
-      </div>
-      <div class="body">
+      </tbody>
+    </table>
+
+    <h2 class="section-title">Imports</h2>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Code</th>
+          <th>Status</th>
+          <th>Quantity</th>
+          <th>Price</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
         @if ($imports)
           @foreach ($imports as $item)
-            <div class="row" style="width:100%; text-align:center; font-size:0;">
-              <p style="display:inline-block; width:15%; margin:0; padding:5px 0; font-size:14px; color:#fff;">{{$item->name}}</p>
-              <p style="display:inline-block; width:15%; margin:0; padding:5px 0; font-size:14px; color:#fff;">{{$item->code}}</p>
-              <p style="display:inline-block; width:15%; margin:0; padding:5px 0; font-size:14px; color:#fff;" data-state="{{$item->state}}">{{$item->state}}</p>
-              <p style="display:inline-block; width:15%; margin:0; padding:5px 0; font-size:14px; color:#fff;">{{$item->quantity}}</p>
-              <p style="display:inline-block; width:15%; margin:0; padding:5px 0; font-size:14px; color:#fff;">{{$item->amount}}</p>
-              <p style="display:inline-block; width:15%; margin:0; padding:5px 0; font-size:14px; color:#fff;">{{$item->created_at}}</p>
-            </div>
+            <tr>
+              <td>{{$item->name}}</td>
+              <td>{{$item->code}}</td>
+              <td><span class="badge badge-gray">{{$item->state}}</span></td>
+              <td>{{$item->quantity}}</td>
+              <td>{{$item->amount}}</td>
+              <td>{{$item->created_at}}</td>
+            </tr>
           @endforeach
         @endif
-      </div>
-    </div>
-  </main>
-  <main>
-    <h1>Supplements</h1>
-    <div class="table">
-      <div class="header" style="width:97%; text-align:center; background-color:#ECEA4A; font-size:0;">
-        <h4 style="display:inline-block; width:19%; margin:0; padding:5px 0; font-size:14px; color:#000000; border-right:1px solid #000000;">Client Name</h4>
-        <h4 style="display:inline-block; width:19%; margin:0; padding:5px 0; font-size:14px; color:#000000; border-right:1px solid #000000;">Supplement Name</h4>
-        <h4 style="display:inline-block; width:19%; margin:0; padding:5px 0; font-size:14px; color:#000000; border-right:1px solid #000000;">Price</h4>
-        <h4 style="display:inline-block; width:19%; margin:0; padding:5px 0; font-size:14px; color:#000000; border-right:1px solid #000000;">Recorded By</h4>
-        <h4 style="display:inline-block; width:19%; margin:0; padding:5px 0; font-size:14px; color:#000000;">Date</h4>
-      </div>
-      <div class="body">
+      </tbody>
+    </table>
+
+    <h2 class="section-title">Supplements</h2>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Client</th>
+          <th>Supplement</th>
+          <th>Price</th>
+          <th>Recorded By</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
         @if ($supplements)
           @foreach ($supplements as $item)
             @if ($item->client)
               @foreach ($item->client as $index => $client)
-                <div class="row" style="width:100%; text-align:center; font-size:0;">
-                  <p style="display:inline-block; width:18%; margin:0; padding:5px 0; font-size:14px; color:#fff;">{{optional($item->client)->fname}} {{optional($item->client)->lname}}</p>
-                  <p style="display:inline-block; width:18%; margin:0; padding:5px 0; font-size:14px; color:#fff;">{{optional($item->supplement)->name}}</p>
-                  <p style="display:inline-block; width:18%; margin:0; padding:5px 0; font-size:14px; color:#fff;">{{$item->amount}}</p>
-                  <p style="display:inline-block; width:18%; margin:0; padding:5px 0; font-size:14px; color:#fff;">{{optional($item->employee)->fname}} {{optional($item->employee)->lname}}</p>
-                  <p style="display:inline-block; width:18%; margin:0; padding:5px 0; font-size:14px; color:#fff;">{{$item->created_at}}</p>
-                </div>
+                <tr>
+                  <td>{{optional($item->client)->fname}} {{optional($item->client)->lname}}</td>
+                  <td>{{optional($item->supplement)->name}}</td>
+                  <td>{{$item->amount}}</td>
+                  <td>{{optional($item->employee)->fname}} {{optional($item->employee)->lname}}</td>
+                  <td>{{$item->created_at}}</td>
+                </tr>
               @endforeach
             @endif
           @endforeach
         @endif
-      </div>
-    </div>
-  </main>
-  <main>
-    <h1>Systems</h1>
-    <div class="table">
-      <div class="header" style="width:97%; text-align:center; background-color:#ECEA4A; font-size:0;">
-        <h4 style="display:inline-block; width:19%; margin:0; padding:5px 0; font-size:14px; color:#000000; border-right:1px solid #000000;">Client Name</h4>
-        <h4 style="display:inline-block; width:19%; margin:0; padding:5px 0; font-size:14px; color:#000000; border-right:1px solid #000000;">System Name</h4>
-        <h4 style="display:inline-block; width:19%; margin:0; padding:5px 0; font-size:14px; color:#000000; border-right:1px solid #000000;">Price</h4>
-        <h4 style="display:inline-block; width:19%; margin:0; padding:5px 0; font-size:14px; color:#000000; border-right:1px solid #000000;">Recorded By</h4>
-        <h4 style="display:inline-block; width:19%; margin:0; padding:5px 0; font-size:14px; color:#000000;">Date</h4>
-      </div>
-      <div class="body">
+      </tbody>
+    </table>
+
+    <h2 class="section-title">Systems</h2>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Client</th>
+          <th>System</th>
+          <th>Price</th>
+          <th>Recorded By</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
         @if ($systems)
           @foreach ($systems as $item)
             @if ($item->client)
               @foreach ($item->client as $index => $client)
-                <div class="row" style="width:100%; text-align:center; font-size:0;">
-                  <p style="display:inline-block; width:18%; margin:0; padding:5px 0; font-size:14px; color:#fff;">{{optional($item->client)->fname}} {{optional($item->client)->lname}}</p>
-                  <p style="display:inline-block; width:18%; margin:0; padding:5px 0; font-size:14px; color:#fff;">{{optional($item->system)->name}}</p>
-                  <p style="display:inline-block; width:18%; margin:0; padding:5px 0; font-size:14px; color:#fff;">{{$item->amount}}</p>
-                  <p style="display:inline-block; width:18%; margin:0; padding:5px 0; font-size:14px; color:#fff;">{{optional($item->employee)->fname}} {{optional($item->employee)->lname}}</p>
-                  <p style="display:inline-block; width:18%; margin:0; padding:5px 0; font-size:14px; color:#fff;">{{$item->created_at}}</p>
-                </div>
+                <tr>
+                  <td>{{optional($item->client)->fname}} {{optional($item->client)->lname}}</td>
+                  <td>{{optional($item->system)->name}}</td>
+                  <td>{{$item->amount}}</td>
+                  <td>{{optional($item->employee)->fname}} {{optional($item->employee)->lname}}</td>
+                  <td>{{$item->created_at}}</td>
+                </tr>
               @endforeach
             @endif
           @endforeach
         @endif
-      </div>
-    </div>
-  </main>
-  <main>
-    <h1>Payment Registry</h1>
-    <div class="table">
-      <div class="header" style="width:97%; text-align:center; background-color:#ECEA4A; font-size:0;">
-        <h4 style="display:inline-block; width:16%; margin:0; padding:5px 0; font-size:14px; color:#000000; border-right:1px solid #000000;">Employee</h4>
-        <h4 style="display:inline-block; width:16%; margin:0; padding:5px 0; font-size:14px; color:#000000; border-right:1px solid #000000;">Order Name</h4>
-        <h4 style="display:inline-block; width:16%; margin:0; padding:5px 0; font-size:14px; color:#000000; border-right:1px solid #000000;">Type</h4>
-        <h4 style="display:inline-block; width:16%; margin:0; padding:5px 0; font-size:14px; color:#000000; border-right:1px solid #000000;">Amount</h4>
-        <h4 style="display:inline-block; width:16%; margin:0; padding:5px 0; font-size:14px; color:#000000; border-right:1px solid #000000;">Pay Month</h4>
-        <h4 style="display:inline-block; width:16%; margin:0; padding:5px 0; font-size:14px; color:#000000;">Date</h4>
-      </div>
-      <div class="body">
+      </tbody>
+    </table>
+
+    <h2 class="section-title">Payment Registry</h2>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Employee</th>
+          <th>Order</th>
+          <th>Type</th>
+          <th>Amount</th>
+          <th>Pay Month</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
         @if ($paymentRegistry)
           @foreach ($paymentRegistry as $item)
-          <div class="row" style="width:100%; text-align:center; font-size:0;">
-            <p style="display:inline-block; width:15%; margin:0; padding:5px 0; font-size:14px; color:#fff;">{{optional($item->employee)->fname}} {{optional($item->employee)->lname}}</p>
-            <p style="display:inline-block; width:15%; margin:0; padding:5px 0; font-size:14px; color:#fff;">{{$item->order_name}}</p>
-            <p style="display:inline-block; width:15%; margin:0; padding:5px 0; font-size:14px; color:#fff;">{{$item->type}}</p>
-            <p style="display:inline-block; width:15%; margin:0; padding:5px 0; font-size:14px; color:#fff;">{{$item->amount}}</p>
-            <p style="display:inline-block; width:15%; margin:0; padding:5px 0; font-size:14px; color:#fff;">{{$item->paymonth}}</p>
-            <p style="display:inline-block; width:15%; margin:0; padding:5px 0; font-size:14px; color:#fff;">{{$item->created_at}}</p>
-          </div>
+            <tr>
+              <td>{{optional($item->employee)->fname}} {{optional($item->employee)->lname}}</td>
+              <td>{{$item->order_name}}</td>
+              <td><span class="badge
+                @if ($item->type == 'Revenues') badge-green
+                @elseif ($item->type == 'Expenses') badge-red
+                @else badge-gray
+                @endif
+              ">{{$item->type}}</span></td>
+              <td>{{$item->amount}}</td>
+              <td>{{$item->paymonth}}</td>
+              <td>{{$item->created_at}}</td>
+            </tr>
           @endforeach
         @endif
-      </div>
+      </tbody>
+    </table>
+
+    <div class="report-footer">
+      <p>Automated report from <a href="{{ url('/') }}">Team Gym</a></p>
     </div>
-  </main>
+  </div>
 </body>
 </html>

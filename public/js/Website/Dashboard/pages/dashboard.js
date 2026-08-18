@@ -5,7 +5,7 @@ let char3 = document.getElementById("chart-3");
 let char4 = document.getElementById("chart-4");
 let char5 = document.getElementById("chart-5");
 let char6 = document.getElementById("chart-6");
-let light = localStorage.getItem("state-mode-team-gym");
+let light = "dark";
 
 function normalizeNumberString(str) {
   if (str == null) return str;
@@ -73,6 +73,7 @@ if (typeof Chart === 'undefined') {
             'rgba(37, 37, 37, 1)',
           ],
           borderWidth: 0,
+          borderRadius: 6,
           cutout: '80%',
         }]
       },
@@ -176,16 +177,19 @@ if (typeof Chart === 'undefined') {
             label: isArabic == "en" ? 'Water' : "المياه",
             data: dataWater,
             backgroundColor: 'rgba(66, 165, 245, 1)',
+            borderRadius: 6,
           },
           {
             label: isArabic == "en" ? 'Protein' : "البروتين",
             data: dataProtein,
             backgroundColor: 'rgba(102, 187, 106, 1)',
+            borderRadius: 6,
           },
           {
             label: isArabic == "en" ? 'Fats' : "الدهون",
             data: dataFats,
             backgroundColor: 'rgba(255, 167, 38, 1)',
+            borderRadius: 6,
           }
         ]
       },
@@ -242,6 +246,8 @@ if (typeof Chart === 'undefined') {
           borderColor: 'rgba(255, 207, 76, 1)',
           pointBackgroundColor: '#fffc688a',
           tension: 0.4,
+          borderCapStyle: 'round',
+          borderJoinStyle: 'round',
           pointBorderWidth: 1,
           pointRadius: 7,
           pointHoverRadius: 14,

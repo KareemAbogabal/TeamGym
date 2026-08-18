@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="{{asset("css/Website/web/components/header.css")}}">
   <link rel="stylesheet" href="{{asset("css/Website/web/components/footer.css")}}">
   <link rel="stylesheet" href="{{asset("css/Website/web/pages/packages.css")}}">
+  <link rel="stylesheet" href="{{asset("css/notification.css")}}">
   <title>Team Gym | Packages</title>
 </head>
 <body>
@@ -20,11 +21,7 @@
   @if (Cookie::has('login_client'))
     <x-web::profile name="{{$client->fname}} {{$client->lname}}" state="{{$client->category}}" documentation="{{$client->documentation}}" img="{{$client->img}}" :lineages="$lineages" :muscles="$muscle" :fats="$fat" :water="$water"/>
   @endif
-  <div class="warnings-container">
-    @foreach ($errors->all() as $error)
-      <x-components::warning :text="$error" />
-    @endforeach
-  </div>
+  <x-components::notifications />
   <header>
     @include('Website.web.Tires.navPackages')
   </header>
@@ -87,5 +84,6 @@
   <script src="{{asset("js/Website/web/pages/packages.js")}}"></script>
   <script src="{{asset("js/Website/web/public.js")}}"></script>
   <script src="{{asset("js/Website/Dashboard/pages/profileCard.js")}}"></script>
+  <script src="{{asset("js/notification.js")}}"></script>
 </body>
 </html>
