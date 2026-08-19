@@ -23,6 +23,8 @@ exerciseCards.forEach(card => {
     if (isUnactive) {
       card.classList.add('reject');
       setTimeout(() => card.classList.remove('reject'), 710);
+      const name = card.getAttribute('data-name');
+      window.TeamGymNotify({ type: 'warning', message: 'exercise-locked', title: name || undefined });
       return;
     }
 

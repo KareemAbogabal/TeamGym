@@ -37,6 +37,7 @@
       "system-empty": "System is required",
       "employee-empty": "Employee is required",
       "lock-entrance": "Entrance is locked, you cannot enter again now",
+      "exercise-locked": "This exercise is locked",
     },
     ar: {
       "saved-successfully": "تم الحفظ بنجاح",
@@ -52,6 +53,7 @@
       "system-empty": "النظام مطلوب",
       "employee-empty": "الموظف مطلوب",
       "lock-entrance": "الدخول مقفول، لا يمكنك الدخول الآن",
+      "exercise-locked": "هذا التمرين مقفول",
     },
   };
 
