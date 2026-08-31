@@ -1,3 +1,5 @@
+@import url("/css/variables.css");
+
 :root {
   --fallback-sans: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   --fallback-ar: "Tahoma", "Arial", sans-serif;

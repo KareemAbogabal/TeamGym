@@ -16,6 +16,7 @@ use App\Models\Back\History;
 
 class LoginCompany extends Controller {
   public function index(Request $request) {
+    // dd(Hash::make("123456"));
     return view('Company.web.Pages.loginCompany');
   }
   public function login(LoginCompanyRequest $request) {

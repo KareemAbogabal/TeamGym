@@ -16,10 +16,18 @@ use App\Models\Back\Payment;
 use App\Models\Back\PaymentRegistry;
 use App\Models\Back\Activity;
 use App\Models\Back\Record;
+use App\Models\Coach\ClientQrCode;
+use App\Enums\QrPurpose;
+use App\Enums\QrStatus;
+use App\Services\ClientQrService;
 use App\Traits\GetLineage;
 
 class Users extends Controller {
   use GetLineage;
+
+  public function __construct(private ClientQrService $qrService) {
+  }
+
   public function index(Request $request) {
     $employees = Employee::whereNot("id", 1)->get();
     $months = [
@@ -81,14 +89,86 @@ class Users extends Controller {
     $paymentRegistry = Payment::where("code_client", $code)->with(["registries"])->get();
     $activity = Activity::where("code_client", $code)->get();
     $record = Record::where("code_client", $code)->get();
+    $qr = ClientQrCode::where("code_client", $code)
+      ->where("purpose", QrPurpose::ClientIdentity->value)
+      ->orderByDesc("created_at")
+      ->first();
+    $barcode = $this->qrService->activeAttendanceRow(Client::where("code", $code)->first());
     $data = [
       "Requests Payment" => $requestsPayment,
       "Payment" => $payment,
       "Payment Registry" => $paymentRegistry,
       "Activity" => $activity,
       "Record" => $record,
+      "QR" => $qr ? [
+        "status" => $qr->status,
+        "created_at" => $qr->created_at?->toDateTimeString(),
+        "last_scanned_at" => $qr->last_scanned_at?->toDateTimeString(),
+        "scan_count" => $qr->scan_count ?? 0,
+        "expires_at" => $qr->expires_at?->toDateTimeString(),
+      ] : null,
+      "Barcode" => $barcode ? [
+        "barcode" => $barcode->barcode,
+        "status" => $barcode->status,
+        "created_at" => $barcode->created_at?->toDateTimeString(),
+        "last_scanned_at" => $barcode->last_scanned_at?->toDateTimeString(),
+        "scan_count" => $barcode->scan_count ?? 0,
+        "expires_at" => $barcode->expires_at?->toDateTimeString(),
+      ] : null,
     ];
     return json_encode($data);
+  }
+
+  /**
+   * Regenerate a client's EAN-13 attendance barcode (the old active one is
+   * revoked first so only ONE active attendance barcode exists per client).
+   */
+  public function regenerateBarcode(Request $request) {
+    $request->validate(['code' => ['required', 'string']]);
+    $client = Client::where("code", $request->input("code"))->first();
+    if (!$client) {
+      return response()->json(['ok' => false, 'message' => __('messages.client-not-found')], 422);
+    }
+    $row = $this->qrService->regenerateAttendanceBarcode($client, auth('employee')->user()?->code);
+    notifySuccess(__('messages.barcode-regenerated'));
+    return response()->json([
+      'ok' => true,
+      'barcode' => $row->barcode,
+      'created_at' => $row->created_at?->toDateTimeString(),
+    ]);
+  }
+
+  /**
+   * Revoke a client's active EAN-13 attendance barcode (kept for audit; marked
+   * revoked so scanners reject it).
+   */
+  public function revokeBarcode(Request $request) {
+    $request->validate(['code' => ['required', 'string']]);
+    $client = Client::where("code", $request->input("code"))->first();
+    if (!$client) {
+      return response()->json(['ok' => false, 'message' => __('messages.client-not-found')], 422);
+    }
+    $row = $this->qrService->activeAttendanceRow($client);
+    if (!$row) {
+      return response()->json(['ok' => false, 'message' => __('messages.no-active-barcode')], 422);
+    }
+    $row->status = QrStatus::Revoked->value;
+    $row->save();
+    notifySuccess(__('messages.barcode-revoked'));
+    return response()->json(['ok' => true]);
+  }
+
+  /**
+   * Print a client's active EAN-13 attendance barcode in a minimal,
+   * print-friendly layout (labels for scanning the client's gym card).
+   */
+  public function printBarcode(Request $request, string $code) {
+    $client = Client::where("code", $code)->first();
+    $row = $client ? $this->qrService->activeAttendanceRow($client) : null;
+    if (!$client || !$row) {
+      abort(404);
+    }
+    return view('Company.Dashboard.Pages.print_barcode', ['client' => $client, 'barcode' => $row]);
   }
   public function updateEmployee(UpdateEmployeeRequest $request) {
     $employee = Employee::where("code", $request->input("code-employee"))->first();

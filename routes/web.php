@@ -13,6 +13,9 @@ use App\Http\Controllers\Website\web\Pages\PackagesController;
 use App\Http\Controllers\Website\web\Pages\CustomerRequestsController;
 use App\Http\Controllers\Website\web\Pages\WelcomeController;
 use App\Http\Controllers\Website\web\Pages\LoginController;
+use App\Http\Controllers\Website\web\Pages\QrLoginController;
+use App\Http\Controllers\Website\Dashboard\Pages\CoachController;
+use App\Http\Controllers\Website\Dashboard\Pages\ClientQr;
 use App\Http\Controllers\Website\Dashboard\Pages\Dashboard;
 use App\Http\Controllers\Website\Dashboard\Pages\SchedulesExercises;
 use App\Http\Controllers\Website\Dashboard\Pages\Plans;
@@ -34,6 +37,9 @@ use App\Http\Controllers\Company\Dashboard\Pages\Exercises;
 use App\Http\Controllers\Company\Dashboard\Pages\Publications;
 use App\Http\Controllers\Company\Dashboard\Pages\ImportProduct;
 use App\Http\Controllers\Company\Dashboard\Pages\SettingCompanys;
+use App\Http\Controllers\Company\Dashboard\Pages\Coach;
+use App\Http\Controllers\Company\Dashboard\Pages\Customers;
+use App\Http\Controllers\Company\Dashboard\Pages\ClientQrScan;
 use App\Http\Controllers\LogOut;
 
 Route::controller(Articles::class)->group(function () {
@@ -51,6 +57,10 @@ Route::controller(LoginController::class)->group(function () {
   Route::post('/forget', 'forget')->name("client.forget")->middleware('throttle:5,1');
   Route::post('/verify-code', 'verifyCode')->name("client.verifyCode")->middleware('throttle:5,1');
   Route::post('/reset-password', 'resetPassword')->name("client.resetPassword")->middleware('throttle:5,1');
+});
+
+Route::controller(QrLoginController::class)->group(function () {
+  Route::post('/qr-login', 'login')->name('qr.login');
 });
 
 Route::controller(ArticleController::class)->group(function () {
@@ -120,6 +130,17 @@ Route::middleware(CustomerVerification::class)->group(function () {
     Route::post('/update-profile', 'updateProfile')->name('updateProfile');
   });
 
+  Route::controller(CoachController::class)->group(function () {
+    Route::get('/coach', 'index')->name('coach');
+    Route::post('/coach/request', 'requestCoach')->name('coach.request');
+    Route::post('/coach/cancel', 'cancelCoach')->name('coach.cancel');
+  });
+
+  Route::controller(ClientQr::class)->group(function () {
+    Route::get('/my-qr', 'index')->name('myQr');
+    Route::post('/my-qr/rotate', 'rotate')->name('myQr.rotate');
+  });
+
   Route::controller(LogOut::class)->group(function () {
     Route::post('/log-out-client', 'logOutClient')->name('logOutClient');
   });
@@ -150,7 +171,10 @@ Route::middleware(AuthenticatedToCompany::class)->group(function () {
       Route::post('/update-client', 'updateClient')->name('updateClient');
       Route::post('/destroy', 'destroy')->name('destroy');
       Route::post('/get-all-data-client', 'getAllDataClient')->name('getAllDataClient');
-    });
+        Route::post('/users/regenerate-barcode', 'regenerateBarcode')->name('users.regenerateBarcode');
+        Route::post('/users/revoke-barcode', 'revokeBarcode')->name('users.revokeBarcode');
+        Route::get('/users/print-barcode/{code}', 'printBarcode')->name('users.printBarcode');
+      });
 
     Route::controller(Historys::class)->group(function () {
       Route::get('/history', 'index')->name('history');
@@ -216,6 +240,31 @@ Route::middleware(AuthenticatedToCompany::class)->group(function () {
     Route::get('/settings-company', 'index')->name('settingsCompany');
     Route::post('/update-employee-profile', 'updateEmployeeProfile')->name('updateEmployeeProfile');
   });
+
+  Route::controller(Coach::class)->group(function () {
+    Route::get('/coach-management', 'index')->name('coachManagement');
+    Route::post('/coach-management/request-client', 'requestClient')->name('coachManagement.requestClient');
+    Route::post('/coach-management/manage', 'manage')->name('coachManagement.manage');
+  });
+
+  Route::controller(Customers::class)->group(function () {
+    Route::get('/customers', 'index')->name('customers');
+    Route::post('/customers/get-all-data-client', 'getAllDataClient')->name('customers.getAllDataClient');
+    Route::post('/customers/update-client', 'updateClient')->name('customers.updateClient');
+    Route::post('/customers/destroy', 'destroy')->name('customers.destroy');
+    Route::post('/customers/regenerate-barcode', 'regenerateBarcode')->name('customers.regenerateBarcode');
+    Route::post('/customers/revoke-barcode', 'revokeBarcode')->name('customers.revokeBarcode');
+    Route::get('/customers/print-barcode/{code}', 'printBarcode')->name('customers.printBarcode');
+  });
+
+  Route::controller(ClientQrScan::class)->group(function () {
+    Route::get('/qr-scan', 'index')->name('qrScan');
+    Route::post('/qr-scan/scan', 'scan')->name('qrScan.scan');
+    Route::post('/qr-scan/record', 'record')->name('qrScan.record');
+    Route::post('/qr-scan/record-code', 'recordByCode')->name('qrScan.recordCode');
+    Route::post('/qr-scan/record-barcode', 'recordBarcode')->name('qrScan.recordBarcode');
+  });
+
   Route::controller(LogOut::class)->group(function () {
     Route::post('/log-out-employee', 'logOutEmployee')->name('logOutEmployee');
   });

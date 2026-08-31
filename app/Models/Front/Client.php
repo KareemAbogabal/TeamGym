@@ -14,13 +14,31 @@ use App\Models\Back\RequestsPayment;
 use App\Models\Back\Payment;
 use App\Models\Back\History;
 use App\Models\Back\CustomerRequests;
+use App\Models\Back\Employee;
+use App\Models\Coach\CoachAssignment;
+use App\Models\Coach\CoachNote;
+use App\Models\Coach\ClientGoal;
+use App\Models\Coach\ClientQrCode;
+use App\Models\Coach\Membership;
+use App\Models\Coach\AttendanceSession;
+use App\Models\Coach\WorkoutPlan;
+use App\Models\Coach\InbodyMeasurement;
+use App\Services\ClientQrService;
 
 class Client extends Authenticatable {
   protected $fillable = ['code', 'fname', 'lname', 'email', 'phone', 'state', 'category', 'documentation', 'img', 'year_inbody',];
+  protected $hidden = ['password', 'remember_token'];
   protected static function booted(): void {
     static::creating(function ($client) {
       if (empty($client->year_inbody)) {
         $client->year_inbody = (int) now()->format('Y');
+      };
+    });
+    static::created(function ($client) {
+      if (!empty($client->code)) {
+        $service = app(ClientQrService::class);
+        $service->ensureForClient($client);
+        $service->ensureAttendanceBarcode($client);
       };
     });
   }
@@ -53,5 +71,45 @@ class Client extends Authenticatable {
   }
   public function cardio() {
     return $this->hasMany(Cardio::class, 'code_client', 'code');
+  }
+  public function activeCoachAssignment() {
+    return $this->hasOne(CoachAssignment::class, 'code_client', 'code')->where('status', 'active');
+  }
+  public function coachAssignments() {
+    return $this->hasMany(CoachAssignment::class, 'code_client', 'code');
+  }
+  public function activeCoach() {
+    return $this->hasOneThrough(Employee::class, CoachAssignment::class, 'code_client', 'code', 'code', 'code_coach')
+      ->where('coach_assignments.status', 'active');
+  }
+  public function currentCoach() {
+    return $this->activeCoachAssignment();
+  }
+  public function qrCodes() {
+    return $this->hasMany(ClientQrCode::class, 'code_client', 'code');
+  }
+  public function activeQrCodes() {
+    return $this->hasMany(ClientQrCode::class, 'code_client', 'code')->where('status', 'active');
+  }
+  public function memberships() {
+    return $this->hasMany(Membership::class, 'code_client', 'code');
+  }
+  public function coachNotes() {
+    return $this->hasMany(CoachNote::class, 'code_client', 'code');
+  }
+  public function goals() {
+    return $this->hasMany(ClientGoal::class, 'code_client', 'code');
+  }
+  public function attendanceSessions() {
+    return $this->hasMany(AttendanceSession::class, 'code_client', 'code');
+  }
+  public function activeCoachAssignments() {
+    return $this->hasMany(CoachAssignment::class, 'code_client', 'code')->where('status', 'active');
+  }
+  public function workoutPlans() {
+    return $this->hasMany(WorkoutPlan::class, 'code_client', 'code');
+  }
+  public function inbodyMeasurements() {
+    return $this->hasMany(InbodyMeasurement::class, 'code_client', 'code');
   }
 }

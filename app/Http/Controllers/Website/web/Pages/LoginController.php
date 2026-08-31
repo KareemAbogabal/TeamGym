@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Front\Client;
 use App\Models\Front\SettingClient;
@@ -37,6 +38,7 @@ class LoginController extends Controller {
     $lnameLower = mb_strtolower($request->input('lname'));
     $checkClient = Client::whereRaw('LOWER(fname) = ?', "$fnameLower")->whereRaw('LOWER(lname) = ?', "$lnameLower")->where('email', $request->input('email'))->first();
     if ($checkClient) {
+      Auth::guard('client')->login($checkClient);
       Cookie::queue(Cookie::forever('login_client', $checkClient->code));
       session(['client' => $checkClient]);
       $clientRequests = CustomerRequests::where("code", Cookie::get('code_request_client'))->get();
@@ -119,6 +121,7 @@ class LoginController extends Controller {
         $payment->save();
       };
       $client = Client::find($signUp->id);
+      Auth::guard('client')->login($client);
       Cookie::queue(Cookie::forever('login_client', $rand));
       session(['client' => $client]);
     };
@@ -177,6 +180,7 @@ class LoginController extends Controller {
     if (!Hash::check($request->input('password'), $client->password)) {
       return redirect()->back()->withErrors(['password' => __('messages.password-incorrect')])->withInput($request->only('email'));
     };
+    Auth::guard('client')->login($client);
     Cookie::queue(Cookie::forever('login_client', $client->code));
     $clientRequests = CustomerRequests::where("code", Cookie::get('code_request_client'))->get();
     foreach ($clientRequests as $r) {

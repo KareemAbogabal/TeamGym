@@ -13,6 +13,15 @@
 /.zed
 /auth.json
 /node_modules
+
+# WhatsApp / Puppeteer / Chromium browser sessions (runtime secrets)
+/whatsapp_session/
+/my-whatsapp-session/
+*.pma
+
+# Runtime secrets & credentials
+*.session-meta.json
+*.browser-metrics
 /public/build
 /public/hot
 /public/storage

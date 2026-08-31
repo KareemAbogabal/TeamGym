@@ -13,36 +13,45 @@ header {
 header nav {
   position: relative;
   margin: 10px;
-  padding: 10px;
+  padding: 10px 22px;
   width: 100%;
   height: 70px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: 0.5s;
-  -webkit-transition: 0.5s;
-  -moz-transition: 0.5s;
-  -ms-transition: 0.5s;
-  -o-transition: 0.5s;
+  background: transparent;
+  transition: 0.5s ease;
+  -webkit-transition: 0.5s ease;
+  -moz-transition: 0.5s ease;
+  -ms-transition: 0.5s ease;
+  -o-transition: 0.5s ease;
 }
 
 header nav img {
-  width: 65px;
+  width: 62px;
+  opacity: 0.95;
 }
 
 .blur-nav {
-  padding: 10px;
-  width: 98% !important;
-  height: 70px !important;
+  padding: 10px 22px;
+  width: 75% !important;
+  height: 74px !important;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #242424a8 !important;
-  border-radius: var(--fontSizeHeaderSection) !important;
-  -webkit-border-radius: var(--fontSizeHeaderSection) !important;
-  -moz-border-radius: var(--fontSizeHeaderSection) !important;
-  -ms-border-radius: var(--fontSizeHeaderSection) !important;
-  -o-border-radius: var(--fontSizeHeaderSection) !important;
+  background: rgba(28, 30, 34, 0.92) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 28px !important;
+  -webkit-border-radius: 28px !important;
+  -moz-border-radius: 28px !important;
+  -ms-border-radius: 28px !important;
+  -o-border-radius: 28px !important;
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+  transition: 0.5s ease;
+  -webkit-transition: 0.5s ease;
+  -moz-transition: 0.5s ease;
+  -ms-transition: 0.5s ease;
+  -o-transition: 0.5s ease;
 }
 
 header nav main {
@@ -72,66 +81,66 @@ header nav ul li {
 header nav ul li a {
   text-decoration: none;
   text-transform: capitalize;
-  color: #747474;
-  transition: 0.3s;
-  -webkit-transition: 0.3s;
-  -moz-transition: 0.3s;
-  -ms-transition: 0.3s;
-  -o-transition: 0.3s;
+  color: rgba(224, 224, 224, 0.82);
+  font-weight: 500;
+  transition: color 0.3s ease;
+  -webkit-transition: color 0.3s ease;
+  -moz-transition: color 0.3s ease;
+  -ms-transition: color 0.3s ease;
+  -o-transition: color 0.3s ease;
+}
+header nav ul li a:hover {
+  color: #ffffff;
 }
 
 header nav ul li .active {
   color: #fffc4d;
-  text-shadow:0px 0px 20px #fffc3f,
-              0px 0px 40px #fffc3f,
-              0px 0px 60px #fffc3f,
-              0px 0px 80px #fffc3f;
 }
 
 header nav .login {
   margin: 0px 20px 0px 0px;
-  padding: 10px 20px;
+  padding: 10px 26px;
   border: none;
   font-size: 17px;
   text-decoration: none;
-  color: #ffffff;
-  border-radius: 7px;
+  color: #212121;
+  border-radius: 999px;
+  -webkit-border-radius: 999px;
+  -moz-border-radius: 999px;
+  -ms-border-radius: 999px;
+  -o-border-radius: 999px;
   letter-spacing: 1px;
   font-weight: 700;
   text-transform: uppercase;
-  transition-property: box-shadow;
-  transition: 0.5s;
-  -webkit-transition: 0.5s;
-  -moz-transition: 0.5s;
-  -ms-transition: 0.5s;
-  -o-transition: 0.5s;
-  cursor: pointer;
-}
-
-header nav .login {
   background: var(--colorGold);
-  box-shadow: 0 0 25px var(--colorGold);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+  -webkit-transition: background 0.3s ease, box-shadow 0.3s ease;
+  -moz-transition: background 0.3s ease, box-shadow 0.3s ease;
+  -ms-transition: background 0.3s ease, box-shadow 0.3s ease;
+  -o-transition: background 0.3s ease, box-shadow 0.3s ease;
 }
-
 header nav .login:hover {
-  box-shadow: 0 0 5px var(--colorGold),
-              0 0 25px var(--colorGold),
-              0 0 var(--fontSizeHeaderSection) var(--colorGold),
-              0 0 100px var(--colorGold);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
 }
 
 header nav .btn-profile {
-  width: 60px;
-  height: 60px;
+  width: 58px;
+  height: 58px;
+  padding: 2px;
   background-color: transparent;
-  border: 1px solid transparent;
-  outline: 1px solid #eee;
+  border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 50px;
   -webkit-border-radius: 50px;
   -moz-border-radius: 50px;
   -ms-border-radius: 50px;
   -o-border-radius: 50px;
   cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+header nav .btn-profile:hover {
+  border-color: rgba(255, 255, 255, 0.45);
 }
 
 header nav .btn-profile img {
@@ -149,8 +158,9 @@ header nav .btn-profile img {
   position: fixed;
   width: 100%;
   height: 100%;
-  backdrop-filter: blur(50px);
-  background-color: #1a1a1a63;
+  backdrop-filter: blur(22px) saturate(110%);
+  -webkit-backdrop-filter: blur(22px) saturate(110%);
+  background: rgba(12, 12, 14, 0.55);
   display: flex;
   opacity: 0;
   justify-content: center;
@@ -169,19 +179,51 @@ header nav .btn-profile img {
 }
 
 .profile .card {
-  padding: 20px;
+  padding: 26px 30px;
   width: 90%;
   height: 90%;
-  background-color: #1a1a1ada;
-  border-radius: 10px;
-  -webkit-border-radius: 10px;
-  -moz-border-radius: 10px;
-  -ms-border-radius: 10px;
-  -o-border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+  background: rgba(28, 30, 34, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 22px;
+  -webkit-border-radius: 22px;
+  -moz-border-radius: 22px;
+  -ms-border-radius: 22px;
+  -o-border-radius: 22px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(18px) saturate(120%);
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
   display: flex;
   justify-content: space-between;
   align-items: end;
   flex-direction: column;
+}
+.profile .card::before {
+  content: "";
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 240px;
+  height: 240px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.04), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+.profile .card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 4%;
+  width: 92%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), transparent);
+  pointer-events: none;
+  z-index: 1;
+}
+.profile .card > * {
+  position: relative;
+  z-index: 2;
 }
 
 .profile .card .header {
@@ -203,22 +245,24 @@ header nav .btn-profile img {
 }
 
 .profile .card .header .img img {
-  width: 120px;
-  height: 120px;
+  width: 124px;
+  height: 124px;
   border-radius: 50%;
   -webkit-border-radius: 50%;
   -moz-border-radius: 50%;
   -ms-border-radius: 50%;
   -o-border-radius: 50%;
-  border: 1px solid transparent;
-  outline: 1px solid #eee;
+  padding: 3px;
   object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
 }
 
 .profile .card .header .img h1 {
   font-size: 28px;
   color: #fff9d6;
   text-transform: capitalize;
+  text-shadow: 0 6px 18px rgba(255, 230, 91, 0.25);
 }
 
 .profile .card .header .img h1 i {
@@ -230,7 +274,7 @@ header nav .btn-profile img {
   background-size: cover;
   text-align: center;
   display: inline-block;
-  font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
 .profile .card .header .img p {
@@ -261,14 +305,25 @@ header nav .btn-profile img {
   align-items: center;
   flex-direction: column;
   color: white;
+  padding: 12px 20px;
+  border-radius: 14px;
+  -webkit-border-radius: 14px;
+  -moz-border-radius: 14px;
+  -ms-border-radius: 14px;
+  -o-border-radius: 14px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: border-color 0.3s, background 0.3s;
+}
+.profile .card .header .link-for-achievements a:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .active-button-profile {
   color: #fffc3f;
-  text-shadow:0px 0px 20px #fffc3f,
-              0px 0px 40px #fffc3f,
-              0px 0px 60px #fffc3f,
-              0px 0px 80px #fffc3f;
 }
 
 .profile .card .header .link-for-achievements a p {
@@ -280,12 +335,157 @@ header nav .btn-profile img {
 
 .active-button-profile p {
   color: #fffc3f !important;
-  text-shadow:0px 0px 20px #fffc3f,
-              0px 0px 40px #fffc3f,
-              0px 0px 60px #fffc3f,
-              0px 0px 80px #fffc3f;
 }
 
+.profile .card .details {
+  width: 100%;
+  height: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 22px;
+  margin: 6px 0;
+}
+.profile .card .details .details-group {
+  flex: 1;
+  min-width: 0;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  -webkit-border-radius: 16px;
+  -moz-border-radius: 16px;
+  -ms-border-radius: 16px;
+  -o-border-radius: 16px;
+  padding: 14px 16px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.profile .card .details .details-group .details-title {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 10px;
+}
+.profile .card .details .details-stack {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+.profile .card .details .details-stack .detail-row {
+  min-width: 0;
+  padding: 9px 12px;
+  border-radius: 10px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+.profile .card .details .details-stack .detail-row-label {
+  margin: 0;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.42);
+}
+.profile .card .details .details-stack .detail-row-value {
+  margin: 3px 0 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff9d6;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.profile .card .details .details-stack .detail-row-value .detail-name {
+  color: #fff9d6;
+}
+.profile .card .details .details-stack .detail-row-sub {
+  margin: 3px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.6);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.profile .card .details .details-stack .detail-status {
+  margin-left: 8px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--colorGold);
+  border: 1px solid rgba(255, 230, 91, 0.35);
+  border-radius: 999px;
+  -webkit-border-radius: 999px;
+  -moz-border-radius: 999px;
+  -ms-border-radius: 999px;
+  -o-border-radius: 999px;
+  padding: 1px 8px;
+}
+.profile .card .details .details-stack .muted {
+  color: rgba(255, 255, 255, 0.4);
+}
+.profile .card .details .details-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.profile .card .details .detail {
+  min-width: 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+.profile .card .details .detail-wide {
+  grid-column: span 2;
+}
+.profile .card .details .detail .detail-label {
+  margin: 0;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.42);
+}
+.profile .card .details .detail .detail-value {
+  margin: 3px 0 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff9d6;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.profile .card .details .detail .detail-status {
+  margin-left: 6px;
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--colorGold);
+  border: 1px solid rgba(255, 230, 91, 0.35);
+  border-radius: 999px;
+  -webkit-border-radius: 999px;
+  -moz-border-radius: 999px;
+  -ms-border-radius: 999px;
+  -o-border-radius: 999px;
+  padding: 1px 8px;
+}
+.profile .card .details .detail .detail-until {
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 400;
+}
 .profile .card .row {
   width: 100%;
   height: auto;
@@ -331,11 +531,19 @@ header nav .btn-profile img {
   position: relative;
   min-width: 100%;
   height: 100%;
-  margin: 0px 8px;
+  margin: 0px 12px;
   display: flex;
   justify-content: center;
   align-items: center;
   scroll-snap-align: center;
+  border-radius: 16px;
+  -webkit-border-radius: 16px;
+  -moz-border-radius: 16px;
+  -ms-border-radius: 16px;
+  -o-border-radius: 16px;
+  padding: 14px 8px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .profile .card .rates .rate canvas {
@@ -351,62 +559,43 @@ header nav .btn-profile img {
 .profile .card .view-close .view-profile {
   border: none;
   color: rgb(15, 15, 15);
-  background-color: var(--colorGold);
-  background-image: none;
+  background: var(--colorGold);
   font-weight: 700;
   text-decoration: none;
   text-transform: capitalize;
   font-size: 17px;
-  padding: 10px 20px;
+  padding: 12px 26px;
   margin: 0px 10px;
-  border-radius: 20px;
-  -webkit-border-radius: 20px;
-  -moz-border-radius: 20px;
-  -ms-border-radius: 20px;
-  -o-border-radius: 20px;
-  box-shadow: 0 0 5px var(--colorGold), 0 0 25px rgba(255, 230, 91, 0.3);
-  transition: box-shadow 0.3s;
+  border-radius: 999px;
+  -webkit-border-radius: 999px;
+  -moz-border-radius: 999px;
+  -ms-border-radius: 999px;
+  -o-border-radius: 999px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.2);
+  transition: box-shadow 0.3s ease;
 }
-
 .profile .card .view-close .view-profile:hover {
-  box-shadow: 0 0 5px var(--colorGold), 0 0 25px var(--colorGold);
-}
-
-.profile .card .view-close .view-profile:hover {
-  background-position: right center;
-  background-size: 200% auto;
-  animation: pulse512 1.5s infinite;
-  -webkit-animation: pulse512 1.5s infinite;
-}
-
-@keyframes pulse512 {
-  0% {
-    box-shadow: 0 0 0 0 #f5ff6766;
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba(218, 203, 68, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(218, 196, 68, 0);
-  }
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.28);
 }
 
 .profile .card .view-close button {
   position: relative;
-  padding: 10px 20px;
-  border: 2px solid #2c2c2c;
-  background-color: #1a1a1a;
+  padding: 12px 24px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: #ffffff;
   font-size: 1.2rem;
   text-transform: capitalize;
   cursor: pointer;
   outline: none;
   overflow: hidden;
-  border-radius: 30px;
-  -webkit-border-radius: 30px;
-  -moz-border-radius: 30px;
-  -ms-border-radius: 30px;
-  -o-border-radius: 30px;
+  border-radius: 999px;
+  -webkit-border-radius: 999px;
+  -moz-border-radius: 999px;
+  -ms-border-radius: 999px;
+  -o-border-radius: 999px;
   transition: all 0.4s ease;
   -webkit-transition: all 0.4s ease;
   -moz-transition: all 0.4s ease;
@@ -443,28 +632,31 @@ header nav .btn-profile img {
 }
 
 .profile .card .view-close button:hover {
-  border-color: #666666;
-  background: #292929;
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 @media (max-width: 1115px) {
   header nav main {
     position: absolute;
-    padding: 10px 70px;
+    padding: 20px 50px;
     width: fit-content !important;
     top: 85px;
     right: -17rem;
-    backdrop-filter: blur(30px);
-    background-color: rgba(26, 26, 26, 0.486);
+    backdrop-filter: blur(18px) saturate(120%);
+    -webkit-backdrop-filter: blur(18px) saturate(120%);
+    background: rgba(30, 32, 36, 0.70);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.05);
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-direction: column-reverse;
-    border-radius: 10px;
-    -webkit-border-radius: 10px;
-    -moz-border-radius: 10px;
-    -ms-border-radius: 10px;
-    -o-border-radius: 10px;
+    border-radius: 18px;
+    -webkit-border-radius: 18px;
+    -moz-border-radius: 18px;
+    -ms-border-radius: 18px;
+    -o-border-radius: 18px;
     transition: all 0.4s ease;
     -webkit-transition: all 0.4s ease;
     -moz-transition: all 0.4s ease;
@@ -493,7 +685,7 @@ header nav .btn-profile img {
     margin: 10px;
   }
 
-  header nav input[type = "checkbox"] {
+  header nav input[type="checkbox"] {
     display: none;
     visibility: hidden;
   }
@@ -513,7 +705,7 @@ header nav .btn-profile img {
     position: relative;
     width: 100%;
     height: 5px;
-    background: #f1faee;
+    background: rgba(255, 255, 255, 0.85);
     border-radius: 100px;
     display: inline-block;
     left: 0;
@@ -524,7 +716,7 @@ header nav .btn-profile img {
     -o-transition: 0.3s ease;
   }
 
-  header nav input[type]:checked ~ span.top {
+  header nav input[type]:checked~span.top {
     transform: rotate(45deg);
     transform-origin: top left;
     width: 48px;
@@ -532,16 +724,33 @@ header nav .btn-profile img {
     left: 4px;
   }
 
-  header nav input[type]:checked ~ span.bottom {
+  header nav input[type]:checked~span.bottom {
     transform: rotate(-45deg);
     transform-origin: top left;
     width: 48px;
     bottom: -1px;
-    box-shadow: 0 0 10px #495057;
   }
 
-  header nav input[type]:checked ~ span.middle {
+  header nav input[type]:checked~span.middle {
     transform: translateX(-20px);
     opacity: 0;
+  }
+}
+
+@media (max-width: 1200px) {
+  .profile .card .details {
+    flex-direction: column;
+  }
+  .profile .card .details .details-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .profile .card .details .details-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .profile .card .details .detail-wide {
+    grid-column: span 2;
   }
 }

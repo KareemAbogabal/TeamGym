@@ -411,3 +411,32 @@ document.addEventListener("DOMContentLoaded", () => {
     scrollToBottom('smooth');
   });
 })();
+
+// Coach request main-card (opened from the options button)
+(function () {
+  const COACH_FOLLOW = 'coach-request';
+  const coachTriggers = document.querySelectorAll(`[data-follow="${COACH_FOLLOW}"]:not(.main-card):not(.close-profile)`);
+  const coachCards = document.querySelectorAll(`.main-card[data-follow="${COACH_FOLLOW}"]`);
+
+  const closeCoachCards = () => {
+    coachCards.forEach(card => card.classList.remove('show-main-card'));
+  };
+
+  coachTriggers.forEach(trigger => {
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (coachCards.length) {
+        const wasVisible = coachCards[0].classList.contains('show-main-card');
+        closeCoachCards();
+        if (!wasVisible) coachCards[0].classList.add('show-main-card');
+      }
+    });
+  });
+
+  document.querySelectorAll(`.close-profile[data-follow="${COACH_FOLLOW}"]`).forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeCoachCards();
+    });
+  });
+})();

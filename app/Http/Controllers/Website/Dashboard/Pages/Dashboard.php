@@ -13,6 +13,10 @@ use App\Models\Front\Client;
 use App\Models\Back\Payment;
 use App\Models\Back\Record;
 use App\Models\Front\Supplement;
+use App\Models\Back\Employee;
+use App\Models\Coach\CoachProfile;
+use App\Models\Coach\CoachAssignment;
+use App\Enums\CoachRequestStatus;
 use App\Models\Back\RequestsPayment;
 use Carbon\Carbon;
 
@@ -110,7 +114,29 @@ class Dashboard extends Controller {
     $day = Carbon::now()->format('l');
     $client = Client::where("code", Cookie::get('login_client'))->first();
     $exercise = Activity::where("code_client", Cookie::get('login_client'))->where("day", $day)->where("statement", "true")->with('elements.attachments')->get();
-    return view('Website.Dashboard.Pages.dashboard', compact("client", "water", "fat", "smm", "weight", "bmi", "pbf", "waterM", "proteinM", "fatM", "analysis", "exercise"));
+
+    $coaches = Employee::where('job_role', 'coach')
+      ->orWhere('job_role', 'trainer')
+      ->get()
+      ->map(function ($coach) {
+        $profile = CoachProfile::where('code_employee', $coach->code)->first();
+        return [
+          'employee' => $coach,
+          'profile' => $profile,
+        ];
+      });
+    $pendingCoach = $client ? CoachAssignment::where('code_client', $client->code)
+      ->where('status', CoachRequestStatus::Pending->value)
+      ->with(['coach'])
+      ->latest('requested_at')
+      ->first() : null;
+    $activeCoach = $client ? CoachAssignment::where('code_client', $client->code)
+      ->where('status', CoachRequestStatus::Active->value)
+      ->with(['coach'])
+      ->latest('started_at')
+      ->first() : null;
+
+    return view('Website.Dashboard.Pages.dashboard', compact("client", "water", "fat", "smm", "weight", "bmi", "pbf", "waterM", "proteinM", "fatM", "analysis", "exercise", "coaches", "pendingCoach", "activeCoach"));
   }
   public function search(Request $request) {
     $name  = mb_strtolower($request->input('name', ''));

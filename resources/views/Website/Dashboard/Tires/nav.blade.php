@@ -139,7 +139,7 @@
       </button>
       <div class="options">
         <button type="button"><i class="fa-solid fa-credit-card"></i></button>
-        <button type="button"><i class="fa-solid fa-dumbbell"></i></button>
+        <button type="button" class="coach-request-option" data-follow="coach-request" aria-label="{{ __('messages.request') }}"><i class="fa-solid fa-dumbbell"></i></button>
       </div>
     </div>
   </div>

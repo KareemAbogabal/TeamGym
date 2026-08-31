@@ -14,8 +14,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use App\Models\Front\Client;
 use App\Models\Front\LineageInBody;
-use App\Models\Front\ImgInBody;
-use App\Models\Back\SettingCompany;
+use App\Models\Front\ImgInBody;use App\Models\Back\SettingCompany;
 use App\Models\Back\Employee;
 use App\Models\Back\Lineage;
 use App\Models\Back\IncomeStatement;
@@ -52,6 +51,9 @@ class AppServiceProvider extends ServiceProvider {
       $protected = array_map('strtolower', (array) config('roles.coach', []));
       $role = strtolower(trim((string) ($user->job_role ?? '')));
       return in_array($role, $protected);
+    });
+    Gate::define('client', function ($user) {
+      return $user instanceof Client;
     });
     View::composer('Website.Dashboard.homePage', function ($view) {
       $client = Client::where("code", Cookie::get('login_client'))->with("settings")->first();

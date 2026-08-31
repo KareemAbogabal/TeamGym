@@ -1,6 +1,8 @@
 :root {
   --colorGold: rgb(255, 230, 91);
   --colorAverage: rgb(236, 234, 74);
+  --colorMark: rgb(255, 230, 91);
+  --fontSizeHeaderSection: 36px;
   --colorSVG1: rgb(255, 240, 150);
   --colorSVG2: rgb(255, 230, 91);
   --colorPearnt: rgb(15, 15, 15);

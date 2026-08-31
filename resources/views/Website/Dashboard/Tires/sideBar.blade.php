@@ -87,6 +87,15 @@
       </a>
     </li>
     <li>
+      <a href="{{route("coach")}}">
+        <svg width="40" height="40" viewBox="0 0 64 64" fill="none">
+          <path d="M20 8 L44 8 L54 18 L44 28 L20 28 L10 18 Z" fill="var(--colorSVG2)" stroke="var(--colorSVG1)" stroke-width="2"/>
+          <rect x="26" y="8" width="12" height="46" rx="3" fill="var(--colorSVG1)"/>
+          <rect x="24" y="50" width="16" height="6" rx="2" fill="var(--colorSVG1)"/>
+        </svg><p class="text-link">{{__('messages.coach')}}</p>
+      </a>
+    </li>
+    <li>
       <a href="{{route("settings")}}">
         <svg width="40" height="40" viewBox="0 8 64 64" fill="none">
           <g fill="var(--colorSVG1)">

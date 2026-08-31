@@ -12,13 +12,16 @@ use App\Models\Back\Imports;
 use App\Models\Back\SettingEmployee;
 use App\Models\Back\SettingCompany;
 use App\Models\Back\Activity;
+use App\Models\Coach\CoachProfile;
+use App\Models\Coach\CoachAssignment;
+use App\Models\Coach\CoachNote;
 
 class Employee extends Authenticatable {
   use Notifiable;
   protected $fillable = ['fname', 'lname', 'job_role', 'phone', 'img', 'email', 'password', 'documentation', 'code'];
   protected $hidden = ['password'];
   public function activities() {
-    return $this->hasOne(Activity::class, 'code_employee', 'code');
+    return $this->hasMany(Activity::class, 'code_employee', 'code');
   }
   public function records() {
     return $this->hasMany(Record::class, 'code_employee', 'code');
@@ -43,5 +46,21 @@ class Employee extends Authenticatable {
   }
   public function notifications() {
     return $this->hasMany(Notification::class, 'code_employee', 'code');
+  }
+  public function coachProfile() {
+    return $this->hasOne(CoachProfile::class, 'code_employee', 'code');
+  }
+  public function coachAssignments() {
+    return $this->hasMany(CoachAssignment::class, 'code_coach', 'code');
+  }
+  public function activeCoachAssignments() {
+    return $this->hasMany(CoachAssignment::class, 'code_coach', 'code')->where('status', 'active');
+  }
+  public function coachNotes() {
+    return $this->hasMany(CoachNote::class, 'code_coach', 'code');
+  }
+  public function isCoach(): bool {
+    $roles = array_map('strtolower', (array) config('roles.coach', []));
+    return in_array(strtolower(trim((string) $this->job_role ?? '')), $roles);
   }
 }
