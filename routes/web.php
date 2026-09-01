@@ -94,8 +94,8 @@ Route::controller(CustomerRequestsController::class)->group(function () {
 Route::middleware(CustomerVerification::class)->group(function () {
   Route::controller(Dashboard::class)->group(function () {
     Route::get('/dashboard', 'index')->name('dashboard');
-    Route::post('/search_client', 'search')->name('search');
-    Route::post('/search_img', 'searchImg')->name('searchImg');
+    Route::post('/search_client', 'search')->name('client.search');
+    Route::post('/search_img', 'searchImg')->name('client.searchImg');
   });
 
   Route::controller(Health::class)->group(function () {
@@ -108,8 +108,6 @@ Route::middleware(CustomerVerification::class)->group(function () {
     Route::get('/schedule', 'index')->name('schedule');
     Route::post('/get-exercises', 'getExercises')->name('getExercises');
     Route::post('/insert-pay-day', 'insertExerciseDay')->name('insertExerciseDay');
-    Route::post('/register-exercise', 'registerExercise');
-    Route::get('/registrations-week', 'getRegistrationsWeek');
   });
 
   Route::controller(Plans::class)->group(function () {
@@ -159,8 +157,8 @@ Route::middleware(AuthenticatedToCompany::class)->group(function () {
 
   Route::controller(DashboardCompany::class)->group(function () {
     Route::get('/dashboard-company', 'index')->name('dashboardCompany');
-    Route::post('/search', 'search')->name('search');
-    Route::post('/search-img', 'searchImg')->name('searchImg');
+    Route::post('/search', 'search')->name('company.search');
+    Route::post('/search-img', 'searchImg')->name('company.searchImg');
     Route::post('/count-request', 'eventCountRequest')->name('eventCountRequest');
   });
 

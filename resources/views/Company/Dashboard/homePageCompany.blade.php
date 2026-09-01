@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="{{ asset('css/table.css') }}">
     <link rel="stylesheet" href="{{ asset('css/Company/pages/homePageCompany.css') }}">
     <link rel="stylesheet" href="{{ asset('css/notification.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/design-system.css') }}">
     <script>
         let lableCanava = "{{ __('messages.card-profile-lable') }}";
         let months = [
@@ -129,6 +130,7 @@
     <script src="{{ asset('js/Company/pages/homePageCompany.js') }}"></script>
     <script src="{{ asset('js/Company/public.js') }}"></script>
     <script src="{{ asset('js/notification.js') }}"></script>
+    <script src="{{ asset('js/design-system.js') }}"></script>
 </body>
 
 </html>

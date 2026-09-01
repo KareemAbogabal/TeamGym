@@ -33,3 +33,9 @@ if (!function_exists('notifyError')) {
     notify('error', $message);
   }
 }
+
+if (!function_exists('notifyWarning')) {
+  function notifyWarning(string $message): void {
+    notify('warning', $message);
+  }
+}

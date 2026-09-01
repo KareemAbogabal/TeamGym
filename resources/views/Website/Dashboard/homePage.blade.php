@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="{{asset("css/table.css")}}">
   <link rel="stylesheet" href="{{asset("css/Website/Dashboard/pages/homePage.css")}}">
   <link rel="stylesheet" href="{{asset("css/notification.css")}}">
+  <link rel="stylesheet" href="{{asset("css/design-system.css")}}">
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
   <script>
     let lableCanava = "{{__('messages.card-profile-lable')}}";
@@ -49,5 +50,6 @@
   </main>
   <script src="{{asset("js/Website/Dashboard/homePage.js")}}"></script>
   <script src="{{asset("js/notification.js")}}"></script>
+  <script src="{{asset("js/design-system.js")}}"></script>
 </body>
 </html>

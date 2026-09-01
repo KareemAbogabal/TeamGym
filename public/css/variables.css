@@ -1,4 +1,12 @@
+/* =====================================================================
+   TeamGym — Design Tokens
+   Centralized brand + semantic tokens for the premium gold/dark identity.
+   Existing tokens are preserved for backward compatibility; the semantic
+   layer (--tg-*) is the canonical source new components should consume.
+   ===================================================================== */
+
 :root {
+  /* ---- Legacy brand tokens (kept for existing CSS compatibility) ---- */
   --colorGold: rgb(255, 230, 91);
   --colorAverage: rgb(236, 234, 74);
   --colorMark: rgb(255, 230, 91);
@@ -17,8 +25,105 @@
   --glass-bg: rgba(18, 18, 18, 0.55);
   --glass-border: rgba(255, 255, 255, 0.12);
   --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+
+  /* =====================================================================
+     SEMANTIC TOKEN SYSTEM (canonical)
+     ===================================================================== */
+
+  /* Backgrounds / surfaces */
+  --tg-bg: #0b0b0b;
+  --tg-bg-elevated: #141414;
+  --tg-surface: #1a1a1a;
+  --tg-surface-2: #212121;
+  --tg-surface-3: #2a2a2a;
+
+  /* Brand */
+  --tg-primary: #ffd14a;
+  --tg-primary-hover: #ffdf80;
+  --tg-primary-active: #e8bd33;
+  --tg-primary-soft: rgba(255, 209, 74, 0.14);
+  --tg-secondary: #c9a227;
+  --tg-accent: #f5c542;
+
+  /* Semantic status colors */
+  --tg-success: #22c55e;
+  --tg-warning: #f59e0b;
+  --tg-danger: #ef4444;
+  --tg-info: #3b82f6;
+  --tg-success-soft: rgba(34, 197, 94, 0.14);
+  --tg-warning-soft: rgba(245, 158, 11, 0.14);
+  --tg-danger-soft: rgba(239, 68, 68, 0.14);
+  --tg-info-soft: rgba(59, 130, 246, 0.14);
+
+  /* Text */
+  --tg-text: #f2f2f2;
+  --tg-text-2: #b9b9b9;
+  --tg-text-muted: #8a8a8a;
+  --tg-text-inverse: #1a1a1a;
+
+  /* Borders / focus */
+  --tg-border: rgba(255, 255, 255, 0.1);
+  --tg-border-strong: rgba(255, 255, 255, 0.18);
+  --tg-focus-ring: 0 0 0 3px rgba(255, 209, 74, 0.35);
+
+  /* Shadows */
+  --tg-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35);
+  --tg-shadow-md: 0 6px 20px rgba(0, 0, 0, 0.4);
+  --tg-shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.55);
+  --tg-shadow-card: 0 8px 32px rgba(0, 0, 0, 0.45);
+
+  /* Radii */
+  --tg-radius-xs: 6px;
+  --tg-radius-sm: 8px;
+  --tg-radius-md: 12px;
+  --tg-radius-lg: 16px;
+  --tg-radius-pill: 999px;
+
+  /* Spacing scale */
+  --tg-space-1: 4px;
+  --tg-space-2: 8px;
+  --tg-space-3: 12px;
+  --tg-space-4: 16px;
+  --tg-space-5: 20px;
+  --tg-space-6: 24px;
+  --tg-space-8: 32px;
+  --tg-space-10: 40px;
+  --tg-space-12: 48px;
+
+  /* Typography */
+  --tg-font-body: 'Cairo', 'Segoe UI', system-ui, sans-serif;
+  --tg-font-display: 'Cairo', 'Segoe UI', system-ui, sans-serif;
+  --tg-font-mono: ui-monospace, 'Cascadia Code', 'Consolas', monospace;
+  --tg-text-sm: 13px;
+  --tg-text-base: 15px;
+  --tg-text-lg: 17px;
+  --tg-text-xl: 20px;
+  --tg-text-2xl: 24px;
+  --tg-text-3xl: 30px;
+  --tg-text-4xl: 38px;
+
+  /* Motion */
+  --tg-duration-fast: 120ms;
+  --tg-duration-base: 200ms;
+  --tg-duration-slow: 320ms;
+  --tg-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --tg-ease-out: cubic-bezier(0, 0, 0.2, 1);
+
+  /* Z-index layers */
+  --tg-z-dropdown: 1000;
+  --tg-z-sticky: 1020;
+  --tg-z-header: 1030;
+  --tg-z-overlay: 1040;
+  --tg-z-modal: 1050;
+  --tg-z-toast: 1060;
+
+  /* Layout */
+  --tg-header-h: 64px;
+  --tg-sidebar-w: 260px;
+  --tg-container-max: 1280px;
 }
 
+/* ---- Light theme overrides ---- */
 .light {
   --colorPearnt: rgb(238, 238, 238);
   --colorPearntSection: rgb(233, 233, 233);
@@ -27,4 +132,32 @@
   --glass-bg: rgba(255, 255, 255, 0.55);
   --glass-border: rgba(0, 0, 0, 0.12);
   --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+
+  --tg-bg: #f6f6f6;
+  --tg-bg-elevated: #ffffff;
+  --tg-surface: #ffffff;
+  --tg-surface-2: #f7f7f7;
+  --tg-surface-3: #efefef;
+  --tg-text: #1a1a1a;
+  --tg-text-2: #3f3f3f;
+  --tg-text-muted: #6f6f6f;
+  --tg-text-inverse: #ffffff;
+  --tg-border: rgba(0, 0, 0, 0.12);
+  --tg-border-strong: rgba(0, 0, 0, 0.2);
+  --tg-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --tg-shadow-md: 0 6px 20px rgba(0, 0, 0, 0.1);
+  --tg-shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.14);
+  --tg-shadow-card: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* Respect reduced motion globally for the design system */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
