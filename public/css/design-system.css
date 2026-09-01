@@ -499,3 +499,145 @@ html[dir="rtl"] .tg-switch input:checked + .tg-switch__track::after {
   background: var(--tg-danger-soft);
   color: var(--tg-danger);
 }
+
+/* ============ Status badges ([data-state]) ============ */
+/* Standardized premium pill for arbitrary status text (pro, basic, middle, login,
+   request, historical states, etc.). Applies to the .state pattern used in tables
+   and card bodies. Non-destructive: these were previously un-styled plain text. */
+.main-card .table .body .state[data-state],
+.main-card .card .body-card .table .body .state[data-state],
+[data-state].state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  padding: 3px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--tg-border);
+  background: var(--tg-surface-2);
+  color: var(--tg-text-2);
+  font-size: var(--tg-text-sm);
+  font-weight: 600;
+  line-height: 1.6;
+  letter-spacing: 0.2px;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+/* Gold highlight for the premium Pro tier */
+[data-state].state[data-state="pro"] {
+  border-color: transparent;
+  background: var(--tg-gold-soft);
+  color: var(--tg-gold);
+}
+[data-state].state[data-state="pro"]::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--tg-gold);
+}
+
+/* Success group (unambiguous positive states) */
+[data-state].state[data-state="available"],
+[data-state].state[data-state="active"],
+[data-state].state[data-state="acceptance"],
+[data-state].state[data-state="paid"],
+[data-state].state[data-state="approved"] {
+  border-color: transparent;
+  background: var(--tg-success-soft);
+  color: var(--tg-success);
+}
+[data-state].state[data-state="available"]::before,
+[data-state].state[data-state="active"]::before,
+[data-state].state[data-state="acceptance"]::before,
+[data-state].state[data-state="paid"]::before,
+[data-state].state[data-state="approved"]::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--tg-success);
+}
+
+/* Warning group (unambiguous pending / low-stock states) */
+[data-state].state[data-state="approach"],
+[data-state].state[data-state="pending"],
+[data-state].state[data-state="request"],
+[data-state].state[data-state="waiting"] {
+  border-color: transparent;
+  background: var(--tg-warning-soft);
+  color: var(--tg-warning);
+}
+[data-state].state[data-state="approach"]::before,
+[data-state].state[data-state="pending"]::before,
+[data-state].state[data-state="request"]::before,
+[data-state].state[data-state="waiting"]::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--tg-warning);
+}
+
+/* Danger group (unambiguous failure / exit states) */
+[data-state].state[data-state="unavailable"],
+[data-state].state[data-state="exit"],
+[data-state].state[data-state="rejected"],
+[data-state].state[data-state="expired"],
+[data-state].state[data-state="suspended"] {
+  border-color: transparent;
+  background: var(--tg-danger-soft);
+  color: var(--tg-danger);
+}
+[data-state].state[data-state="unavailable"]::before,
+[data-state].state[data-state="exit"]::before,
+[data-state].state[data-state="rejected"]::before,
+[data-state].state[data-state="expired"]::before,
+[data-state].state[data-state="suspended"]::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--tg-danger);
+}
+
+/* Cascade hardening: ensure badge colors/backgrounds win over legacy table text
+   styling regardless of legacy specificity. These vars resolve inside :root.
+   Applies to all [data-state] status badges. */
+[data-state].state {
+  color: var(--tg-text-2) !important;
+  background-color: var(--tg-surface-2) !important;
+  border-color: var(--tg-border) !important;
+}
+[data-state].state[data-state="pro"] {
+  color: var(--tg-gold) !important;
+  background-color: var(--tg-gold-soft) !important;
+  border-color: transparent !important;
+}
+[data-state].state[data-state="available"],
+[data-state].state[data-state="active"],
+[data-state].state[data-state="acceptance"],
+[data-state].state[data-state="paid"],
+[data-state].state[data-state="approved"] {
+  color: var(--tg-success) !important;
+  background-color: var(--tg-success-soft) !important;
+  border-color: transparent !important;
+}
+[data-state].state[data-state="approach"],
+[data-state].state[data-state="pending"],
+[data-state].state[data-state="request"],
+[data-state].state[data-state="waiting"] {
+  color: var(--tg-warning) !important;
+  background-color: var(--tg-warning-soft) !important;
+  border-color: transparent !important;
+}
+[data-state].state[data-state="unavailable"],
+[data-state].state[data-state="exit"],
+[data-state].state[data-state="rejected"],
+[data-state].state[data-state="expired"],
+[data-state].state[data-state="suspended"] {
+  color: var(--tg-danger) !important;
+  background-color: var(--tg-danger-soft) !important;
+  border-color: transparent !important;
+}

@@ -44,6 +44,8 @@
   --tg-primary-soft: rgba(255, 209, 74, 0.14);
   --tg-secondary: #c9a227;
   --tg-accent: #f5c542;
+  --tg-gold: #ffd14a;
+  --tg-gold-soft: rgba(255, 209, 74, 0.14);
 
   /* Semantic status colors */
   --tg-success: #22c55e;
