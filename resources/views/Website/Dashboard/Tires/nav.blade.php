@@ -130,7 +130,7 @@
         </h1>
         <p>{{$client->category}}</p>
       </div>
-      <button class="option-btn">
+      <button type="button" class="option-btn">
         <svg width="40" height="40" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="32" cy="16" r="4" fill="rgb(116, 116, 116)" />
           <circle cx="32" cy="32" r="4" fill="rgb(116, 116, 116)" />

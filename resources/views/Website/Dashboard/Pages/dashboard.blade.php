@@ -107,7 +107,7 @@
         <div class="button-row-card">
           <div class="buttons">
             <x-components::close-button follow="coach-request" />
-            <button type="submit" class="view-profile" @if($pendingCoach) disabled @endif>{{ __('messages.request') }}</button>
+            <button type="submit" class="view-profile tg-btn tg-btn--primary" @if($pendingCoach) disabled @endif>{{ __('messages.request') }}</button>
           </div>
         </div>
       </form>

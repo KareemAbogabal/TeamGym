@@ -35,7 +35,7 @@
             <p>{{$history->attachment ?? '--'}}</p>
             <p>{{$history->created_at->format('Y-m-d H:i:s')}}</p>
             <p>
-              <button class="btn-details">
+              <button type="button" class="btn-details">
                 <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 48 48">
                   <circle cx="24" cy="24" r="22" stroke="var(--colorSVG2)" stroke-width="2.5" fill="none"/>
                   <path d="M16 20 L24 30 L32 20" fill="none" stroke="var(--colorSVG2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>

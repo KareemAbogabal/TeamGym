@@ -21,7 +21,7 @@
               </label>
               <input id="imageInput" type="file" name="profile_image" accept="image/*" style="display:none" />
             </div>
-            <button type="submit" name="action" value="removePhoto" id="removePhoto" class="remove-photo">Remove photo</button>
+            <button type="submit" name="action" value="removePhoto" id="removePhoto" class="remove-photo tg-btn tg-btn--danger">Remove photo</button>
           </div>
           <div class="form-wrap">
             <div class="row two-cols">

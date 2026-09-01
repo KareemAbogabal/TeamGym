@@ -13,10 +13,10 @@
     <input type="text" id="scanToken" placeholder="{{ __('messages.scan-token-placeholder') }}" />
 
     <div class="actions">
-      <button type="button" id="btnLookup" class="btn">{{ __('messages.lookup') }}</button>
-      <button type="button" id="btnRecord" class="btn primary">{{ __('messages.check-in-out') }}</button>
-      <button type="button" id="btnRecordCode" class="btn" data-code>{{ __('messages.check-in-out-code') }}</button>
-      <button type="button" id="btnRecordBarcode" class="btn" data-barcode>{{ __('messages.scan-attendance-barcode') }}</button>
+      <button type="button" id="btnLookup" class="btn tg-btn tg-btn--secondary">{{ __('messages.lookup') }}</button>
+      <button type="button" id="btnRecord" class="btn primary tg-btn tg-btn--primary">{{ __('messages.check-in-out') }}</button>
+      <button type="button" id="btnRecordCode" class="btn tg-btn tg-btn--secondary" data-code>{{ __('messages.check-in-out-code') }}</button>
+      <button type="button" id="btnRecordBarcode" class="btn tg-btn tg-btn--secondary" data-barcode>{{ __('messages.scan-attendance-barcode') }}</button>
     </div>
 
     <div id="scanResult" class="result"></div>

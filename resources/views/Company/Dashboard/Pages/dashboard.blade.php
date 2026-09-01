@@ -147,7 +147,7 @@
               <h4>{{ __('messages.records') }}</h4>
               <h1>{{$recordsCount}} {{ __('messages.records') }}</h1>
             </div>
-            <button>{{ __('messages.see_all') }}</button>
+            <button type="button" class="tg-btn tg-btn--ghost">{{ __('messages.see_all') }}</button>
           </div>
           <main>
             <x-components::table :header="[__('messages.name'), __('messages.state')]">

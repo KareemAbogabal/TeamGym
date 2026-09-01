@@ -60,7 +60,7 @@
         <div class="button-row-card">
           <div class="buttons">
             <x-components::close-button />
-            <button type="submit" class="view-profile">{{ __('messages.form-send') }}</button>
+            <button type="submit" class="view-profile tg-btn tg-btn--primary">{{ __('messages.form-send') }}</button>
           </div>
         </div>
       </form>
@@ -129,7 +129,7 @@
         <div class="button-row-card">
           <div class="buttons">
             <x-components::close-button />
-            <button type="submit" class="view-profile">{{ __('messages.form-send') }}</button>
+            <button type="submit" class="view-profile tg-btn tg-btn--primary">{{ __('messages.form-send') }}</button>
           </div>
         </div>
       </form>

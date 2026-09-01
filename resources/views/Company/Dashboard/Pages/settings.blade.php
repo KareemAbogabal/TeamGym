@@ -21,7 +21,7 @@
               </label>
               <input id="imageInput" name="image" type="file" accept="image/*" style="display:none" />
             </div>
-            <button type="submit" name="action" value="removePhoto" class="remove-photo">{{__('messages.remove-photo')}}</button>
+            <button type="submit" name="action" value="removePhoto" class="remove-photo tg-btn tg-btn--danger">{{__('messages.remove-photo')}}</button>
           </div>
           <div class="form-wrap">
             <div class="row two-cols">

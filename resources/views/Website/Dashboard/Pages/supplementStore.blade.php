@@ -42,7 +42,7 @@
                 <img src="{{asset("images/products/" . $itemSupplement->supplement->img)}}" alt="No Img Product">
                 <div class="content">
                   <h1>{{$itemSupplement->supplement->name}}</h1>
-                  <button class="show-details-product">
+                  <button type="button" class="show-details-product tg-btn tg-btn--outline">
                     <span>{{__('messages.show-the-details')}}</span>
                   </button>
                 </div>

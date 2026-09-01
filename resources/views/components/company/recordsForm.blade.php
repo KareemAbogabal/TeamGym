@@ -14,7 +14,7 @@
       </div>
       <div class="state-check-client">
       </div>
-      <button type="submit">{{__('messages.record')}}</button>
+      <button type="submit" class="tg-btn tg-btn--primary">{{__('messages.record')}}</button>
     </form>
     <form action="{{route("signUpRecord")}}" method="post" class="hidden">
       @csrf
@@ -49,7 +49,7 @@
           </svg>
           <label for="remember-1">{{__('messages.form-remember-me')}}</label>
         </label>
-        <button type="submit">{{__('messages.form-send')}}</button>
+        <button type="submit" class="tg-btn tg-btn--primary">{{__('messages.form-send')}}</button>
       </div>
     </form>
     <form action="{{route("addRequests")}}" method="post" class="hidden attachment-form">
@@ -117,7 +117,7 @@
           </svg>
           <label for="remember-2">{{__('messages.form-remember-me')}}</label>
         </label>
-        <button type="submit">{{__('messages.form-send')}}</button>
+        <button type="submit" class="tg-btn tg-btn--primary">{{__('messages.form-send')}}</button>
       </div>
     </form>
     <form action="{{route("registrationRequestsPayment")}}" method="post" class="hidden">
@@ -176,7 +176,7 @@
           </svg>
           <label for="remember-3">{{__('messages.form-remember-me')}}</label>
         </label>
-        <button type="submit">{{__('messages.form-send')}}</button>
+        <button type="submit" class="tg-btn tg-btn--primary">{{__('messages.form-send')}}</button>
       </div>
     </form>
   </div>

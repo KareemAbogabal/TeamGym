@@ -71,7 +71,7 @@
               <p>{{$client->category}}</p>
               <p>{{$client->created_at}}</p>
               <p>
-                <button class="btn-details-customer" data-code="{{$client->code}}" data-follow="details-card">
+                <button type="button" class="btn-details-customer" data-code="{{$client->code}}" data-follow="details-card">
                   <svg width="30" height="30" viewBox="0 0 64 64" aria-hidden="true">
                     <circle cx="32" cy="22" r="3" fill="var(--colorSVG1)"/>
                     <circle cx="32" cy="32" r="3" fill="var(--colorSVG1)"/>
@@ -146,7 +146,7 @@
           <div class="button-row-card">
             <div class="buttons">
               <x-components::close-button follow="entrances-card" />
-              <button type="submit" class="view-profile">{{__('messages.form-send')}}</button>
+              <button type="submit" class="view-profile tg-btn tg-btn--primary">{{__('messages.form-send')}}</button>
             </div>
           </div>
         </form>
@@ -175,7 +175,7 @@
               @endif
               <p>{{ $item->created_at }}</p>
               <p>
-                <button class="btn-details">
+                <button type="button" class="btn-details">
                   <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 48 48">
                     <circle cx="24" cy="24" r="22" stroke="var(--colorSVG2)" stroke-width="2.5" fill="none"/>
                     <path d="M16 20 L24 30 L32 20" fill="none" stroke="var(--colorSVG2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>

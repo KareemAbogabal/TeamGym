@@ -54,7 +54,7 @@
 
     <form method="post" action="{{ route('myQr.rotate') }}">
       @csrf
-      <button type="submit" class="btn">{{ __('messages.rotate-qr') }}</button>
+      <button type="submit" class="btn tg-btn tg-btn--primary">{{ __('messages.rotate-qr') }}</button>
     </form>
 
     <p class="qr-status">

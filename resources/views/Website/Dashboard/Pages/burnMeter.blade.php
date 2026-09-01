@@ -108,7 +108,7 @@
           <h1>{{__('messages.runing')}}</h1>
           <p>20 {{__('messages.minutes')}}</p>
         </div>
-        <button class="btn-start-program">{{__('messages.start')}}</button>
+        <button class="btn-start-program tg-btn tg-btn--primary" type="button">{{__('messages.start')}}</button>
       </div>
     </div>
     <div class="program" style="--colorprogram: rgba(208, 190, 58, 0.72); --bgprogram: rgba(246, 241, 150, 0.70);">
@@ -118,7 +118,7 @@
           <h1>{{__('messages.treadmill')}}</h1>
           <p>20 {{__('messages.minutes')}}</p>
         </div>
-        <button class="btn-start-program">{{__('messages.start')}}</button>
+        <button class="btn-start-program tg-btn tg-btn--primary" type="button">{{__('messages.start')}}</button>
       </div>
     </div>
     <div class="program" style="--colorprogram: #9466ffb7; --bgprogram: #bfa3ffb7;">
@@ -128,7 +128,7 @@
           <h1>{{__('messages.running-distance')}}</h1>
           <p>20 {{__('messages.minutes')}}</p>
         </div>
-        <button class="btn-start-program">{{__('messages.start')}}</button>
+        <button class="btn-start-program tg-btn tg-btn--primary" type="button">{{__('messages.start')}}</button>
       </div>
     </div>
   </div>
@@ -148,7 +148,7 @@
                 <p>{{$item->distance ?? 0}} KG / h</p>
                 <p>{{$item->created_at}}</p>
                 <p>
-                  <button class="btn-details">
+                  <button type="button" class="btn-details">
                     <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 48 48">
                       <circle cx="24" cy="24" r="22" stroke="var(--colorSVG2)" stroke-width="2.5" fill="none"/>
                       <path d="M16 20 L24 30 L32 20" fill="none" stroke="var(--colorSVG2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>

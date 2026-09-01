@@ -223,8 +223,8 @@
 </head>
 <body>
   <div class="toolbar">
-    <button type="button" class="btn-close" onclick="window.close()">Close</button>
-    <button type="button" class="btn-print" onclick="window.print()">Print</button>
+    <button type="button" class="btn-close tg-btn tg-btn--secondary" onclick="window.close()">Close</button>
+    <button type="button" class="btn-print tg-btn tg-btn--primary" onclick="window.print()">Print</button>
   </div>
 
   <div class="sheet">

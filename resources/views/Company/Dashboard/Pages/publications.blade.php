@@ -13,7 +13,7 @@
       <div class="button-row-card">
         <div class="buttons">
           <x-components::close-button follow="show-card" />
-          <button type="submit" class="view-profile">{{__('messages.form-send')}}</button>
+          <button type="submit" class="view-profile tg-btn tg-btn--primary">{{__('messages.form-send')}}</button>
         </div>
       </div>
     </form>
@@ -103,7 +103,7 @@
           <div class="button-row-card">
             <div class="buttons">
               <x-components::close-button follow="defult-card" />
-              <button type="submit" class="view-profile">{{__('messages.form-send')}}</button>
+              <button type="submit" class="view-profile tg-btn tg-btn--primary">{{__('messages.form-send')}}</button>
             </div>
           </div>
         </form>
@@ -226,7 +226,7 @@
           <div class="button-row-card">
             <div class="buttons">
               <x-components::close-button follow="system-card" />
-              <button type="submit" class="view-profile">{{__('messages.form-send')}}</button>
+              <button type="submit" class="view-profile tg-btn tg-btn--primary">{{__('messages.form-send')}}</button>
             </div>
           </div>
         </form>
@@ -269,7 +269,7 @@
           <div class="button-row-card">
             <div class="buttons">
               <x-components::close-button follow="edit-card" />
-              <button type="submit" class="view-profile">{{__('messages.form-send')}}</button>
+              <button type="submit" class="view-profile tg-btn tg-btn--primary">{{__('messages.form-send')}}</button>
             </div>
           </div>
         </form>
@@ -309,7 +309,7 @@
           <div class="button-row-card">
             <div class="buttons">
               <button type="button" class="close-profile">{{__('messages.card-profile-button-close')}}</button>
-              <button type="submit" class="view-profile">{{__('messages.form-send')}}</button>
+              <button type="submit" class="view-profile tg-btn tg-btn--primary">{{__('messages.form-send')}}</button>
             </div>
           </div>
         </form>
@@ -396,7 +396,7 @@
           <div class="button-row-card">
             <div class="buttons">
               <button type="button" class="close-profile">{{__('messages.card-profile-button-close')}}</button>
-              <button type="submit" class="view-profile">{{__('messages.form-send')}}</button>
+              <button type="submit" class="view-profile tg-btn tg-btn--primary">{{__('messages.form-send')}}</button>
             </div>
           </div>
         </form>
@@ -404,7 +404,7 @@
     </div>
   </div> --}}
   <div class="btns-system">
-    <button class="add add-system" data-follow="system-card">
+    <button type="button" class="add add-system tg-btn tg-btn--primary" data-follow="system-card">
       <svg aria-hidden="true" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path stroke-width="2" stroke="#fffffff" d="M13.5 3H12H8C6.34315 3 5 4.34315 5 6V18C5 19.6569 6.34315 21 8 21H11M13.5 3L19 8.625M13.5 3V7.625C13.5 8.17728 13.9477 8.625 14.5 8.625H19M19 8.625V11.8125" stroke-linejoin="round" stroke-linecap="round"></path>
         <path stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="#fffffff" d="M17 15V18M17 21V18M17 18H14M17 18H20"></path>
@@ -426,7 +426,7 @@
       <span>{{__('messages.add-snacks')}}</span>
     </button> --}}
     @if ($systemDefult)
-      <button class="add defult-system" data-follow="defult-card">
+      <button type="button" class="add defult-system tg-btn tg-btn--primary" data-follow="defult-card">
         <svg aria-hidden="true" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path stroke-width="2" stroke="#fffffff" d="M13.5 3H12H8C6.34315 3 5 4.34315 5 6V18C5 19.6569 6.34315 21 8 21H11M13.5 3L19 8.625M13.5 3V7.625C13.5 8.17728 13.9477 8.625 14.5 8.625H19M19 8.625V11.8125" stroke-linejoin="round" stroke-linecap="round"></path>
           <path stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="#fffffff" d="M17 15V18M17 21V18M17 18H14M17 18H20"></path>
@@ -478,7 +478,7 @@
               <h1>{{$item->amount}} {{__('messages.EGP')}}</h1>
               <p>{{$item->duration}} {{__('messages.month')}}</p>
             </div>
-            <button class="btn-edit-system" data-follow="show-card">{{__('messages.edit')}}</button>
+            <button type="button" class="btn-edit-system tg-btn tg-btn--outline" data-follow="show-card">{{__('messages.edit')}}</button>
           </div>
         @endforeach
       @endif
@@ -510,7 +510,7 @@
               <h1 class="name-product">{{$item->name}}</h1>
               <p class="content-product">{{$item->description}}</p>
             </div>
-            <button type="button" data-code="{{$item->code}}" class="edit-product" data-follow="edit-card">
+            <button type="button" data-code="{{$item->code}}" class="edit-product tg-btn tg-btn--outline" data-follow="edit-card">
               <span>{{__('messages.edit')}}</span>
             </button>
           </div>

@@ -97,8 +97,8 @@
           <div class="button-row-card">
             <div class="buttons">
               <x-components::close-button follow="requests-card" />
-              <button type="submit" name="action" value="reject" class="reject">{{__('messages.reject')}}</button>
-              <button type="submit" name="action" data-label="{{ __('messages.form-send') }}" value="acceptance" class="acceptance view-profile">{{__('messages.acceptance')}}</button>
+              <button type="submit" name="action" value="reject" class="reject tg-btn tg-btn--danger">{{__('messages.reject')}}</button>
+              <button type="submit" name="action" data-label="{{ __('messages.form-send') }}" value="acceptance" class="acceptance view-profile tg-btn tg-btn--success">{{__('messages.acceptance')}}</button>
             </div>
           </div>
         </form>
@@ -141,8 +141,8 @@
           <div class="button-row-card">
             <div class="buttons">
               <x-components::close-button follow="edit-card" />
-              <button type="submit" name="action" value="reject" class="reject">{{__('messages.reject')}}</button>
-              <button type="submit" name="action" value="acceptance" class="acceptance view-profile">{{__('messages.acceptance')}}</button>
+              <button type="submit" name="action" value="reject" class="reject tg-btn tg-btn--danger">{{__('messages.reject')}}</button>
+              <button type="submit" name="action" value="acceptance" class="acceptance view-profile tg-btn tg-btn--success">{{__('messages.acceptance')}}</button>
             </div>
           </div>
         </form>

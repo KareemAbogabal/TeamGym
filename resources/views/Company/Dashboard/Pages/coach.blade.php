@@ -9,7 +9,7 @@
   <div class="content-table coach-head">
     <h1>{{ __('messages.coach-management') }}</h1>
     @if (\Illuminate\Support\Facades\Gate::forUser($employee)->allows('coach'))
-      <button type="button" class="btn add-request coach-summon-trigger">
+      <button type="button" class="btn add-request coach-summon-trigger tg-btn tg-btn--primary">
         <i class="fa-solid fa-user-plus"></i>
         {{ __('messages.coach-requests-client') }}
       </button>
@@ -90,7 +90,7 @@
         <div class="button-row-card">
           <div class="buttons">
             <x-components::close-button extraClass="coach-summon-close" />
-            <button type="submit" class="view-profile">{{ __('messages.request') }}</button>
+            <button type="submit" class="view-profile tg-btn tg-btn--primary">{{ __('messages.request') }}</button>
           </div>
         </div>
       </form>
@@ -114,8 +114,8 @@
                 @csrf
                 <input type="hidden" name="assignment_id" value="{{ $r->id }}" />
                 <input type="hidden" name="note" value="" />
-                <button type="submit" name="action" value="approve" class="btn success">{{ __('messages.approve') }}</button>
-                <button type="submit" name="action" value="reject" class="btn danger">{{ __('messages.reject') }}</button>
+                <button type="submit" name="action" value="approve" class="btn success tg-btn tg-btn--success">{{ __('messages.approve') }}</button>
+                <button type="submit" name="action" value="reject" class="btn danger tg-btn tg-btn--danger">{{ __('messages.reject') }}</button>
               </form>
             </div>
           </div>
@@ -141,8 +141,8 @@
                 @csrf
                 <input type="hidden" name="assignment_id" value="{{ $r->id }}" />
                 <input type="hidden" name="note" value="" />
-                <button type="submit" name="action" value="approve" class="btn success">{{ __('messages.approve') }}</button>
-                <button type="submit" name="action" value="reject" class="btn danger">{{ __('messages.reject') }}</button>
+                <button type="submit" name="action" value="approve" class="btn success tg-btn tg-btn--success">{{ __('messages.approve') }}</button>
+                <button type="submit" name="action" value="reject" class="btn danger tg-btn tg-btn--danger">{{ __('messages.reject') }}</button>
               </form>
             </div>
           </div>
@@ -168,7 +168,7 @@
                 @csrf
                 <input type="hidden" name="assignment_id" value="{{ $a->id }}" />
                 <input type="hidden" name="note" value="" />
-                <button type="submit" name="action" value="end" class="btn danger">{{ __('messages.end') }}</button>
+                <button type="submit" name="action" value="end" class="btn danger tg-btn tg-btn--danger">{{ __('messages.end') }}</button>
               </form>
             </div>
           </div>

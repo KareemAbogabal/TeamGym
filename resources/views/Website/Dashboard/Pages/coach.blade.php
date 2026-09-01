@@ -42,7 +42,7 @@
         <form method="post" action="{{ route('coach.cancel') }}">
           @csrf
           <input type="hidden" name="assignment_id" value="{{ $pending->id }}" />
-          <button type="submit" class="btn">{{ __('messages.cancel') }}</button>
+          <button type="submit" class="btn tg-btn tg-btn--secondary">{{ __('messages.cancel') }}</button>
         </form>
       </div>
     @else
@@ -57,7 +57,7 @@
   </section>
 
   <div class="coach-actions">
-    <button type="button" class="btn coach-request-open" data-follow="coach-request" @if($pending) disabled @endif>
+    <button type="button" class="btn coach-request-open tg-btn tg-btn--primary" data-follow="coach-request" @if($pending) disabled @endif>
       <i class="fa-solid @if($active) fa-arrows-rotate @else fa-dumbbell @endif"></i>
       @if ($active)
         {{ __('messages.change-coach') }}
@@ -106,7 +106,7 @@
         <div class="button-row-card">
           <div class="buttons">
             <x-components::close-button follow="coach-request" />
-            <button type="submit" class="view-profile" @if($pending) disabled @endif>{{ __('messages.request') }}</button>
+            <button type="submit" class="view-profile tg-btn tg-btn--primary" @if($pending) disabled @endif>{{ __('messages.request') }}</button>
           </div>
         </div>
       </form>
@@ -128,9 +128,9 @@
           </div>
         </div>
         @if ($pending)
-          <button class="btn" disabled>{{ __('messages.requested') }}</button>
+          <button type="button" class="btn tg-btn tg-btn--secondary disabled" disabled>{{ __('messages.requested') }}</button>
         @else
-          <button type="button" class="btn coach-request-open" data-follow="coach-request">{{ __('messages.request') }}</button>
+          <button type="button" class="btn coach-request-open tg-btn tg-btn--primary" data-follow="coach-request">{{ __('messages.request') }}</button>
         @endif
       </div>
     @empty

@@ -38,7 +38,7 @@
                   <span @if (optional($item->imports)->quantity <= 0) data-state="unavailable" @elseif (optional($item->imports)->quantity == 2) data-state="approach" @else data-state="available" @endif>{{optional($item->imports)->quantity}}</span>
                   <form action="{{route("destroySupplementsAndImports")}}" method="post">
                     <input type="hidden" value="{{$item->code}}" name="code">
-                    <button type="submit">
+                    <button type="submit" class="tg-btn tg-btn--primary">
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="18" height="18" aria-label="X in circle">
                         <circle cx="32" cy="32" r="28" fill="none" />
                         <line x1="22" y1="22" x2="42" y2="42" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
@@ -144,7 +144,7 @@
           </label>
         </div>
       </div>
-      <button type="submit">{{__('messages.record')}}</button>
+      <button type="submit" class="tg-btn tg-btn--primary">{{__('messages.record')}}</button>
     </form>
   </div>
   <div class="main-table">

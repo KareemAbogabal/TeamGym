@@ -104,7 +104,7 @@
               <input type="text" placeholder="{{__('messages.meal-name')}}" name="meal[]">
               <input type="text" placeholder="{{__('messages.how-often')}}" name="often[]">
               <input type="text" placeholder="{{__('messages.quantity')}}" name="quantity[]">
-              <button type="button" class="remove">
+<button type="button" class="remove">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="30" height="30" aria-label="X in circle">
                   <circle cx="32" cy="32" r="28" fill="none" />
                   <line x1="22" y1="22" x2="42" y2="42" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
@@ -113,9 +113,8 @@
               </button>
             </div>
           </div>
-        </div>
-        <div class="main-input input-add-row">
-          <label for="">{{__('messages.name-of-the-dish')}}</label>
+          <div class="main-input input-add-row">
+            <label for="">{{__('messages.name-of-the-dish')}}</label>
           <div class="row-input">
             <label for="" class="add-shape-foods">
               <svg aria-hidden="true" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -129,7 +128,7 @@
         <div class="button-row-card">
           <div class="buttons">
             <x-components::close-button follow="food-card" />
-            <button type="submit" class="view-profile">{{__('messages.form-send')}}</button>
+            <button type="submit" class="view-profile tg-btn tg-btn--primary">{{__('messages.form-send')}}</button>
           </div>
         </div>
       </form>
@@ -245,7 +244,7 @@
         <div class="button-row-card">
           <div class="buttons">
             <x-components::close-button follow="exercise-card" />
-            <button type="submit" class="view-profile">{{__('messages.form-send')}}</button>
+            <button type="submit" class="view-profile tg-btn tg-btn--primary">{{__('messages.form-send')}}</button>
           </div>
         </div>
       </form>
@@ -277,7 +276,7 @@
                 </div>
               </div>
               <div class="plan-actions">
-                <button class="plan-btn plan-btn-exercise exercise" data-follow="exercise-card">
+                <button type="button" class="plan-btn plan-btn-exercise exercise tg-btn tg-btn--outline" data-follow="exercise-card">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 32" width="20" height="20" fill="none">
                     <rect x="0" y="8" width="6" height="16" rx="1" fill="currentColor"/>
                     <rect x="8" y="4" width="6" height="24" rx="1" fill="currentColor"/>
@@ -289,7 +288,7 @@
                   </svg>
                   <span>{{__('messages.exercise-name')}}</span>
                 </button>
-                <button class="plan-btn plan-btn-diet foode" data-follow="food-card">
+                <button type="button" class="plan-btn plan-btn-diet foode tg-btn tg-btn--outline" data-follow="food-card">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 32" width="20" height="20" fill="currentColor">
                     <rect x="7.2" y="5.0" width="1.6" height="7.6" rx="0.6"/>
                     <rect x="10.0" y="5.0" width="1.6" height="7.6" rx="0.6"/>
@@ -299,7 +298,7 @@
                   </svg>
                   <span>{{__('messages.foods')}}</span>
                 </button>
-                <button class="plan-btn plan-btn-view list" data-code="{{$item->code}}" data-follow="list-card">
+                <button type="button" class="plan-btn plan-btn-view list tg-btn tg-btn--outline" data-code="{{$item->code}}" data-follow="list-card">
                   <svg width="20" height="20" viewBox="0 0 64 64" fill="currentColor">
                     <circle cx="32" cy="22" r="3"/>
                     <circle cx="32" cy="32" r="3"/>
