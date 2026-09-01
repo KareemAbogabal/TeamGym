@@ -89,7 +89,7 @@
         </div>
         <div class="button-row-card">
           <div class="buttons">
-            <button type="button" class="close-profile coach-summon-close">{{ __('messages.card-profile-button-close') }}</button>
+            <x-components::close-button extraClass="coach-summon-close" />
             <button type="submit" class="view-profile">{{ __('messages.request') }}</button>
           </div>
         </div>

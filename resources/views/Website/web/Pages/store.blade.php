@@ -105,7 +105,7 @@
           </div>
           <div class="button-row-card">
             <div class="buttons">
-              <button type="button" class="close-profile close-card" data-follow="show-card">{{__('messages.card-profile-button-close')}}</button>
+              <x-components::close-button follow="show-card" extraClass="close-card" />
               <button type="submit" class="view-profile">{{__('messages.form-send')}}</button>
             </div>
           </div>

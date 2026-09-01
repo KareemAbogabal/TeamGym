@@ -96,7 +96,7 @@
           </div>
           <div class="button-row-card">
             <div class="buttons">
-              <button type="button" class="close-profile" data-follow="requests-card">{{__('messages.card-profile-button-close')}}</button>
+              <x-components::close-button follow="requests-card" />
               <button type="submit" name="action" value="reject" class="reject">{{__('messages.reject')}}</button>
               <button type="submit" name="action" data-label="{{ __('messages.form-send') }}" value="acceptance" class="acceptance view-profile">{{__('messages.acceptance')}}</button>
             </div>
@@ -140,7 +140,7 @@
           </div>
           <div class="button-row-card">
             <div class="buttons">
-              <button type="button" class="close-profile" data-follow="edit-card">{{__('messages.card-profile-button-close')}}</button>
+              <x-components::close-button follow="edit-card" />
               <button type="submit" name="action" value="reject" class="reject">{{__('messages.reject')}}</button>
               <button type="submit" name="action" value="acceptance" class="acceptance view-profile">{{__('messages.acceptance')}}</button>
             </div>

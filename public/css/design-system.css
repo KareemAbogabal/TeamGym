@@ -421,8 +421,7 @@ html[dir="rtl"] .tg-switch input:checked + .tg-switch__track::after {
 
 /* =====================================================================
    MISC
-   ===================================================================== */
-.tg-divider {
+   ===================================================================== */.tg-divider {
   height: 1px;
   background: var(--tg-border);
   border: none;
@@ -436,4 +435,67 @@ html[dir="rtl"] .tg-switch input:checked + .tg-switch__track::after {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+
+/* =====================================================================
+   MAIN-CARD CLOSE BUTTON (standardized)
+   ===================================================================== */
+.tg-card-close {
+  position: absolute;
+  top: 14px;
+  inset-inline-end: 14px;
+  z-index: 5;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--tg-radius-sm);
+  border: 1px solid var(--tg-border);
+  background: var(--tg-bg-elevated);
+  color: var(--tg-text-2);
+  cursor: pointer;
+  line-height: 1;
+  transition: background-color var(--tg-duration-fast) var(--tg-ease),
+    color var(--tg-duration-fast) var(--tg-ease),
+    border-color var(--tg-duration-fast) var(--tg-ease),
+    transform var(--tg-duration-fast) var(--tg-ease);
+}
+.tg-card-close:hover {
+  background: var(--tg-danger-soft);
+  border-color: var(--tg-danger);
+  color: var(--tg-danger);
+}
+.tg-card-close:active { transform: scale(0.94); }
+.tg-card-close:focus-visible {
+  outline: none;
+  box-shadow: var(--tg-focus-ring);
+}
+.tg-card-close svg { width: 18px; height: 18px; }
+
+/* Neutralize legacy text-button styling when using the standardized close icon */
+.button-row-card .close-profile.tg-card-close,
+.main-card .card .button-row-card .close-profile.tg-card-close {
+  position: absolute;
+  top: 14px;
+  inset-inline-end: 14px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--tg-border);
+  border-radius: var(--tg-radius-sm);
+  background: var(--tg-bg-elevated);
+  color: var(--tg-text-2);
+  box-shadow: none;
+}
+
+/* Suppress legacy ripple/hover decorations for standardized close icon */
+.main-card .card .button-row-card .close-profile.tg-card-close::after {
+  content: none;
+}
+.main-card .card .button-row-card .close-profile.tg-card-close:hover {
+  border-color: var(--tg-danger);
+  background: var(--tg-danger-soft);
+  color: var(--tg-danger);
 }

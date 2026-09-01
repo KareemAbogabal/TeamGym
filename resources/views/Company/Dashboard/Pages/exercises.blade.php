@@ -128,7 +128,7 @@
         </div>
         <div class="button-row-card">
           <div class="buttons">
-            <button type="button" class="close-profile" data-follow="food-card">{{__('messages.card-profile-button-close')}}</button>
+            <x-components::close-button follow="food-card" />
             <button type="submit" class="view-profile">{{__('messages.form-send')}}</button>
           </div>
         </div>
@@ -149,7 +149,7 @@
       </div>
       <div class="button-row-card">
         <div class="buttons">
-          <button type="button" class="close-profile" data-follow="list-card">{{__('messages.card-profile-button-close')}}</button>
+          <x-components::close-button follow="list-card" />
         </div>
       </div>
     </div>
@@ -244,7 +244,7 @@
         </div>
         <div class="button-row-card">
           <div class="buttons">
-            <button type="button" class="close-profile" data-follow="exercise-card">{{__('messages.card-profile-button-close')}}</button>
+            <x-components::close-button follow="exercise-card" />
             <button type="submit" class="view-profile">{{__('messages.form-send')}}</button>
           </div>
         </div>

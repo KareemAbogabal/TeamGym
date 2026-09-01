@@ -105,7 +105,7 @@
         </div>
         <div class="button-row-card">
           <div class="buttons">
-            <button type="button" class="close-profile" data-follow="coach-request">{{ __('messages.card-profile-button-close') }}</button>
+            <x-components::close-button follow="coach-request" />
             <button type="submit" class="view-profile" @if($pending) disabled @endif>{{ __('messages.request') }}</button>
           </div>
         </div>
