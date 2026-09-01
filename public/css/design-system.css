@@ -411,6 +411,161 @@ html[dir="rtl"] .tg-switch input:checked + .tg-switch__track::after {
 .tg-table tbody tr:hover { background: var(--tg-surface-2); }
 
 /* =====================================================================
+   LEGACY TABLE COMPATIBILITY LAYER (.table / x-components::table)
+   Token-map the legacy div-based .table grid (gold/black brand) onto the
+   design tokens. Markup is untouched; !important wins over table.css and
+   page-level CSS. Row-status badges are re-mapped onto the same semantic
+   token groups used by the [data-state].state badge styles above.
+   ===================================================================== */
+.table {
+  background: linear-gradient(160deg, var(--tg-surface-2), var(--tg-surface)) !important;
+  border-color: var(--tg-border-strong) !important;
+  border-radius: var(--tg-radius-md) !important;
+  box-shadow: var(--tg-shadow-card) !important;
+}
+
+.table .header {
+  background-color: var(--tg-gold) !important;
+}
+.table .header h4 {
+  color: var(--tg-text-inverse) !important;
+}
+.table .header h4:not(:last-child)::after {
+  background-color: color-mix(in srgb, var(--tg-text-inverse) 22%, transparent) !important;
+}
+
+.table .body .row {
+  border-color: var(--tg-border-strong) !important;
+}
+.table .body .row p,
+.table .body .row p:has(img) {
+  color: var(--tg-text) !important;
+}
+.table .body .row .content {
+  color: var(--tg-text-2) !important;
+}
+.table .body .row .details ul li {
+  color: var(--tg-text) !important;
+}
+.table .body .choose p {
+  color: var(--tg-text-muted) !important;
+}
+
+.table .body::-webkit-scrollbar-thumb {
+  background-color: var(--tg-gold) !important;
+}
+
+/* Pill-style row buttons follow the gold/primary brand */
+.table .body .row button:not(:has(svg)) {
+  --primary-color: var(--tg-primary) !important;
+  --secondary-color: var(--tg-text-inverse) !important;
+  --hover-color: var(--tg-primary-hover) !important;
+}
+.table .body .row .details ul li button {
+  background-color: var(--tg-primary) !important;
+  color: var(--tg-text-inverse) !important;
+  border-radius: var(--tg-radius-sm) !important;
+}
+
+/* Row status badges -> design tokens (mirrors the .state badge groups).
+   Scoped to enumerated status values so dynamic data-state cells (e.g. an
+   amount passed via data-state) stay plain text. */
+.table .body .row p[data-state="available"],
+.table .body .row p[data-state="active"],
+.table .body .row p[data-state="acceptance"],
+.table .body .row p[data-state="approved"],
+.table .body .row p[data-state="paid"],
+.table .body .row p[data-state="sold"],
+.table .body .row p[data-state="entrance"],
+.table .body .row p[data-state="easy"],
+.table .body .row p[data-state="Revenues"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  margin-inline: auto;
+  padding: 3px 12px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  color: var(--tg-success) !important;
+  background-color: var(--tg-success-soft) !important;
+  font-size: var(--tg-text-sm);
+  font-weight: 600;
+  line-height: 1.6;
+  letter-spacing: 0.2px;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+.table .body .row p[data-state="approach"],
+.table .body .row p[data-state="pending"],
+.table .body .row p[data-state="request"],
+.table .body .row p[data-state="waiting"],
+.table .body .row p[data-state="PRO"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  margin-inline: auto;
+  padding: 3px 12px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  color: var(--tg-warning) !important;
+  background-color: var(--tg-warning-soft) !important;
+  font-size: var(--tg-text-sm);
+  font-weight: 600;
+  line-height: 1.6;
+  letter-spacing: 0.2px;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+.table .body .row p[data-state="unavailable"],
+.table .body .row p[data-state="exit"],
+.table .body .row p[data-state="rejected"],
+.table .body .row p[data-state="reject"],
+.table .body .row p[data-state="expired"],
+.table .body .row p[data-state="suspended"],
+.table .body .row p[data-state="cancelled"],
+.table .body .row p[data-state="unpaid"],
+.table .body .row p[data-state="Expenses"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  margin-inline: auto;
+  padding: 3px 12px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  color: var(--tg-danger) !important;
+  background-color: var(--tg-danger-soft) !important;
+  font-size: var(--tg-text-sm);
+  font-weight: 600;
+  line-height: 1.6;
+  letter-spacing: 0.2px;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+.table .body .row p[data-state="login"],
+.table .body .row p[data-state="middle"],
+.table .body .row p[data-state="import"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  margin-inline: auto;
+  padding: 3px 12px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  color: var(--tg-info) !important;
+  background-color: var(--tg-info-soft) !important;
+  font-size: var(--tg-text-sm);
+  font-weight: 600;
+  line-height: 1.6;
+  letter-spacing: 0.2px;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+/* =====================================================================
    EMPTY / LOADING STATES
    ===================================================================== */
 .tg-empty {
