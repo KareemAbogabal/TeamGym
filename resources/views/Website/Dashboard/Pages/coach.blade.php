@@ -89,20 +89,18 @@
       @endif
       <form method="post" action="{{ route('coach.request') }}">
         @csrf
-        <div class="main-input">
-          <label for="coach-request-select">{{ __('messages.choose-a-coach') }}</label>
-          <select id="coach-request-select" name="code_coach" required>
+        <x-components::ui.field for="coach-request-select" label="{{ __('messages.choose-a-coach') }}" required>
+          <x-components::ui.select id="coach-request-select" name="code_coach" required>
             <option value="">{{ __('messages.choose-a-coach') }}</option>
             @forelse ($coaches as $c)
               <option value="{{ $c['employee']->code }}">{{ $c['employee']->fname }} {{ $c['employee']->lname }}@if($c['profile']?->specialization) — {{ $c['profile']->specialization }}@endif</option>
             @empty
             @endforelse
-          </select>
-        </div>
-        <div class="main-input">
-          <label for="coach-request-reason">{{ __('messages.reason-optional') }}</label>
-          <textarea id="coach-request-reason" name="reason" rows="3" placeholder="{{ __('messages.reason-optional') }}"></textarea>
-        </div>
+          </x-components::ui.select>
+        </x-components::ui.field>
+        <x-components::ui.field for="coach-request-reason" label="{{ __('messages.reason-optional') }}">
+          <x-components::ui.textarea id="coach-request-reason" name="reason" rows="3" placeholder="{{ __('messages.reason-optional') }}"></x-components::ui.textarea>
+        </x-components::ui.field>
         <div class="button-row-card">
           <div class="buttons">
             <x-components::close-button follow="coach-request" />

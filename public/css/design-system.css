@@ -336,6 +336,69 @@ html[dir="rtl"] .tg-switch input:checked + .tg-switch__track::after {
   box-shadow: var(--tg-focus-ring);
 }
 
+/* File upload (dropzone-style) */
+.tg-file {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--tg-space-2);
+  padding: var(--tg-space-6) var(--tg-space-4);
+  min-width: 220px;
+  border: 1px dashed var(--tg-border-strong);
+  border-radius: var(--tg-radius-sm);
+  background: var(--tg-surface-2);
+  color: var(--tg-text-2);
+  cursor: pointer;
+  text-align: center;
+  transition: border-color var(--tg-duration-fast) var(--tg-ease),
+    background-color var(--tg-duration-fast) var(--tg-ease),
+    color var(--tg-duration-fast) var(--tg-ease);
+}
+.tg-file:hover {
+  border-color: var(--tg-primary);
+  background: var(--tg-primary-soft);
+  color: var(--tg-text);
+}
+.tg-file:has(input:focus-visible) {
+  box-shadow: var(--tg-focus-ring);
+}
+.tg-file input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.tg-file__icon { font-size: var(--tg-text-3xl); line-height: 1; }
+.tg-file__text { font-weight: 600; font-size: var(--tg-text-base); }
+.tg-file__hint { font-size: var(--tg-text-sm); color: var(--tg-text-muted); }
+
+/* =====================================================================
+   LEGACY FORM COMPATIBILITY LAYER
+   Token-map the existing dashboard form fields (main-input, nebula-input,
+   selects, textareas) onto the design tokens. Markup is untouched; only
+   textual fields are targeted — checkboxes/radios/file inputs and the
+   nav/table search boxes keep their bespoke chrome. Complements the new
+   x-components::ui.* components.
+   ===================================================================== */
+form input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):not(.search):not(.search-input),
+form select,
+form textarea {
+  background-color: var(--tg-surface) !important;
+  color: var(--tg-text) !important;
+  border: 1px solid var(--tg-border-strong) !important;
+  border-radius: var(--tg-radius-sm) !important;
+  font-family: var(--tg-font-body) !important;
+}
+form input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):not(.search):not(.search-input):focus,
+form select:focus,
+form textarea:focus {
+  outline: none !important;
+  border-color: var(--tg-primary) !important;
+  box-shadow: var(--tg-focus-ring) !important;
+}
+
 /* =====================================================================
    LEGACY-BUTTON COMPATIBILITY LAYER
    Any element also carrying .tg-btn wins the design-system identity over
