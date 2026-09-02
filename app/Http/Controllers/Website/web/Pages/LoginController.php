@@ -18,175 +18,198 @@ use App\Models\Back\Payment;
 use App\Models\Back\CustomerRequests;
 use App\Traits\Warning;
 use App\Traits\GetLineage;
+use App\Services\ResetCodeService;
 use App\Http\Requesters\Website\web\SignUp\SignUpRequest;
 use App\Http\Requesters\Website\web\Forget\ForgetRequest;
 use App\Http\Requesters\Website\web\Login\LoginRequest;
 use App\Http\Requesters\Website\web\VerifyCode\VerifyCodeRequest;
 use App\Http\Requesters\Website\web\ResetPassword\ResetPasswordRequest;
-use App\Http\Requesters\Website\web\AddRequestProduct\AddRequestProductRequest;
-use App\Http\Requesters\Website\web\AddRequestCustomer\AddRequestCustomerRequest;
-use App\Http\Requesters\Website\web\DeleteCustomerRequests\DeleteCustomerRequestsRequest;
 use Carbon\Carbon;
 
 class LoginController extends Controller {
   use Warning, GetLineage;
+
   public function loginPage(Request $request) {
     return view('Website.web.Pages.login');
   }
+
   public function signUp(SignUpRequest $request) {
-    $fnameLower = mb_strtolower($request->input('fname'));
-    $lnameLower = mb_strtolower($request->input('lname'));
-    $checkClient = Client::whereRaw('LOWER(fname) = ?', "$fnameLower")->whereRaw('LOWER(lname) = ?', "$lnameLower")->where('email', $request->input('email'))->first();
-    if ($checkClient) {
-      Auth::guard('client')->login($checkClient);
-      Cookie::queue(Cookie::forever('login_client', $checkClient->code));
-      session(['client' => $checkClient]);
-      $clientRequests = CustomerRequests::where("code", Cookie::get('code_request_client'))->get();
-      foreach ($clientRequests as $r) {
-        $r->code_client = $checkClient->code;
-        $r->email = $checkClient->email;
-        $r->save();
-      };
-    } else {
-      $system = System::where("defult", "true")->first();
-      $employee = Employee::find(1);
-      if (!$system) {
-        notifyError(__('messages.system-empty'));
-        return redirect()->back();
-      };
-      if (!$employee) {
-        notifyError(__('messages.employee-empty'));
-        return redirect()->back();
-      };
-      $fname = $request->input('fname');
-      $lname = $request->input('lname');
-      $phone = $request->input('phone');
-      if (!empty($request->input('email'))) {
-        $email = $request->input('email');
-        $this->warning($request->input('email'), __('messages.email-empty'));
-      } else {
-        $email = $fname . "@gmail.com";
-      };
-      $password = $request->input('password');
-      $this->warning($request->input('fname'), __('messages.fname-empty'));
-      $this->warning($request->input('lname'), __('messages.lname-empty'));
-      $this->warning($request->input('phone'), __('messages.phone-empty'));
-      $this->warning($request->input('password'), __('messages.password-empty'));
-      if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $this->warning($request->input('email'), __('messages.email-check'));
-      };
-      $rand = rand(100000, time());
-      $signUp = new Client();
-      $signUp->code = $rand;
-      $signUp->fname = $fname;
-      $signUp->lname = $lname;
-      $signUp->phone = $phone;
-      $signUp->email = $email;
-      $signUp->password = Hash::make($password);
+    $fnameLower = mb_strtolower(trim($request->input('fname')));
+    $lnameLower = mb_strtolower(trim($request->input('lname')));
+    $email = mb_strtolower(trim($request->input('email', '')));
+    $email = $email !== '' ? $email : ($request->input('fname') . "@gmail.com");
+
+    $exists = Client::whereRaw('LOWER(email) = ?', [$email])->exists();
+    if ($exists) {
+      return redirect()->route('loginPage')->withErrors(['email' => __('messages.already-registered')]);
+    }
+
+    $system = System::where("defult", "true")->first();
+    $employee = Employee::find(1);
+    if (!$system || !$employee) {
+      notifyError(__('messages.system-empty'));
+      return redirect()->back();
+    }
+
+    $fname = $request->input('fname');
+    $lname = $request->input('lname');
+    $phone = $request->input('phone');
+    $password = $request->input('password');
+    $this->warning($fname, __('messages.fname-empty'));
+    $this->warning($lname, __('messages.lname-empty'));
+    $this->warning($phone, __('messages.phone-empty'));
+    $this->warning($password, __('messages.password-empty'));
+
+    $rand = random_int(100000, 999999999);
+    $signUp = new Client();
+    $signUp->code = $rand;
+    $signUp->fname = $fname;
+    $signUp->lname = $lname;
+    $signUp->phone = $phone;
+    $signUp->email = $email;
+    $signUp->password = Hash::make($password);
+    $signUp->category = $system->name;
+    $signUp->save();
+
+    $clientRequests = CustomerRequests::where("code", Cookie::get('code_request_client'))->get();
+    foreach ($clientRequests as $r) {
+      $r->code_client = $signUp->code;
+      $r->save();
+    }
+
+    $settings = new SettingClient();
+    $settings->code = $rand;
+    $settings->code_client = $signUp->code;
+    $settings->class_reminders = 1;
+    $settings->payment_date = 1;
+    $settings->promotions = 1;
+    $settings->save();
+
+    $requestsPayment = new RequestsPayment();
+    $requestsPayment->addRequest($signUp->code, "system", $system->code, null, $system->amount, "daily", $employee->code);
+    $requestsPayment->state = "acceptance";
+    $requestsPayment->save();
+
+    $month = strtolower(Carbon::now('Africa/Cairo')->format('F'));
+    if ($system) {
+      $payment = new Payment();
+      $payment->code = $rand;
+      $payment->code_client = $signUp->code;
+      $payment->code_employee = $employee->code;
+      $payment->code_systems = $system->code;
+      $payment->order_name = $system->name;
       $signUp->category = $system->name;
       $signUp->save();
-      $clientRequests = CustomerRequests::where("code", Cookie::get('code_request_client'))->get();
-      foreach ($clientRequests as $r) {
-        $r->code_client = $signUp->code;
-        $r->save();
-      };
-      $settings = new SettingClient();
-      $settings->code = $rand;
-      $settings->code_client = $signUp->code;
-      $settings->class_reminders = 1;
-      $settings->payment_date = 1;
-      $settings->promotions = 1;
-      $settings->save();
-      $requestsPayment = new RequestsPayment();
-      $requestsPayment->addRequest($signUp->code, "system", $system->code, null, $system->amount, "daily", $employee->code);
-      $requestsPayment->state = "acceptance";
-      $requestsPayment->save();
-      $month = strtolower(Carbon::now('Africa/Cairo')->format('F'));
-      if ($system) {
-        $payment = new Payment();
-        $payment->code = $rand;
-        $payment->code_client = $signUp->code;
-        $payment->code_employee = $employee->code;
-        $payment->code_systems = $system->code;
-        $payment->order_name = $system->name;
-        $signUp->category = $system->name;
-        $signUp->save();
-        Lineage::addLineage(null, $system->code, null, null, null, "system", 1);
-        $payment->code_request_payment = $requestsPayment->code;
-        $payment->type = "system";
-        $payment->amount = $system->amount;
-        $payment->paid = 0;
-        $payment->payday = "daily";
-        $payment->paymonth = $month;
-        $payment->save();
-      };
-      $client = Client::find($signUp->id);
-      Auth::guard('client')->login($client);
-      Cookie::queue(Cookie::forever('login_client', $rand));
-      session(['client' => $client]);
-    };
+      Lineage::addLineage(null, $system->code, null, null, null, "system", 1);
+      $payment->code_request_payment = $requestsPayment->code;
+      $payment->type = "system";
+      $payment->amount = $system->amount;
+      $payment->paid = 0;
+      $payment->payday = "daily";
+      $payment->paymonth = $month;
+      $payment->save();
+    }
+
+    $client = Client::find($signUp->id);
+    Auth::guard('client')->login($client, true);
+    $request->session()->regenerate();
+    $request->session()->regenerateToken();
+    Cookie::queue(Cookie::forever('login_client', $rand));
+    session(['client' => $client]);
+
     return redirect()->route('front');
   }
+
   public function forget(ForgetRequest $request) {
-    $email = $request->input('email');
-    $client = Client::where('email', $email)->first();
-    if (!$client) {
-      return redirect()->back()->withErrors(['email' => __('messages.email-not-registered')])->withInput($request->only('email'));
-    };
-    $code = str_pad(mt_rand(0, 999999), 6, '0', STR_PAD_LEFT);
-    date_default_timezone_set("Africa/Cairo");
-    $d = date_create();
-    $time = date_format($d, "Y-m-j_g-i_A");
-    $data = ["userName" => "$client->fname $client->lname", 'name' => "$client->fname", 'code' => "$client->code", 'time' => "$time", "phone" => "$client->phone", 'verificationCode' => "$code"];
-    Mail::send('Mail.pageMail', $data, function ($message) use ($email) {
-      $message->embed(public_path('images/header/Team-Gym.png'));
-      $message->to($email)->subject('Verification Code — Team Gym');
-    });
-    Cookie::queue(Cookie::forever('temporary', $code));
-    return redirect()->route('loginPage');
+    $email = mb_strtolower(trim($request->input('email')));
+    $client = Client::whereRaw('LOWER(email) = ?', [$email])->first();
+    // Same generic response whether or not the account exists (no enumeration).
+    if ($client) {
+      $code = ResetCodeService::issue(ResetCodeService::TYPE_CLIENT, $email);
+      date_default_timezone_set("Africa/Cairo");
+      $d = date_create();
+      $time = date_format($d, "Y-m-j_g-i_A");
+      $data = [
+        "userName" => "$client->fname $client->lname",
+        'name' => "$client->fname",
+        'code' => "$client->code",
+        'time' => "$time",
+        "phone" => "$client->phone",
+        'verificationCode' => "$code",
+      ];
+      try {
+        Mail::send('Mail.pageMail', $data, function ($message) use ($email) {
+          $message->embed(public_path('images/header/Team-Gym.png'));
+          $message->to($email)->subject('Verification Code — Team Gym');
+        });
+      } catch (\Throwable $e) {
+        \Illuminate\Support\Facades\Log::channel('security')->warning('client reset mail failed', ['email' => substr($email, 0, 3) . '***']);
+      }
+    } else {
+      \Illuminate\Support\Facades\Log::channel('security')->warning('client reset requested for unknown email', ['email' => substr($email, 0, 3) . '***']);
+    }
+    session(['client_reset_email' => $email]);
+    return redirect()->route('loginPage')->with('status', __('messages.reset-code-sent'));
   }
+
   public function verifyCode(VerifyCodeRequest $request) {
-    $temporary = Cookie::get('temporary');
-    if (!$temporary) {
+    $email = session('client_reset_email');
+    if (!$email) {
       return redirect()->route('loginPage');
-    };
-    if ($temporary !== $request->input('code')) {
-      return back()->withErrors(['code' => __('messages.verification-code-invalid')]);
-    };
-    Cookie::queue(Cookie::forget('temporary'));
-    Cookie::queue(Cookie::forever('verified', $temporary));
+    }
+    if (!ResetCodeService::verify(ResetCodeService::TYPE_CLIENT, $email, $request->input('code'))) {
+      return back()->withErrors(['code' => __('messages.reset-invalid')]);
+    }
+    session(['client_reset_verified' => true]);
     return redirect()->route('loginPage');
   }
+
   public function resetPassword(ResetPasswordRequest $request) {
-    $verified = Cookie::get('verified');
-    if (!$verified) {
-      return redirect()->route('loginPage');
-    };
-    $email = $request->input('email');
-    $client = Client::where('email', $email)->first();
+    $email = session('client_reset_email');
+    if (!$email || !session('client_reset_verified')) {
+      return redirect()->route('loginPage')->withErrors(['error' => __('messages.reset-in-progress')]);
+    }
+    $client = Client::whereRaw('LOWER(email) = ?', [mb_strtolower($email)])->first();
     if (!$client) {
-      return redirect()->back()->withErrors(['email' => __('messages.email-not-registered')])->withInput($request->only('email'));
-    };
+      $request->session()->forget(['client_reset_email', 'client_reset_verified']);
+      return redirect()->route('loginPage')->withErrors(['error' => __('messages.reset-in-progress')]);
+    }
     $client->password = Hash::make($request->input('password'));
     $client->save();
-    Cookie::queue(Cookie::forget('verified'));
-    return redirect()->route('loginPage');
+    $request->session()->forget(['client_reset_email', 'client_reset_verified']);
+    \Illuminate\Support\Facades\Log::channel('security')->info('client password reset completed', ['client_code' => $client->code]);
+    return redirect()->route('loginPage')->with('status', __('messages.saved-successfully'));
   }
+
   public function login(LoginRequest $request) {
-    $client = Client::where('email', $request->input('email'))->first();
-    if (!$client) {
-      return redirect()->back()->withErrors(['email' => __('messages.email-not-registered')])->withInput($request->only('email'));
-    };
-    if (!Hash::check($request->input('password'), $client->password)) {
-      return redirect()->back()->withErrors(['password' => __('messages.password-incorrect')])->withInput($request->only('email'));
-    };
-    Auth::guard('client')->login($client);
+    $email = mb_strtolower(trim($request->input('email')));
+    $client = Client::whereRaw('LOWER(email) = ?', [$email])->first();
+    $password = (string) $request->input('password');
+
+    // One generic failure response — avoids user enumeration.
+    if (!$client || !Hash::check($password, $client->password)) {
+      \Illuminate\Support\Facades\Log::channel('security')->warning('client login failed', ['email' => substr($email, 0, 3) . '***']);
+      return redirect()->back()->withErrors(['credentials' => __('messages.login-invalid')]);
+    }
+    if (Hash::needsRehash($client->password)) {
+      $client->password = Hash::make($password);
+      $client->save();
+    }
+
+    Auth::guard('client')->login($client, true);
+    $request->session()->regenerate();
+    $request->session()->regenerateToken();
     Cookie::queue(Cookie::forever('login_client', $client->code));
+    session(['client' => $client]);
+
     $clientRequests = CustomerRequests::where("code", Cookie::get('code_request_client'))->get();
     foreach ($clientRequests as $r) {
       $r->code_client = $client->code;
+      $r->email = $client->email;
       $r->save();
-    };
+    }
+    \Illuminate\Support\Facades\Log::channel('security')->info('client login success', ['client_code' => $client->code]);
+
     return redirect()->route('front');
   }
 }

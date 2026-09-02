@@ -101,7 +101,22 @@ class CustomerRequestsController extends Controller {
     return back();
   }
   public function deleteCustomerRequests(DeleteCustomerRequestsRequest $request) {
-    $customerRequests = CustomerRequests::where("code", $request->input("code"))->first();
+    $code = $request->input("code");
+    $customerRequests = CustomerRequests::where("code", $code)->first();
+
+    if (!$customerRequests) {
+      return back()->withErrors(['error' => __('messages.request-not-found')]);
+    }
+
+    // Ownership is enforced server-side: the current authenticated client or
+    // the session-bound anonymous basket must own the request being deleted.
+    $client = Auth::guard('client')->user();
+    $ownsRequest = $client && $customerRequests->code_client === $client->code;
+    $ownsBasket = !$client && Cookie::get('code_request_client') === $code;
+    if (!$ownsRequest && !$ownsBasket) {
+      abort(403);
+    }
+
     $customerRequests->delete();
     Cookie::queue(Cookie::forget('code_request_client'));
     return back();

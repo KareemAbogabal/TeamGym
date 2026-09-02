@@ -4,15 +4,18 @@ namespace App\Http\Controllers\Website\Dashboard\Pages;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use App\Models\Front\Client;
 use App\Models\Front\SettingClient;
 use App\Http\Requesters\Website\Dashboard\UpdateProfile\UpdateProfileRequest;
 
 class SettingClients extends Controller {
+  public function clientCode(): ?string {
+    return Auth::guard('client')->user()?->code;
+  }
   public function index(Request $request) {
-    $client = Client::where("code", Cookie::get('login_client'))->with("settings")->first();
+    $client = Auth::guard('client')->user();
     return view('Website.Dashboard.Pages.settings', compact("client"));
   }
   public function updateProfile(UpdateProfileRequest $request) {
@@ -34,7 +37,10 @@ class SettingClients extends Controller {
     if (!$request->has('action')) {
       return back()->withErrors(['all' => __('messages.failed-action')]);
     };
-    $client = Client::where('code', Cookie::get('login_client'))->firstOrFail();
+    $client = Auth::guard('client')->user();
+    if (!$client) {
+      return back()->withErrors(['all' => __('messages.unauthorized')]);
+    }
     if ($request->input('action') !== "removePhoto") {
       if ($request->hasFile('profile_image')) {
         $oldPath = public_path('images/subscribers/'.$client->img);

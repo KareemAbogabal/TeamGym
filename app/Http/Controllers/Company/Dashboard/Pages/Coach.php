@@ -53,18 +53,20 @@ class Coach extends Controller {
       ->limit(100)
       ->get();
 
-        $coaches = Employee::where('job_role', 'coach')
-          ->orWhere('job_role', 'trainer')
-          ->get()
-          ->map(function ($coach) {
-            $profile = CoachProfile::where('code_employee', $coach->code)->first();
-            return [
-              'employee' => $coach,
-              'profile' => $profile,
-              'activeClients' => CoachAssignment::where('code_coach', $coach->code)
-                ->where('status', CoachRequestStatus::Active->value)->count(),
-            ];
-          });
+        $coachEmployees = Employee::whereIn('job_role', ['coach', 'trainer'])->get();
+    $codes = $coachEmployees->pluck('code');
+    $profiles = CoachProfile::whereIn('code_employee', $codes)->get()->keyBy('code_employee');
+    $activeCounts = CoachAssignment::whereIn('code_coach', $codes)
+      ->where('status', CoachRequestStatus::Active->value)
+      ->selectRaw('code_coach, COUNT(*) as total')
+      ->groupBy('code_coach')
+      ->pluck('total', 'code_coach');
+
+    $coaches = $coachEmployees->map(fn ($coach) => [
+      'employee' => $coach,
+      'profile' => $profiles->get($coach->code),
+      'activeClients' => (int) ($activeCounts[$coach->code] ?? 0),
+    ]);
 
     $clients = Client::all();
 

@@ -3,7 +3,7 @@
 namespace App\Models\Front;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Front\Client;
 use Carbon\Carbon;
 
@@ -12,7 +12,7 @@ class LineageInBody extends Model {
     return $this->belongsTo(Client::class, 'code', 'code');
   }
   public function addLineages($name, $lineage) {
-    $client = Client::where("code", Cookie::get('login_client'))->first();
+    $client = Auth::guard('client')->user();
     $exists = self::where('code', $client->code)->get();
     $date = strtolower(Carbon::now('Africa/Cairo')->format('F'));
     $months = [

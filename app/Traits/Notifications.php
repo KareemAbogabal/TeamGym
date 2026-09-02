@@ -78,13 +78,15 @@ trait Notifications {
     return $iconName ? ($icons[$iconName] ?? null) : null;
   }
   public function notificationSystem($state) {
-    $client = Client::where('code', Cookie::get('login_client'))->with([
+    $authClient = Auth::guard('client')->user();
+    $clientCode = $authClient ? $authClient->code : Cookie::get('login_client');
+    $client = $clientCode ? Client::where('code', $clientCode)->with([
       'payment' => function ($q) {
         $q->whereColumn('amount', '>', 'paid');
       },
       'activities',
       'settings'
-    ])->first();
+    ])->first() : null;
     $employeeCode = Auth::guard('employee')->user();
     if ($employeeCode) {
       $employee = Employee::where("code", $employeeCode->code)->with("setting")->first();
@@ -94,10 +96,16 @@ trait Notifications {
     $month = Carbon::now('Africa/Cairo')->format('F');
     $rand = rand(100000, time());
     if ($client) {
-      foreach ($client->payment as $p) {
+      $paymentList = $client->payment->values();
+      $supplementCodes = $paymentList->pluck('code_supplements')->filter()->unique();
+      $systemCodes = $paymentList->pluck('code_systems')->filter()->unique();
+      $supplementsMap = Supplement::whereIn('code', $supplementCodes)->get()->keyBy('code');
+      $systemsMap = System::whereIn('code', $systemCodes)->get()->keyBy('code');
+
+      foreach ($paymentList as $p) {
         if ($p->payday == $today) {
-          $getSupplement = Supplement::where("code", $p->code_supplements)->first();
-          $getSystem = System::where("code", $p->code_systems)->first();
+          $getSupplement = $supplementsMap->get($p->code_supplements);
+          $getSystem = $systemsMap->get($p->code_systems);
           $notification = new Notification();
           $notification->code = rand(100000, time());
           $notification->code_client = $client->code;
@@ -244,11 +252,14 @@ trait Notifications {
       };
     };
     if ($state == "client") {
+      if (!$client || !$client->settings) {
+        return collect();
+      }
       if ($client->settings->payment_date == true) {
-        $notifications = Notification::where('code_client', Cookie::get('login_client'))->get();
+        $notifications = Notification::where('code_client', $client->code)->get();
         if ($notifications == null) return null;
       } else if ($client->settings->payment_date == false) {
-        $notifications = Notification::where('code_client', Cookie::get('login_client'))->whereNot("type", "supplement")->whereNot("type", "system")->get();
+        $notifications = Notification::where('code_client', $client->code)->whereNot("type", "supplement")->whereNot("type", "system")->get();
         if ($notifications == null) return null;
       };
     } else {

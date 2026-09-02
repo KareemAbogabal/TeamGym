@@ -1,57 +1,53 @@
-let forms = document.querySelectorAll("form");
-let switchCard = document.querySelector(".card");
-let switchCardImg = switchCard.querySelector("img");
-let switchCardh1 = switchCard.querySelector("h1");
-let switchCardp = switchCard.querySelector("p");
-let switchButton = document.querySelector(".switch");
-let switchButtonP = switchButton.querySelector("p");
+let card = document.querySelector("main .card");
+let switchBtn = document.querySelector("main .switch");
+let signupForm = document.querySelector(".panel-signup");
+let loginForm = document.querySelector(".panel-login");
 let forget = document.querySelector(".forget");
+let overlayForms = Array.from(document.querySelectorAll(".overlay-form"));
 
-function getCookie(name) {
-  let match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-  return match ? match[2] : null;
+function resetOverlays() {
+  overlayForms.forEach((f) => f.classList.add("hidden"));
 }
 
-function showForm(index) {
-  forms.forEach((f, i) => {
-    if (i === index) {
-      f.classList.remove("hidden");
-    } else {
-      f.classList.add("hidden");
-    }
-  });
-  if (index !== 0 && index !== 2) {
-    switchCard.classList.add("hidden");
+function showActivePanel() {
+  if (card.classList.contains("show-sigin-up")) {
+    signupForm.classList.remove("hidden");
+    loginForm.classList.add("hidden");
   } else {
-    switchCard.classList.remove("hidden");
+    loginForm.classList.remove("hidden");
+    signupForm.classList.add("hidden");
   }
 }
 
-let temporary = getCookie("temporary");
-let verified = getCookie("verified");
-
-if (temporary) {
-  showForm(3);
-} else if (verified) {
-  showForm(4);
+function hidePanels() {
+  signupForm.classList.add("hidden");
+  loginForm.classList.add("hidden");
 }
 
-forget.onclick = () => {
-  showForm(1);
-};
+if (switchBtn) {
+  switchBtn.addEventListener("click", () => {
+    card.classList.toggle("show-sigin-up");
+    resetOverlays();
+    card.classList.remove("hidden");
+    showActivePanel();
+  });
+}
 
-switchButton.addEventListener("click", () => {
-  switchCard.classList.toggle("show-sigin-up");
-  if (switchCard.classList.contains("show-sigin-up")) {
-    switchCardImg.src = imgSiginUp;
-    switchCardh1.innerHTML = h1SiginUp;
-    switchCardp.innerHTML = pSiginUp;
-    switchButtonP.innerHTML = btnLogin;
-  } else {
-    switchCardImg.src = imgLogin;
-    switchCardh1.innerHTML = h1Login;
-    switchCardp.innerHTML = pLogin;
-    switchButtonP.innerHTML = btnSiginUp;
+if (forget) {
+  forget.onclick = () => {
+    hidePanels();
+    card.classList.add("hidden");
+    overlayForms.forEach((f, i) => {
+      f.classList.toggle("hidden", i !== 0);
+    });
+  };
+}
+
+document.querySelectorAll(".overlay-form .form-back").forEach((btn) => {
+  btn.onclick = () => {
+    resetOverlays();
+    card.classList.remove("hidden");
+    showActivePanel();
   };
 });
 
@@ -80,7 +76,7 @@ inputs.forEach(input => {
   });
 });
 
-let resetForm = forms[4];
+let resetForm = overlayForms[2];
 if (resetForm) {
   resetForm.addEventListener("submit", (e) => {
     let password = resetForm.querySelector('input[name="password"]');

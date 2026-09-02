@@ -10,7 +10,6 @@ class LoginCompanyRequest extends FormRequest {
     }
     public function rules(): array {
         return [
-            'fname' => ['required', 'string'],
             'email' => ['required', 'email'],
             'password' => ['required'],
         ];

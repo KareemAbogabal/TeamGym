@@ -583,7 +583,7 @@ class Records extends Controller {
     date_default_timezone_set("Africa/Cairo");
     $d = date_create();
     $time = date_format($d, "Y-m-j_g-i_A");
-    $data = ["userName" => "$signUp->fname $signUp->lname", 'name' => "$signUp->fname", 'code' => "$signUp->code", 'time' => "$time", "phone" => "$signUp->phone", 'password' => "$password"];
+    $data = ["userName" => "$signUp->fname $signUp->lname", 'name' => "$signUp->fname", 'code' => "$signUp->code", 'time' => "$time", "phone" => "$signUp->phone"];
     Mail::send('Mail.pageMail', $data, function ($message) use ($email) {
       $message->embed(public_path('images/header/Team-Gym.png'));
       $message->to($email)->subject('Sign up in Team Gym');

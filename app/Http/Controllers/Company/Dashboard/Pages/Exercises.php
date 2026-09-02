@@ -240,22 +240,25 @@ class Exercises extends Controller {
   }
   public function updateCoulmn(Request $request) {
     $request->validate([
-      'file' => ['required', "file"],
+      'file' => ['required', "file", 'mimes:png,jpg,jpeg,webp,mp4,webm,mov,avi,ogg', 'max:15360'],
       'id' => ['required'],
       'state' => ['required', 'in:img,video'],
     ]);
     $file = $request->file('file');
     $id = $request->input('id');
     $state = $request->input('state');
+    if (in_array(strtolower((string) $file->getClientOriginalExtension()), ['php', 'phtml', 'phar'], true)) {
+      notifyError('Invalid file type.');
+      return redirect()->back();
+    };
     $attachments = ActivityAttachments::find($id);
-    $attachmentsAll = ActivityAttachments::all();
-    $oldImg = $attachments->img;
-    $oldVideo = $attachments->video;
     if (!$attachments) {
       Log::warning('updateCoulmn: attachments not found', ['id' => $id]);
       notifyError('attachments not found.');
       return redirect()->back();
     };
+    $oldImg = $attachments->img;
+    $oldVideo = $attachments->video;
     $element = ActivityElements::find($attachments->code);
     if (!$element) {
       Log::warning('updateCoulmn: element not found for attachment', ['attachment_id' => $id, 'element_code' => $attachments->code]);
@@ -266,7 +269,7 @@ class Exercises extends Controller {
     $filesExercises = FilesExercises::where('name', $name)->first();
     try {
       if ($state === "img") {
-        $oldPath = $attachments->img ? public_path($attachments->img) : null;
+        $oldPath = $oldImg ? public_path($oldImg) : null;
         $dir = public_path("images/exercises/{$name}");
         if ($oldPath && File::exists($oldPath)) {
           File::delete($oldPath);
@@ -274,7 +277,7 @@ class Exercises extends Controller {
         if (!File::exists($dir)) {
           File::makeDirectory($dir, 0755, true);
         };
-        $imgName = time() . '_' . $file->getClientOriginalName();
+        $imgName = time() . '_' . bin2hex(random_bytes(6)) . '.' . $file->getClientOriginalExtension();
         $file->move($dir, $imgName);
         $newRel = "images/exercises/{$name}/{$imgName}";
         $attachments->img = $newRel;
@@ -285,7 +288,7 @@ class Exercises extends Controller {
           $filesExercises->save();
         };
       } else {
-        $oldPath = $attachments->video ? public_path($attachments->video) : null;
+        $oldPath = $oldVideo ? public_path($oldVideo) : null;
         $dir = public_path("video/exercises/{$name}");
         if ($oldPath && File::exists($oldPath)) {
           File::delete($oldPath);
@@ -293,7 +296,7 @@ class Exercises extends Controller {
         if (!File::exists($dir)) {
           File::makeDirectory($dir, 0755, true);
         };
-        $videoName = time() . '_' . $file->getClientOriginalName();
+        $videoName = time() . '_' . bin2hex(random_bytes(6)) . '.' . $file->getClientOriginalExtension();
         $file->move($dir, $videoName);
         $newRel = "video/exercises/{$name}/{$videoName}";
         $attachments->video = $newRel;
@@ -310,7 +313,6 @@ class Exercises extends Controller {
       Log::error('updateCoulmn exception', [
         'message' => $e->getMessage(),
         'trace' => $e->getTraceAsString(),
-        'input' => $request->all(),
         'attachment_id' => $id,
       ]);
       notifyError('حدث خطأ أثناء معالجة الملف. راجع السجل.');
@@ -327,18 +329,14 @@ class Exercises extends Controller {
     if ($state == "main") {
       $activity = Activity::find($id);
       if ($activity) {
-        // $dirImg = public_path("images/exercises/{$activity->id}");
-        // if (File::exists($dirImg)) {
-        //   File::deleteDirectory($dirImg);
-        // };
-        // $dirVideo = public_path("video/exercises/{$activity->id}");
-        // if (File::exists($dirVideo)) {
-        //   File::deleteDirectory($dirVideo);
-        // };
         $activity->delete();
       };
     } else {
       $element = ActivityElements::find($id);
+      if (!$element) {
+        notifyError('element not found.');
+        return redirect()->route("exercise");
+      };
       $activity = Activity::where("code_attachments", $element->code_activities)->first();
       $attachment = ActivityAttachments::where('code', $element->id)->first();
       $attachmentsCount = ActivityElements::all();

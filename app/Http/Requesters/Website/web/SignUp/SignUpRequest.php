@@ -14,7 +14,7 @@ class SignUpRequest extends FormRequest {
             "fname" => ["required", "string"],
             "phone" => ["required", "numeric", "digits:11"],
             "email" => ["nullable", "email"],
-            "password" => ["required", "min:5"],
+            "password" => ["required", "min:8"],
         ];
     }
 }

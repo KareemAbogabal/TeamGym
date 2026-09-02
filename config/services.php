@@ -37,4 +37,10 @@ return [
     'facebook' => [
         'graph_version' => env('FB_GRAPH_VERSION', 'v24.0'),
     ],
+
+    'security' => [
+        // Send Strict-Transport-Security even when the request scheme is not
+        // detected as secure (e.g. behind some proxies). Enable only on HTTPS.
+        'hsts' => env('SECURITY_HSTS', false),
+    ],
 ];

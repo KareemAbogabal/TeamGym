@@ -20,7 +20,7 @@ trait IncomeStatements {
   }
   public function stateIncomeStatement($type) {
     $name = mb_strtolower($type);
-    $incomeStatementCountType = IncomeStatement::whereRaw('LOWER(type) = ?', "$name")->get();
+    $currentAmounts = IncomeStatement::whereRaw('LOWER(type) = ?', "$name")->pluck('amount');
     $max = 20000;
     $toFloatSafe = function ($v) {
       if ($v === null) return 0.0;
@@ -34,30 +34,16 @@ trait IncomeStatements {
     $totalExpenses = $expensesAmounts->reduce(fn($carry, $item) => $carry + $toFloatSafe($item), 0.0);
     $revenuesAmounts = IncomeStatement::where('type', 'Revenues')->pluck('amount');
     $totalRevenues = $revenuesAmounts->reduce(fn($carry, $item) => $carry + $toFloatSafe($item), 0.0);
-    $totalAll = $totalExpenses + $totalRevenues;
     $expensesPct = $max > 0 ? round(($totalExpenses / $max) * 100, 2) : 0;
     $revenuesPct = $max > 0 ? round(($totalRevenues / $max) * 100, 2) : 0;
-    $totalAmount = 0;
     $lineage = 0;
     $state = 0;
+    $totalAmount = $currentAmounts->reduce(fn($carry, $item) => $carry + $item, 0);
     if ($type == "revenues") {
-      $incomeStatementCount = IncomeStatement::whereRaw('LOWER(type) = ?', "expenses")->get();
-      $incomeStatementCountInput = IncomeStatement::whereRaw('LOWER(type) = ?', "input")->get();
-      $expenses = 0;
-      $input = 0;
-      $total = 0;
-      foreach ($incomeStatementCountType as $i) {
-        $totalAmount += $i->amount;
-      };
-      foreach ($incomeStatementCount as $i) {
-        $expenses += $i->amount;
-      };
-      // foreach ($incomeStatementCountInput as $i) {
-      //   $input += $i->amount;
-      // };
-      // $totalAmount = $total - ($expenses - $input);
+      $expensesSum = IncomeStatement::whereRaw('LOWER(type) = ?', "expenses")->pluck('amount')
+        ->reduce(fn($carry, $item) => $carry + $item, 0);
       $lineage = $revenuesPct;
-      if ($totalAmount > $expenses) {
+      if ($totalAmount > $expensesSum) {
         $state = 1;
       };
       return [
@@ -66,16 +52,10 @@ trait IncomeStatements {
         "state" => $state,
       ];
     } else {
-      $incomeStatementCount = IncomeStatement::whereRaw('LOWER(type) = ?', "revenues")->get();
-      $revenues = 0;
-      foreach ($incomeStatementCount as $i) {
-        $revenues += $i->amount;
-      };
-      foreach ($incomeStatementCountType as $i) {
-        $totalAmount += $i->amount;
-      };
+      $revenuesSum = IncomeStatement::whereRaw('LOWER(type) = ?', "revenues")->pluck('amount')
+        ->reduce(fn($carry, $item) => $carry + $item, 0);
       $lineage = $expensesPct;
-      if ($totalAmount > $revenues) {
+      if ($totalAmount > $revenuesSum) {
         $state = 1;
       };
       return [

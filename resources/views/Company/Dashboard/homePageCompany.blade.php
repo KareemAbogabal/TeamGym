@@ -7,6 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="google" content="notranslate">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="description" content="{{ __('messages.meta-description-dashboard') }}">
     <link rel="icon" href="{{ asset('images/header/Team-Gym.png') }}">
     <link rel="stylesheet" href="{{ asset('css/table.css') }}">
     <link rel="stylesheet" href="{{ asset('css/Company/pages/homePageCompany.css') }}">

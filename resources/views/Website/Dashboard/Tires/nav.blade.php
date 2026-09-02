@@ -2,8 +2,8 @@
   <div class="img-and-menu">
     <img src="{{asset("images/header/Team-Gym.png")}}" alt="No Img Logo">
     <div class="menu">
-      <label class="menu-label">
-        <input type="checkbox" />
+      <label class="menu-label" aria-label="{{ __('messages.menu') }}">
+        <input type="checkbox" name="menu-toggle" />
         <span class="bar bar-1"></span>
         <span class="bar bar-2"></span>
         <span class="bar bar-3"></span>
@@ -12,7 +12,7 @@
   </div>
   <form action="" method="post" class="form-search">
     <input type="text" class="search"placeholder="{{__('messages.search-thing')}}">
-    <button type="submit">
+    <button type="submit" aria-label="{{ __('messages.search') }}">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
         <path fill="var(--colorAverage)" d="M10 4a7 7 0 1 0 4.95 11.95l4.5 4.5a1 1 0 0 0 1.42-1.42l-4.5-4.5A7 7 0 0 0 10 4zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/>
       </svg>
@@ -130,7 +130,7 @@
         </h1>
         <p>{{$client->category}}</p>
       </div>
-      <button type="button" class="option-btn">
+      <button type="button" class="option-btn" aria-haspopup="true" aria-expanded="false" aria-label="{{ __('messages.menu') }}">
         <svg width="40" height="40" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="32" cy="16" r="4" fill="rgb(116, 116, 116)" />
           <circle cx="32" cy="32" r="4" fill="rgb(116, 116, 116)" />
@@ -138,7 +138,7 @@
         </svg>
       </button>
       <div class="options">
-        <button type="button"><i class="fa-solid fa-credit-card"></i></button>
+        <button type="button" aria-label="{{ __('messages.payments') }}"><i class="fa-solid fa-credit-card"></i></button>
         <button type="button" class="coach-request-option" data-follow="coach-request" aria-label="{{ __('messages.request') }}"><i class="fa-solid fa-dumbbell"></i></button>
       </div>
     </div>

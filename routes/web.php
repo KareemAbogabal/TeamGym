@@ -52,15 +52,15 @@ Route::controller(WelcomeController::class)->group(function () {
 
 Route::controller(LoginController::class)->group(function () {
   Route::get('/login-page', 'loginPage')->name("loginPage");
-  Route::post('/sign-up', 'signUp')->name("signUp");
-  Route::post('/login-in', 'login')->name("client.login");
-  Route::post('/forget', 'forget')->name("client.forget")->middleware('throttle:5,1');
-  Route::post('/verify-code', 'verifyCode')->name("client.verifyCode")->middleware('throttle:5,1');
-  Route::post('/reset-password', 'resetPassword')->name("client.resetPassword")->middleware('throttle:5,1');
+  Route::post('/sign-up', 'signUp')->name("signUp")->middleware('throttle:signup');
+  Route::post('/login-in', 'login')->name("client.login")->middleware('throttle:client-login');
+  Route::post('/forget', 'forget')->name("client.forget")->middleware('throttle:password-reset');
+  Route::post('/verify-code', 'verifyCode')->name("client.verifyCode")->middleware('throttle:password-reset');
+  Route::post('/reset-password', 'resetPassword')->name("client.resetPassword")->middleware('throttle:password-reset');
 });
 
 Route::controller(QrLoginController::class)->group(function () {
-  Route::post('/qr-login', 'login')->name('qr.login');
+  Route::post('/qr-login', 'login')->name('qr.login')->middleware('throttle:qr-login');
 });
 
 Route::controller(ArticleController::class)->group(function () {
@@ -86,9 +86,9 @@ Route::controller(PackagesController::class)->group(function () {
 });
 
 Route::controller(CustomerRequestsController::class)->group(function () {
-  Route::post('/add-request-product', 'addRequestProduct')->name("addRequestProduct");
-  Route::post('/add-request-customer', 'addRequestCustomer')->name("addRequestCustomer");
-  Route::post('/delete-request-customer', 'deleteCustomerRequests')->name("deleteCustomerRequests");
+  Route::post('/add-request-product', 'addRequestProduct')->name("addRequestProduct")->middleware('throttle:request-create');
+  Route::post('/add-request-customer', 'addRequestCustomer')->name("addRequestCustomer")->middleware('throttle:request-create');
+  Route::post('/delete-request-customer', 'deleteCustomerRequests')->name("deleteCustomerRequests")->middleware('throttle:request-create');
 });
 
 Route::middleware(CustomerVerification::class)->group(function () {
@@ -146,13 +146,15 @@ Route::middleware(CustomerVerification::class)->group(function () {
 
 Route::controller(LoginCompany::class)->group(function () {
   Route::get('/login-company', 'index')->name('loginCompany');
-  Route::post('/login', 'login')->name('login');
-  Route::post('/forget-pass', 'forget')->name('company.forget');
+  Route::post('/login', 'login')->name('login')->middleware('throttle:company-login');
+  Route::post('/forget-pass', 'forget')->name('company.forget')->middleware('throttle:password-reset');
 });
 
 Route::middleware(AuthenticatedToCompany::class)->group(function () {
-  Route::controller(Employees::class)->group(function () {
-    Route::post('/add-employees', 'addEmployee')->name('addEmployee');
+  Route::middleware(CheckAdmin::class)->group(function () {
+    Route::controller(Employees::class)->group(function () {
+      Route::post('/add-employees', 'addEmployee')->name('addEmployee');
+    });
   });
 
   Route::controller(DashboardCompany::class)->group(function () {
@@ -211,27 +213,29 @@ Route::middleware(AuthenticatedToCompany::class)->group(function () {
     Route::post('/add-exercises', 'addExercises')->name('addExercises');
     Route::post('/add-foods', 'addFoods')->name('addFoods');
     Route::post('/update-coulmn', 'updateCoulmn')->name('updateCoulmn');
-    Route::post('/destroy-exercises', 'destroy')->name('destroyExercises');
+    Route::middleware(CheckAdmin::class)->group(function () {
+      Route::post('/destroy-exercises', 'destroy')->name('destroyExercises');
+    });
     Route::post('/check-shape', 'checkShape')->name('checkShape');
     Route::post('/get-activity-customer', 'getActivityCustomer')->name('getActivityCustomer');
   });
 
-  Route::controller(Publications::class)->group(function () {
-    Route::get('/publications', 'index')->name('publications');
-    Route::post('/add-system', 'addSystem')->name('addSystem');
-    Route::post('/update-system', 'updateSystem')->name('updateSystem');
-    Route::post('/remove-system', 'removeSystem')->name('removeSystem');
-    Route::post('/add-supplement', 'addSupplement')->name('addSupplement');
-    Route::post('/add-snack', 'addSnack')->name('addSnack');
-    Route::post('/update-supplement', 'updateSupplement')->name('updateSupplement');
-    Route::post('/destroy-supplements', 'destroySupplements')->name('destroySupplements');
-    Route::get('/notification-discount', 'notificationDiscount')->name('notificationDiscount');
-  });
+  Route::middleware(CheckAdmin::class)->group(function () {
+    Route::controller(Publications::class)->group(function () {
+      Route::get('/publications', 'index')->name('publications');
+      Route::post('/add-system', 'addSystem')->name('addSystem');
+      Route::post('/update-system', 'updateSystem')->name('updateSystem');
+      Route::post('/remove-system', 'removeSystem')->name('removeSystem');
+      Route::post('/update-supplement', 'updateSupplement')->name('updateSupplement');
+      Route::post('/destroy-supplements', 'destroySupplements')->name('destroySupplements');
+      Route::get('/notification-discount', 'notificationDiscount')->name('notificationDiscount');
+    });
 
-  Route::controller(ImportProduct::class)->group(function () {
-    Route::get('/imports', 'index')->name('imports');
-    Route::post('/add-product', 'addProduct')->name('addProduct');
-    Route::post('/destroy-supplement', 'destroySupplementsAndImports')->name('destroySupplementsAndImports');
+    Route::controller(ImportProduct::class)->group(function () {
+      Route::get('/imports', 'index')->name('imports');
+      Route::post('/add-product', 'addProduct')->name('addProduct');
+      Route::post('/destroy-supplement', 'destroySupplementsAndImports')->name('destroySupplementsAndImports');
+    });
   });
 
   Route::controller(SettingCompanys::class)->group(function () {
@@ -248,19 +252,21 @@ Route::middleware(AuthenticatedToCompany::class)->group(function () {
   Route::controller(Customers::class)->group(function () {
     Route::get('/customers', 'index')->name('customers');
     Route::post('/customers/get-all-data-client', 'getAllDataClient')->name('customers.getAllDataClient');
-    Route::post('/customers/update-client', 'updateClient')->name('customers.updateClient');
-    Route::post('/customers/destroy', 'destroy')->name('customers.destroy');
-    Route::post('/customers/regenerate-barcode', 'regenerateBarcode')->name('customers.regenerateBarcode');
-    Route::post('/customers/revoke-barcode', 'revokeBarcode')->name('customers.revokeBarcode');
-    Route::get('/customers/print-barcode/{code}', 'printBarcode')->name('customers.printBarcode');
+    Route::middleware(CheckAdmin::class)->group(function () {
+      Route::post('/customers/update-client', 'updateClient')->name('customers.updateClient');
+      Route::post('/customers/destroy', 'destroy')->name('customers.destroy');
+      Route::post('/customers/regenerate-barcode', 'regenerateBarcode')->name('customers.regenerateBarcode');
+      Route::post('/customers/revoke-barcode', 'revokeBarcode')->name('customers.revokeBarcode');
+      Route::get('/customers/print-barcode/{code}', 'printBarcode')->name('customers.printBarcode');
+    });
   });
 
   Route::controller(ClientQrScan::class)->group(function () {
     Route::get('/qr-scan', 'index')->name('qrScan');
-    Route::post('/qr-scan/scan', 'scan')->name('qrScan.scan');
-    Route::post('/qr-scan/record', 'record')->name('qrScan.record');
-    Route::post('/qr-scan/record-code', 'recordByCode')->name('qrScan.recordCode');
-    Route::post('/qr-scan/record-barcode', 'recordBarcode')->name('qrScan.recordBarcode');
+    Route::post('/qr-scan/scan', 'scan')->name('qrScan.scan')->middleware('throttle:staff-scan');
+    Route::post('/qr-scan/record', 'record')->name('qrScan.record')->middleware('throttle:staff-scan');
+    Route::post('/qr-scan/record-code', 'recordByCode')->name('qrScan.recordCode')->middleware('throttle:staff-scan');
+    Route::post('/qr-scan/record-barcode', 'recordBarcode')->name('qrScan.recordBarcode')->middleware('throttle:staff-scan');
   });
 
   Route::controller(LogOut::class)->group(function () {
@@ -277,5 +283,5 @@ Route::middleware(AuthenticatedToCompany::class)->group(function () {
 // });
 
 Route::controller(Records::class)->group(function () {
-  Route::match(['get', 'post'], '/auto-record', 'autoRecord')->name('autoRecord');
+  Route::post('/auto-record', 'autoRecord')->name('autoRecord')->middleware(CustomerVerification::class)->middleware('throttle:staff-scan');
 });

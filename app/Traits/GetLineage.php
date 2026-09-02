@@ -1,17 +1,20 @@
 <?php
 
 namespace App\Traits;
-use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Front\Client;
 use App\Models\Front\LineageInBody;
 use Carbon\Carbon;
 
 trait GetLineage {
+  public function clientCode(): ?string {
+    return Auth::guard('client')->user()?->code;
+  }
   public function get($ModelClass, $name, $state = true) {
     $lineage = null;
     $nameLineages = mb_strtolower($name);
     if ($state) {
-      $item = $ModelClass::where("code", Cookie::get('login_client'))->where("name", "$name")->first();
+      $item = $ModelClass::where("code", $this->clientCode())->where("name", "$name")->first();
     } else {
       $item = $ModelClass::whereRaw('LOWER(name) = ?', ["$nameLineages"])->first();
     };
@@ -35,7 +38,7 @@ trait GetLineage {
     $lineage = [];
     $nameLineages = mb_strtolower($name);
     if ($state) {
-      $item = $ModelClass::where("code", Cookie::get('login_client'))->where("name", "$name")->first();
+      $item = $ModelClass::where("code", $this->clientCode())->where("name", "$name")->first();
     } else {
       $item = $ModelClass::whereRaw('LOWER(name) = ?', ["$nameLineages"])->first();
     };

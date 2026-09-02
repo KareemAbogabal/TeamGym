@@ -54,13 +54,28 @@ class Customers extends Controller {
     ];
     $dataLineage = [];
     $dataValues = [];
+    $smmArrAll = $this->getArray(LineageInBody::class, "SMM", false);
+    $fatArrAll = $this->getArray(LineageInBody::class, "fat_mass", false);
+    $latestRows = [];
+    if ($clients->isNotEmpty()) {
+      $rows = LineageInBody::whereIn('code', $clients->pluck('code'))->get();
+      foreach ($rows as $r) {
+        $key = $r->code . '|' . $r->name;
+        $prev = $latestRows[$key] ?? null;
+        $rTime = $r->created_at ? $r->created_at->getTimestamp() : 0;
+        $prevTime = $prev && $prev->created_at ? $prev->created_at->getTimestamp() : 0;
+        if (!$prev || $rTime > $prevTime) {
+          $latestRows[$key] = $r;
+        };
+      };
+    };
     foreach ($clients as $c) {
       foreach ($metrics as $metric) {
-        $row = LineageInBody::where('code', $c->code)->where('name', $metric)->orderByDesc('created_at')->first();
+        $row = $latestRows[$c->code . '|' . $metric] ?? null;
         $value = 0;
         if ($row) {
-          $dataLineage[$c->code]['SMM'] = $this->getArray(LineageInBody::class, "SMM", false);
-          $dataLineage[$c->code]['fat_mass'] = $this->getArray(LineageInBody::class, "fat_mass", false);
+          $dataLineage[$c->code]['SMM'] = $smmArrAll;
+          $dataLineage[$c->code]['fat_mass'] = $fatArrAll;
           foreach (array_reverse($months) as $m) {
             if (!is_null($row->{$m}) && $row->{$m} !== 0 && $row->{$m} !== '0') {
               $value = $row->{$m};

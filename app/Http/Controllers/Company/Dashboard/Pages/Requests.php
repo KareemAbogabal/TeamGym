@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
@@ -34,6 +35,7 @@ class Requests extends Controller {
     return view('Company.Dashboard.Pages.requests', compact("requestsPayment", "supplements", "customerRequests"));
   }
   public function addPayments(Request $request) {
+    return DB::transaction(function () use ($request) {
     $request->validate([
       'fname' => ['required', 'string'],
       'lname' => ['required', 'string'],
@@ -50,7 +52,7 @@ class Requests extends Controller {
     $rand = rand(100000, time());
     $action = $request->input('action');
     $employee = Auth::guard('employee')->user();
-    $requestsPayment = RequestsPayment::where("code", $request->input("code_request_payment"))->first();
+    $requestsPayment = RequestsPayment::where("code", $request->input("code_request_payment"))->lockForUpdate()->first();
     if (!$requestsPayment) {
       return back()->withErrors(['error' => 'Request payment not found']);
     };
@@ -118,8 +120,10 @@ class Requests extends Controller {
     $history->recordHistory("$employee->fname $employee->lname", null, $employee->code, "acceptance", $request->input("amount"), $request->input("order_name"), "$employee->fname $employee->lname");
     notifySuccess(__('messages.updated-successfully'));
     return back();
+    });
   }
   public function customerRequests(Request $request) {
+    return DB::transaction(function () use ($request) {
     $request->validate([
       'id_request' => ['required', 'integer', 'exists:customer_requests,id'],
       'code_order' => ['required', 'string'],
@@ -136,7 +140,7 @@ class Requests extends Controller {
     $action = $request->input('action');
     $employee = Auth::guard('employee')->user();
     $client = Client::whereRaw('LOWER(fname) = ?', [mb_strtolower($request->input("fname"))])->whereRaw('LOWER(lname) = ?', [mb_strtolower($request->input("lname"))])->first();
-    $customerRequests = CustomerRequests::find($request->input("id_request"));
+    $customerRequests = CustomerRequests::where('id', $request->input("id_request"))->lockForUpdate()->first();
     if (!$customerRequests) {
       return back()->withErrors(['error' => 'Customer request not found']);
     };
@@ -221,7 +225,7 @@ class Requests extends Controller {
           date_default_timezone_set("Africa/Cairo");
           $d = date_create();
           $time = date_format($d, "Y-m-j_g-i_A");
-          $data = ["userName" => "$e->fname $e->lname", 'name' => "$clientNew->fname $clientNew->lname", 'code' => "$clientNew->code", 'time' => "$time", "phone" => "$clientNew->phone", 'password' => "$password"];
+          $data = ["userName" => "$e->fname $e->lname", 'name' => "$clientNew->fname $clientNew->lname", 'code' => "$clientNew->code", 'time' => "$time", "phone" => "$clientNew->phone"];
           Mail::send('Mail.pageMail', $data, function ($message) use ($e) {
             $message->embed(public_path('images/header/Team-Gym.png'));
             $message->to($e->email)->subject('Sign up in Team Gym');
@@ -295,5 +299,6 @@ class Requests extends Controller {
     // $CustomerRequests->delete();
     notifySuccess(__('messages.updated-successfully'));
     return back();
+    });
   }
 }

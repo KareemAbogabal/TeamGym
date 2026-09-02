@@ -242,6 +242,27 @@ main form button[type="submit"]:active {
   -o-transition: 100ms;
 }
 
+.login-error,
+.reset-note {
+  margin: 10px 0;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.login-error {
+  color: #ff8f8f;
+  border: 1px solid rgba(255, 96, 96, 0.45);
+  background: rgba(255, 80, 80, 0.08);
+}
+
+.reset-note {
+  color: #8fd3ff;
+  border: 1px solid rgba(96, 180, 255, 0.45);
+  background: rgba(80, 160, 255, 0.08);
+}
+
 @media (max-width: 1115px) {
   body {
     overflow: auto;
