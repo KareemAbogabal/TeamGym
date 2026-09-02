@@ -120,11 +120,12 @@ mark {
   content: "";
   position: absolute;
   bottom: clamp(-20px, -2vw, -27px);
-  width: clamp(200px, 30vw, 450px);
+  width: clamp(350px, 50vw, 850px);
   height: clamp(30px, 4.5vw, 58px);
-  background-color: rgb(45, 45, 45);
-  filter: blur(13px);
-  -webkit-filter: blur(13px);
+  background-color: rgb(63, 63, 63);
+  opacity: 2;
+  filter: blur(9px);
+  -webkit-filter: blur(9px);
   z-index: 3;
 }
 
